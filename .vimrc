@@ -36,7 +36,7 @@ set backupdir=~/.vim/backup
 set directory=~/.vim/backup
 
 set foldmethod=indent
-set foldlevelstart=0
+set foldlevelstart=99
 
 " Set the Tab Label
 set guitablabel=\[%N\]%M\ %t
