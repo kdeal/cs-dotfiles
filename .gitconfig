@@ -1,0 +1,6 @@
+[user]
+    name = Kyle Deal
+    email = kdeal@kyledeal.com
+
+[include]
+   path = ~/.config/git/common.gitconfig

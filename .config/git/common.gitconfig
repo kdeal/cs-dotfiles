@@ -1,0 +1,67 @@
+[apply]
+    whitespace = warn
+
+[bash]
+    showDirtyState = true
+
+[branch]
+    autosetuprebase = always
+
+[blame]
+    date = auto:human
+
+[commit]
+    verbose = true
+
+[core]
+    commitGraph = true
+    excludesfile = ~/.config/git/gitignore
+    whitespace = trailing-space
+
+[diff]
+    indentHeuristic = on
+    compactionHeuristic = on
+    colorMoved = default
+
+[fetch]
+    prune = true
+
+[help]
+    autocorrect = 30
+
+[log]
+    date = auto:human
+
+[push]
+    default = current
+
+[pull]
+    rebase = merges
+
+[rebase]
+    instructionFormat = (%an) %s
+    autoSquash = true
+    autoStash = true
+    stat = true
+
+[rerere]
+    enabled = true
+
+[stash]
+    showPatch = true
+    showStat = true
+
+[status]
+    short = true
+    branch = true
+    showStash = true
+
+[web]
+    browser = copy
+
+[alias]
+    add-staged = "!git add --update $(git diff --cached --name-only)"
+    l = "log -n 25 --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cd) %C(bold blue)<%an>%Creset' --abbrev-commit"
+    commit-message = "log --pretty=%B -n1"
+
+# vim: ft=gitconfig

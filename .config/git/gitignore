@@ -1,0 +1,13 @@
+tags
+tags.*
+.DS_Store
+.cache
+__pycache__/
+/venv
+/node_env
+.ropeproject/
+.env
+.mypy_cache/
+.vscode/
+
+/kd_tmp/
