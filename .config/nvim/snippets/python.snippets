@@ -1,0 +1,13 @@
+snippet dg "Insert debug break point"
+import pudb
+pudb.set_trace()
+endsnippet
+
+snippet mainifmain "Main function with __name__ if block" b
+def main():
+	pass
+
+
+if __name__ == '__main__':
+	main()
+endsnippet
