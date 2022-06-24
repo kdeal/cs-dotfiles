@@ -8,5 +8,4 @@ if status is-interactive
 
     # set vi mode
     fish_vi_key_bindings
-    fish_user_key_bindings
 end
