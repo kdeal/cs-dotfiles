@@ -9,6 +9,10 @@ function cmd_install --description="Install extra commands that I might want"
             if test "$input_hash" = "$file_hash"
                 tar xzf "$tmp_file" -C ~/.cmds/
                 ln -s ~/.cmds/nvim-linux64/bin/nvim ~/.local/bin/
+                # Update abbrs to make edit expand to nvim
+                update_abbrs
+                # Reload editor settings
+                source ~/.config/fish/conf.d/editor.fish
             else
                 echo "Hashes don't match expected: $input_hash, actual: $file_hash"
             end
