@@ -33,7 +33,7 @@ end
 
 vim.opt.termguicolors = true
 vim.g.gruvbox_italic = 1
-vim.cmd('colorscheme gruvbox')
+pcall(vim.cmd, 'colorscheme gruvbox')
 
 -- Make backspacing work like I expect it to
 vim.opt.backspace = {"indent", "eol", "start"}
