@@ -224,5 +224,5 @@ vim.fn.sign_define('DiagnosticSignInfo', {text = 'ℹ', texthl = 'DiagnosticSign
 vim.fn.sign_define('DiagnosticSignHint', {text = '🞇', texthl = 'DiagnosticSignHint', linehl = "",  numhl = "" })
 
 -- Run formatter
-nnoremap("<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", { silent = true })
+nnoremap("<space>f", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", { silent = true })
 vnoremap("<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", { silent=true })
