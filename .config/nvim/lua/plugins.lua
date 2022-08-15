@@ -129,6 +129,23 @@ return require('packer').startup(function()
         config = function() require('dapui_conf') end,
     }
 
+    -- Show tests in a side panel
+    use {
+        "nvim-neotest/neotest",
+        requires = {
+            "nvim-lua/plenary.nvim",
+            "nvim-treesitter/nvim-treesitter",
+            "antoinemadec/FixCursorHold.nvim"
+        },
+        config = function() require('neotest_conf') end,
+    }
+    use {
+        "nvim-neotest/neotest-python",
+        requires = {
+            "nvim-neotest/neotest",
+        }
+    }
+
     -- Automatically set up configuration after cloning packer.nvim
     if packer_bootstrap then
         require('packer').sync()
