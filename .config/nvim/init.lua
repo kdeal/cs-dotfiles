@@ -189,7 +189,6 @@ vim.cmd([[
     augroup vimrcterminal
         autocmd!
         autocmd TermOpen * setlocal nonumber
-        autocmd TermOpen * startinsert
     augroup END
 ]])
 
