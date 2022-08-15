@@ -112,6 +112,23 @@ return require('packer').startup(function()
         config = function() require('treesitter_conf') end,
     }
 
+    -- Debugging things
+    use {
+        'mfussenegger/nvim-dap',
+        config = function() require('dap_conf') end,
+    }
+
+    use {
+        'mfussenegger/nvim-dap-python',
+        requires = {"mfussenegger/nvim-dap"},
+        config = function() require('dap_python_conf') end,
+    }
+    use {
+        "rcarriga/nvim-dap-ui",
+        requires = {"mfussenegger/nvim-dap"},
+        config = function() require('dapui_conf') end,
+    }
+
     -- Automatically set up configuration after cloning packer.nvim
     if packer_bootstrap then
         require('packer').sync()
