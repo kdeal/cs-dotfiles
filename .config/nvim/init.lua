@@ -156,6 +156,7 @@ nnoremap('<leader>ss', ':syntax sync fromstart<CR>', { silent = true })
 -- Basic editing mappings
 noremap('<leader>w', ':w<CR>', { silent = true})
 noremap('<leader>q', ':q<CR>', { silent = true})
+noremap('<leader>Q', ':qall<CR>', { silent = true})
 noremap('<leader>cq', ':cq<CR>', { silent = true})
 noremap('<leader>e', ':e ')
 noremap('<leader>/e', ':ll<CR>')
