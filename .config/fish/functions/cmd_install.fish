@@ -39,6 +39,12 @@ function cmd_install --description="Install extra commands that I might want"
             else
                 echo "Hashes don't match expected"
             end
+        case "debugpy"
+            if command -q "pip"
+                pip install debugpy==1.6.3
+            else
+                echo "Pip unavailable can't install"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
