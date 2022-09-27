@@ -16,6 +16,18 @@ _G.vnoremap = function(key, command, opts)
     vim.api.nvim_set_keymap('v', key, command, opts)
 end
 
+_G.snoremap = function(key, command, opts)
+    opts = opts or {}
+    opts.noremap = true
+    vim.api.nvim_set_keymap('s', key, command, opts)
+end
+
+_G.inoremap = function(key, command, opts)
+    opts = opts or {}
+    opts.noremap = true
+    vim.api.nvim_set_keymap('i', key, command, opts)
+end
+
 _G.tnoremap = function(key, command, opts)
     opts = opts or {}
     opts.noremap = true

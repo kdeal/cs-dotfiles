@@ -94,10 +94,24 @@ return require('packer').startup(function()
     use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
 
     -- Lua completion tool
-    use 'hrsh7th/cmp-nvim-lsp'
-    use 'hrsh7th/cmp-buffer'
-    use 'hrsh7th/cmp-path'
-    use { 'hrsh7th/nvim-cmp', config = function() require('cmp_conf') end }
+    use {
+        'hrsh7th/nvim-cmp',
+        requires = {
+            'hrsh7th/cmp-nvim-lsp',
+            'hrsh7th/cmp-buffer',
+            'hrsh7th/cmp-path',
+            'saadparwaiz1/cmp_luasnip',
+            'L3MON4D3/LuaSnip'
+        },
+        config = function()
+            require('cmp_conf')
+        end,
+    }
+
+    use {
+        'L3MON4D3/LuaSnip',
+        config = function() require('luasnip_conf') end,
+    }
 
     -- Simplifies the Vim ui to help you to focus on writing
     use 'junegunn/goyo.vim'
@@ -135,22 +149,12 @@ return require('packer').startup(function()
         requires = {
             "nvim-lua/plenary.nvim",
             "nvim-treesitter/nvim-treesitter",
-            "antoinemadec/FixCursorHold.nvim"
+            "antoinemadec/FixCursorHold.nvim",
+            -- This isn't really required, but is lang implementations for it
+            "nvim-neotest/neotest-go",
+            "nvim-neotest/neotest-python",
         },
         config = function() require('neotest_conf') end,
-    }
-    use {
-        "nvim-neotest/neotest-python",
-        requires = {
-            "nvim-neotest/neotest",
-        }
-    }
-
-    use {
-        "nvim-neotest/neotest-go",
-        requires = {
-            "nvim-neotest/neotest",
-        }
     }
 
     use {
