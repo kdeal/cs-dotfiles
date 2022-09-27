@@ -3,6 +3,7 @@
 
 [bash]
     showDirtyState = true
+    showUntrackedFiles = true
 
 [branch]
     autosetuprebase = always
