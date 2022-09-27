@@ -3,6 +3,14 @@ require("neotest").setup({
     require("neotest-python")({}),
     require('neotest-go'),
   },
+  icons = {
+    running_animated = {"⠋", "⠙", "⠚", "⠞", "⠖", "⠦", "⠴", "⠲", "⠳", "⠓"},
+    passed = "✔",
+    running = "…",
+    failed = "✖",
+    skipped = "🞅",
+    unknown = "?",
+  },
 })
 
 -- Add background to the gutter icons
