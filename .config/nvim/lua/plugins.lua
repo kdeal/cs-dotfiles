@@ -146,6 +146,14 @@ return require('packer').startup(function()
         }
     }
 
+    use {
+        "lewis6991/gitsigns.nvim",
+        requires = {
+            "nvim-lua/plenary.nvim",
+        },
+        config = function() require('gitsigns_conf') end,
+    }
+
     -- Automatically set up configuration after cloning packer.nvim
     if packer_bootstrap then
         require('packer').sync()
