@@ -147,6 +147,13 @@ return require('packer').startup(function()
     }
 
     use {
+        "nvim-neotest/neotest-go",
+        requires = {
+            "nvim-neotest/neotest",
+        }
+    }
+
+    use {
         "lewis6991/gitsigns.nvim",
         requires = {
             "nvim-lua/plenary.nvim",
