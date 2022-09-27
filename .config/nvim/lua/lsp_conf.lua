@@ -15,7 +15,7 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 
     if client.resolved_capabilities.document_range_formatting then
-        buf_set_option'formatexpr', 'v:lua.vim.lsp.formatexpr')
+        buf_set_option('formatexpr', 'v:lua.vim.lsp.formatexpr')
     end
 end
 
