@@ -13,6 +13,7 @@ function cmd_install --description="Install extra commands that I might want"
     end
     switch $argv[1]
         case "nvim"
+            echo "https://github.com/neovim/neovim/releases/tag/nightly"
             read -l --prompt-str "Enter tar hash: " input_hash
             set -l url "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $input_hash)
