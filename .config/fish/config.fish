@@ -5,6 +5,8 @@ if status is-interactive
     # Capital raw control chars is for colors only
     set -x LESS '--quit-if-one-screen --RAW-CONTROL-CHARS --no-init'
 
+    set -x RIPGREP_CONFIG_PATH "$HOME/.config/ripgreprc"
+
     # set vi mode
     fish_vi_key_bindings
 end
