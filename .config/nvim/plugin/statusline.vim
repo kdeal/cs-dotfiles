@@ -61,3 +61,8 @@ set statusline+=%=%{StatusFiletype()}
 set statusline+=\ %{StatusFugitive()}
 set statusline+=%4*%{LinterStatus()}%2*
 set statusline+=%*\ %l:%c\ %P
+
+set winbar=%2*
+set winbar+=\ %f%h%q
+set winbar+=%3*%{StatusModified()}%2*
+set winbar+=\ %1*%{StatusReadonly()}%2*
