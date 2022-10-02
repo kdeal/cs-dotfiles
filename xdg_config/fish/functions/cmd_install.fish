@@ -15,7 +15,7 @@ function cmd_install --description="Install extra commands that I might want"
         case "nvim"
             set -l nvim_hash "1af27471f76f1b4f7ad6563c863a4a78117f0515e3390ee4d911132970517fa7"
             set -l url "https://github.com/neovim/neovim/releases/download/v0.8.0/nvim-linux64.tar.gz"
-            set -l tmp_file (__cmd_install_checksha_download $url $input_hash)
+            set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C ~/.cmds/
