@@ -11,6 +11,11 @@ function cmd_install --description="Install extra commands that I might want"
             return 1
         end
     end
+
+    set -l CACHE_DIR "$HOME/.cache"
+    set -l BIN_DIR "$HOME/.local/bin"
+    mkdir -p "$CACHE_DIR" "$BIN_DIR"
+
     switch $argv[1]
         case "nvim"
             set -l nvim_hash "1af27471f76f1b4f7ad6563c863a4a78117f0515e3390ee4d911132970517fa7"
@@ -18,8 +23,8 @@ function cmd_install --description="Install extra commands that I might want"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
-                tar xzf "$tmp_file" -C ~/.cmds/
-                ln -s ~/.cmds/nvim-linux64/bin/nvim ~/.local/bin/
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                rsync -a "$CACHE_DIR/nvim-linux64/" ~/.local/
                 # Update abbrs to make edit expand to nvim
                 update_abbrs
                 # Reload editor settings
@@ -32,8 +37,8 @@ function cmd_install --description="Install extra commands that I might want"
             set -l url "https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $rg_hash)
             if test -n "$tmp_file"
-                tar xzf "$tmp_file" -C ~/.cmds/
-                ln -s ~/.cmds/ripgrep-13.0.0-x86_64-unknown-linux-musl/rg ~/.local/bin/
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp "$CACHE_DIR/ripgrep-13.0.0-x86_64-unknown-linux-musl/rg" "$BIN_DIR"
                 # Update abbrs to make grep expand to rg
                 update_abbrs
             else
