@@ -33,9 +33,6 @@ return require('packer').startup(function()
         cmd = { 'Delete', 'Unlink', 'Move', 'Rename', 'Chmod', 'Mkdir', 'SudoWrite', 'SudoEdit' },
     }
 
-    -- Automatically figure out indentation
-    use 'tpope/vim-sleuth'
-
     -- Set the cwd to repo root
     use 'airblade/vim-rooter'
 
