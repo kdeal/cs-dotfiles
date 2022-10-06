@@ -86,7 +86,7 @@ vim.opt.autoread = true
 
 -- Show special things
 vim.opt.list = true
-vim.opt.listchars = { tab = '»·', trail = '·' }
+vim.opt.listchars = { tab = '··»', trail = '·' }
 vim.opt.showbreak = '»»'
 
 -- Indenting
