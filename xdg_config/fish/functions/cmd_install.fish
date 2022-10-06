@@ -50,6 +50,12 @@ function cmd_install --description="Install extra commands that I might want"
             else
                 echo "Pip unavailable can't install"
             end
+        case "gopls"
+            if command -q "go"
+                go install golang.org/x/tools/gopls@latest
+            else
+                echo "Go unavailable can't install"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
