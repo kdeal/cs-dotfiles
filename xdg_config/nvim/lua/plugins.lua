@@ -40,7 +40,7 @@ return require('packer').startup(function()
     use { 'mbbill/undotree', cmd = 'UndotreeToggle' }
 
     -- Show how far indented a line is
-    use 'lukas-reineke/indent-blankline.nvim'
+    use { 'lukas-reineke/indent-blankline.nvim', config = function() require('indent_conf') end }
 
     -- Fuzzy finding all the things
     use { 'junegunn/fzf', run = './install --all --no-zsh --no-bash' }
