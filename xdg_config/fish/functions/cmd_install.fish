@@ -62,6 +62,9 @@ function cmd_install --description="Install extra commands that I might want"
                 virtualenv "$HOME/.local/share/pre-commit/venv"
                 $HOME/.local/share/pre-commit/venv/bin/pip install pre-commit
                 ln -s "$HOME/.local/share/pre-commit/venv/bin/pre-commit" "$BIN_DIR/"
+                if git rev-parse
+                    pre-commit install-hooks
+                end
             else
                 echo "virtualenv unavailable can't install"
             end
