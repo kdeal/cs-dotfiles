@@ -56,6 +56,15 @@ function cmd_install --description="Install extra commands that I might want"
             else
                 echo "Go unavailable can't install"
             end
+        case "pre-commit"
+            if command -q "virtualenv"
+                mkdir -p "$HOME/.local/share/pre-commit"
+                virtualenv "$HOME/.local/share/pre-commit/venv"
+                $HOME/.local/share/pre-commit/venv/bin/pip install pre-commit
+                ln -s "$HOME/.local/share/pre-commit/venv/bin/pre-commit" "$BIN_DIR/"
+            else
+                echo "virtualenv unavailable can't install"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
