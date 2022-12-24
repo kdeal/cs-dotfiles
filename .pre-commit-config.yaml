@@ -1,0 +1,9 @@
+---
+repos:
+  - repo: local
+    hooks:
+      - id: fish_indent
+        name: "fish indent"
+        language: system
+        entry: fish_indent --write
+        types: [fish]
