@@ -20,6 +20,8 @@ null_ls.setup({
         -- Yaml sources
         null_ls.builtins.diagnostics.yamllint,
         -- Markdown sources
-        null_ls.builtins.code_actions.proselint
+        null_ls.builtins.code_actions.proselint,
+        -- Lua sources
+        null_ls.builtins.formatting.stylua,
     },
 })

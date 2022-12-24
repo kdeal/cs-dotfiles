@@ -7,3 +7,7 @@ repos:
         language: system
         entry: fish_indent --write
         types: [fish]
+  - repo: https://github.com/JohnnyMorganz/StyLua
+    rev: v0.15.3
+    hooks:
+      - id: stylua-github
