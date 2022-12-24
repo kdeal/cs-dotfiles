@@ -1,8 +1,8 @@
-local log = require('plenary.log').new {
-    plugin = 'rename_popup',
-    level = 'info',
-}
-local popup = require 'plenary.popup'
+local log = require("plenary.log").new({
+    plugin = "rename_popup",
+    level = "info",
+})
+local popup = require("plenary.popup")
 
 local rename_popup = {}
 
@@ -68,9 +68,9 @@ local function popup_options()
 
         -- Formatting related settings
         -- These characters make the border look nicer
-        borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
-        borderhighlight = 'RenamePopupBackground',
-        highlight = 'RenamePopupBackground',
+        borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+        borderhighlight = "RenamePopupBackground",
+        highlight = "RenamePopupBackground",
         minheight = 1,
         minwidth = 30,
         wrap = false,
@@ -90,13 +90,7 @@ local function configure_window(prompt_win_id)
         '<cmd>lua require("plenary.popup").execute_callback(' .. buf_id .. ")<CR>",
         { noremap = true }
     )
-    vim.api.nvim_buf_set_keymap(
-        buf_id,
-        "n",
-        "<esc>",
-        "<cmd>quit<CR>",
-        { noremap = true }
-    )
+    vim.api.nvim_buf_set_keymap(buf_id, "n", "<esc>", "<cmd>quit<CR>", { noremap = true })
 end
 
 function rename_popup.rename()

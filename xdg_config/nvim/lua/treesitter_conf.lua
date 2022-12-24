@@ -1,4 +1,4 @@
-require'nvim-treesitter.configs'.setup {
+require("nvim-treesitter.configs").setup({
     ensure_installed = {
         "comment",
         "css",
@@ -23,6 +23,6 @@ require'nvim-treesitter.configs'.setup {
     },
     indent = {
         enable = true,
-        disable = {'python', 'javascript'},
+        disable = { "python", "javascript" },
     },
-}
+})

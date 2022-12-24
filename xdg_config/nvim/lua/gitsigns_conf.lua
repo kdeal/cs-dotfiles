@@ -1,4 +1,4 @@
-require('gitsigns').setup({
+require("gitsigns").setup({
     signcolumn = false,
 })
-noremap('<leader>gd', ':Gitsigns toggle_signs<CR>')
+noremap("<leader>gd", ":Gitsigns toggle_signs<CR>")
