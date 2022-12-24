@@ -17,8 +17,8 @@ function cmd_install --description="Install extra commands that I might want"
     mkdir -p "$CACHE_DIR" "$BIN_DIR"
 
     switch $argv[1]
-        case "nvim"
-            set -l nvim_hash "1af27471f76f1b4f7ad6563c863a4a78117f0515e3390ee4d911132970517fa7"
+        case nvim
+            set -l nvim_hash 1af27471f76f1b4f7ad6563c863a4a78117f0515e3390ee4d911132970517fa7
             set -l url "https://github.com/neovim/neovim/releases/download/v0.8.0/nvim-linux64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
@@ -32,8 +32,8 @@ function cmd_install --description="Install extra commands that I might want"
             else
                 echo "Hashes don't match expected"
             end
-        case "rg"
-            set -l rg_hash "ee4e0751ab108b6da4f47c52da187d5177dc371f0f512a7caaec5434e711c091"
+        case rg
+            set -l rg_hash ee4e0751ab108b6da4f47c52da187d5177dc371f0f512a7caaec5434e711c091
             set -l url "https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $rg_hash)
             if test -n "$tmp_file"
@@ -44,20 +44,20 @@ function cmd_install --description="Install extra commands that I might want"
             else
                 echo "Hashes don't match expected"
             end
-        case "debugpy"
-            if command -q "pip"
+        case debugpy
+            if command -q pip
                 pip install debugpy==1.6.3
             else
                 echo "Pip unavailable can't install"
             end
-        case "gopls"
-            if command -q "go"
+        case gopls
+            if command -q go
                 go install golang.org/x/tools/gopls@latest
             else
                 echo "Go unavailable can't install"
             end
-        case "pre-commit"
-            if command -q "virtualenv"
+        case pre-commit
+            if command -q virtualenv
                 mkdir -p "$HOME/.local/share/pre-commit"
                 virtualenv "$HOME/.local/share/pre-commit/venv"
                 $HOME/.local/share/pre-commit/venv/bin/pip install pre-commit

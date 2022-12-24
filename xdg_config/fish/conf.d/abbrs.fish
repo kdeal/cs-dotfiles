@@ -10,15 +10,15 @@ function update_abbrs
 
     # Command specifc
     if command -qs exa
-        abbr -a x 'exa'
-        abbr -a ls 'exa'
+        abbr -a x exa
+        abbr -a ls exa
         abbr -a ll 'exa -la'
         abbr -a la 'exa -a'
-        abbr -a find 'fd'
+        abbr -a find fd
     end
 
     if command -qs rg
-        abbr -a grep 'rg'
+        abbr -a grep rg
     end
 
     if command -qs bat
@@ -26,15 +26,15 @@ function update_abbrs
     end
 
     if command -qs nvim
-        abbr -a edit 'nvim'
+        abbr -a edit nvim
     else
-        abbr -a edit 'vim'
+        abbr -a edit vim
     end
 
     abbr -a ps 'ps -ef | rg'
     abbr -a ta "tmux attach"
-    abbr -a cg 'gitroot'
-    abbr -a g 'git'
+    abbr -a cg gitroot
+    abbr -a g git
     abbr -a testify 'testify -v --summary '
     abbr -a pydoc 'python -m pydoc '
     abbr -a rsync 'rsync --stats -avz'
@@ -57,7 +57,7 @@ function update_abbrs
     abbr -a gdts 'git difftool --cached'
     abbr -a gdst 'git difftool --cached'
     abbr -a gf 'git fetch origin'
-    abbr -a gic 'git-icheckout'
+    abbr -a gic git-icheckout
     abbr -a gl 'git l'
     abbr -a gml 'git merge -'
     abbr -a gph 'git push origin'

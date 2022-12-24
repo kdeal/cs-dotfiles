@@ -13,8 +13,8 @@ function fish_prompt --description 'Write out the prompt'
     echo -n (prompt_pwd)
     set_color normal
 
-    set -g __fish_git_prompt_showcolorhints "true"
-    set -g __fish_git_prompt_show_informative_status "true"
+    set -g __fish_git_prompt_showcolorhints true
+    set -g __fish_git_prompt_show_informative_status true
     set -g ___fish_git_prompt_char_cleanstate ""
     set -g ___fish_git_prompt_char_stateseparator ""
     __fish_git_prompt
@@ -44,4 +44,3 @@ function fish_prompt --description 'Write out the prompt'
     echo -n '% '
     set_color normal
 end
-
