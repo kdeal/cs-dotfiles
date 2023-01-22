@@ -68,6 +68,10 @@ function cmd_install --description="Install extra commands that I might want"
             else
                 echo "virtualenv unavailable can't install"
             end
+        case pyright
+            if command -q npm
+                npm install -g pyright
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
