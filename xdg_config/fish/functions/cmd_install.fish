@@ -72,6 +72,14 @@ function cmd_install --description="Install extra commands that I might want"
             if command -q npm
                 npm install -g pyright
             end
+        case delta
+            set -l delta_hash f2499f34a4355a808c084764dcb37b613af4d45af28d8f8fb5a0739eeb2839f9
+            set -l url "https://github.com/dandavison/delta/releases/download/0.15.1/delta-0.15.1-x86_64-unknown-linux-musl.tar.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $delta_hash)
+            if test -n "$tmp_file"
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp "$CACHE_DIR/delta-0.15.1-x86_64-unknown-linux-musl/delta" "$BIN_DIR"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end

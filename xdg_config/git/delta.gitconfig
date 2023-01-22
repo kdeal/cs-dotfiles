@@ -1,0 +1,15 @@
+[core]
+    pager = delta
+
+[delta]
+    side-by-side = true
+    syntax-theme = gruvbox-dark
+    file-style = bold yellow
+    file-decoration-style = blue ol ul
+    hunk-header-decoration-style = dim blue ul
+
+[interactive]
+    diffFilter = delta --color-only
+
+[merge]
+    conflictstyle = diff3
