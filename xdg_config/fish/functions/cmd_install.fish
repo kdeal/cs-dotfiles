@@ -80,6 +80,19 @@ function cmd_install --description="Install extra commands that I might want"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
                 cp "$CACHE_DIR/delta-0.15.1-x86_64-unknown-linux-musl/delta" "$BIN_DIR"
             end
+        case bat
+            set -l bat_hash 917844685025552d9fb3d66e233ce55d3b3c2ea85a6c0ad3dc703705adea9525
+            set -l url "https://github.com/sharkdp/bat/releases/download/v0.22.1/bat-v0.22.1-x86_64-unknown-linux-musl.tar.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $bat_hash)
+            if test -n "$tmp_file"
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp "$CACHE_DIR/bat-v0.22.1-x86_64-unknown-linux-musl/bat" "$BIN_DIR"
+                cp "$CACHE_DIR/bat-v0.22.1-x86_64-unknown-linux-musl/autocomplete/bat.fish" ~/.config/fish/completions/
+                # Update abbrs to make cat expand to rg
+                update_abbrs
+            else
+                echo "Hashes don't match expected"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
