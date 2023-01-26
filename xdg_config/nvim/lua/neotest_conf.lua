@@ -11,6 +11,9 @@ require("neotest").setup({
         skipped = "🞅",
         unknown = "?",
     },
+    quickfix = {
+        open = false,
+    },
 })
 
 -- Add background to the gutter icons
