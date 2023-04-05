@@ -229,7 +229,7 @@ nnoremap("]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", { silent = true })
 vim.diagnostic.config({ virtual_text = false })
 
 vim.fn.sign_define("DiagnosticSignError", { text = "✘", texthl = "DiagnosticSignError", linehl = "", numhl = "" })
-vim.fn.sign_define("DiagnosticSignWarn", { text = "⚠", texthl = "DiagnosticSignWarn", linehl = "", numhl = "" })
+vim.fn.sign_define("DiagnosticSignWarn", { text = "⚑", texthl = "DiagnosticSignWarn", linehl = "", numhl = "" })
 vim.fn.sign_define("DiagnosticSignInfo", { text = "ℹ", texthl = "DiagnosticSignInfo", linehl = "", numhl = "" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "🞇", texthl = "DiagnosticSignHint", linehl = "", numhl = "" })
 

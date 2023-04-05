@@ -8,8 +8,8 @@ require("neotest").setup({
         passed = "✔",
         running = "…",
         failed = "✖",
-        skipped = "🞅",
-        unknown = "?",
+        skipped = "↷",
+        unknown = "🞅",
     },
     quickfix = {
         open = false,
