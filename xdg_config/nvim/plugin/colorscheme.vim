@@ -22,3 +22,6 @@ augroup AdjustColors
     autocmd!
     autocmd ColorScheme gruvbox call AdjustHighlights()
 augroup END
+
+let g:gruvbox_italic = 1
+silent! colorscheme gruvbox

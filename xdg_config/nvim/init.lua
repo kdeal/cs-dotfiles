@@ -44,8 +44,6 @@ _G.noremap = function(key, command, opts)
 end
 
 vim.opt.termguicolors = true
-vim.g.gruvbox_italic = 1
-pcall(vim.cmd, "colorscheme gruvbox")
 
 -- Make backspacing work like I expect it to
 vim.opt.backspace = { "indent", "eol", "start" }
