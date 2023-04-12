@@ -16,6 +16,15 @@ function! AdjustHighlights() abort
     highlight! link DiagnosticWarn GruvboxYellow
     highlight! link DiagnosticInfo GruvboxBlue
     highlight! link DiagnosticHint GruvboxPurple
+
+    " Fix noice colors. By default it uses DiagnosticSign colors, but in
+    " gruvbox that has a different background. Switch them to the non-sign
+    " versions to make the background the same
+    highlight! link NoiceCmdlineIcon DiagnosticInfo
+    highlight! link NoiceCmdlinePopupBorder DiagnosticInfo
+    highlight! link NoiceCmdlineIconSearch DiagnosticWarn
+    highlight! link NoiceCmdlinePopupBorderSearch DiagnosticWarn
+    highlight! link NoiceConfirmBorder DiagnosticInfo
 endfunction
 
 augroup AdjustColors
