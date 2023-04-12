@@ -202,6 +202,16 @@ return require("packer").startup(function()
         end,
     })
 
+    use({
+        "folke/noice.nvim",
+        config = function()
+            require("noice_conf")
+        end,
+        requires = {
+            "MunifTanjim/nui.nvim",
+        },
+    })
+
     -- Automatically set up configuration after cloning packer.nvim
     if packer_bootstrap then
         require("packer").sync()

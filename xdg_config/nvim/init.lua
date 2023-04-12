@@ -73,9 +73,6 @@ vim.cmd([[
 -- Don't use mouse most of the time, annoying for copying
 vim.opt.mouse = "ar"
 
--- Be lazy about redrawing
-vim.opt.lazyredraw = true
-
 vim.opt.foldmethod = "indent"
 vim.opt.foldlevelstart = 99
 
