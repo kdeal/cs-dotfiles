@@ -44,7 +44,7 @@ endfunction
 
 function! RecordStatus() abort
     let l:status_mode = luaeval('require("noice").api.statusline.mode.get()')
-        if l:status_mode ==# 'v:null' || l:status_mode =~ '-- \a\+ --'
+        if l:status_mode ==# 'v:null' || l:status_mode =~ '-- .\+ --'
             return ''
         else
             return l:status_mode
