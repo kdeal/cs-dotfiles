@@ -1,3 +1,5 @@
+-- Set up notify before setting up noice
+require("notify_conf")
 require("noice").setup({
     presets = {
         bottom_search = true,
