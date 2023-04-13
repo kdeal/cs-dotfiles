@@ -1,5 +1,6 @@
 require("nvim-treesitter.configs").setup({
     ensure_installed = {
+        "bash",
         "comment",
         "css",
         "fish",
@@ -9,6 +10,8 @@ require("nvim-treesitter.configs").setup({
         "javascript",
         "json",
         "lua",
+        "markdown",
+        "markdown_inline",
         "python",
         "regex",
         "rust",
