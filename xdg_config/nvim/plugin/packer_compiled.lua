@@ -202,6 +202,11 @@ local no_errors, error_msg = pcall(function()
             path = "/home/codespace/.local/share/nvim/site/pack/packer/start/nvim-lspconfig",
             url = "https://github.com/neovim/nvim-lspconfig",
         },
+        ["nvim-notify"] = {
+            loaded = true,
+            path = "/home/codespace/.local/share/nvim/site/pack/packer/start/nvim-notify",
+            url = "https://github.com/rcarriga/nvim-notify",
+        },
         ["nvim-treesitter"] = {
             config = { "\27LJ\2\n/\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\20treesitter_conf\frequire\0" },
             loaded = true,
@@ -217,11 +222,6 @@ local no_errors, error_msg = pcall(function()
             loaded = true,
             path = "/home/codespace/.local/share/nvim/site/pack/packer/start/plenary.nvim",
             url = "https://github.com/nvim-lua/plenary.nvim",
-        },
-        ["requirements.txt.vim"] = {
-            loaded = true,
-            path = "/home/codespace/.local/share/nvim/site/pack/packer/start/requirements.txt.vim",
-            url = "https://github.com/raimon49/requirements.txt.vim",
         },
         ["sideways.vim"] = {
             commands = { "SidewaysLeft", "SidewaysRight" },
@@ -279,12 +279,6 @@ local no_errors, error_msg = pcall(function()
             path = "/home/codespace/.local/share/nvim/site/pack/packer/start/vim-javascript",
             url = "https://github.com/pangloss/vim-javascript",
         },
-        ["vim-polyglot"] = {
-            loaded = true,
-            needs_bufread = true,
-            path = "/home/codespace/.local/share/nvim/site/pack/packer/opt/vim-polyglot",
-            url = "https://github.com/sheerun/vim-polyglot",
-        },
         ["vim-python-pep8-indent"] = {
             loaded = true,
             path = "/home/codespace/.local/share/nvim/site/pack/packer/start/vim-python-pep8-indent",
@@ -313,101 +307,6 @@ local no_errors, error_msg = pcall(function()
     }
 
     time([[Defining packer_plugins]], false)
-    -- Setup for: vim-polyglot
-    time([[Setup for vim-polyglot]], true)
-    try_loadstring(
-        "\27LJ\2\n>\0\0\2\0\4\0\0056\0\0\0009\0\1\0005\1\3\0=\1\2\0K\0\1\0\1\2\0\0\vpython\22polyglot_disabled\6g\bvim\0",
-        "setup",
-        "vim-polyglot"
-    )
-    time([[Setup for vim-polyglot]], false)
-    time([[packadd for vim-polyglot]], true)
-    vim.cmd([[packadd vim-polyglot]])
-    time([[packadd for vim-polyglot]], false)
-    -- Config for: fidget.nvim
-    time([[Config for fidget.nvim]], true)
-    try_loadstring(
-        "\27LJ\2\n+\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\16fidget_conf\frequire\0",
-        "config",
-        "fidget.nvim"
-    )
-    time([[Config for fidget.nvim]], false)
-    -- Config for: indent-blankline.nvim
-    time([[Config for indent-blankline.nvim]], true)
-    try_loadstring(
-        "\27LJ\2\n+\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\16indent_conf\frequire\0",
-        "config",
-        "indent-blankline.nvim"
-    )
-    time([[Config for indent-blankline.nvim]], false)
-    -- Config for: nvim-dap-python
-    time([[Config for nvim-dap-python]], true)
-    try_loadstring(
-        "\27LJ\2\n/\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\20dap_python_conf\frequire\0",
-        "config",
-        "nvim-dap-python"
-    )
-    time([[Config for nvim-dap-python]], false)
-    -- Config for: nvim-lspconfig
-    time([[Config for nvim-lspconfig]], true)
-    try_loadstring(
-        "\27LJ\2\n(\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\rlsp_conf\frequire\0",
-        "config",
-        "nvim-lspconfig"
-    )
-    time([[Config for nvim-lspconfig]], false)
-    -- Config for: neotest
-    time([[Config for neotest]], true)
-    try_loadstring(
-        "\27LJ\2\n,\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\17neotest_conf\frequire\0",
-        "config",
-        "neotest"
-    )
-    time([[Config for neotest]], false)
-    -- Config for: null-ls.nvim
-    time([[Config for null-ls.nvim]], true)
-    try_loadstring(
-        "\27LJ\2\n,\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\17null_ls_conf\frequire\0",
-        "config",
-        "null-ls.nvim"
-    )
-    time([[Config for null-ls.nvim]], false)
-    -- Config for: gitsigns.nvim
-    time([[Config for gitsigns.nvim]], true)
-    try_loadstring(
-        "\27LJ\2\n-\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\18gitsigns_conf\frequire\0",
-        "config",
-        "gitsigns.nvim"
-    )
-    time([[Config for gitsigns.nvim]], false)
-    -- Config for: LuaSnip
-    time([[Config for LuaSnip]], true)
-    try_loadstring(
-        "\27LJ\2\n,\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\17luasnip_conf\frequire\0",
-        "config",
-        "LuaSnip"
-    )
-    time([[Config for LuaSnip]], false)
-    -- Config for: telescope.nvim
-    time([[Config for telescope.nvim]], true)
-    try_loadstring(
-        "\27LJ\2\n.\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\19telescope_conf\frequire\0",
-        "config",
-        "telescope.nvim"
-    )
-    time([[Config for telescope.nvim]], false)
-    -- Config for: nvim-cmp
-    time([[Config for nvim-cmp]], true)
-    try_loadstring("\27LJ\2\n(\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\rcmp_conf\frequire\0", "config", "nvim-cmp")
-    time([[Config for nvim-cmp]], false)
-    -- Config for: nvim-dap-ui
-    time([[Config for nvim-dap-ui]], true)
-    try_loadstring(
-        "\27LJ\2\n*\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\15dapui_conf\frequire\0",
-        "config",
-        "nvim-dap-ui"
-    )
-    time([[Config for nvim-dap-ui]], false)
     -- Config for: vim-fugitive
     time([[Config for vim-fugitive]], true)
     try_loadstring(
@@ -416,18 +315,22 @@ local no_errors, error_msg = pcall(function()
         "vim-fugitive"
     )
     time([[Config for vim-fugitive]], false)
-    -- Config for: nvim-treesitter
-    time([[Config for nvim-treesitter]], true)
+    -- Config for: indent-blankline.nvim
+    time([[Config for indent-blankline.nvim]], true)
     try_loadstring(
-        "\27LJ\2\n/\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\20treesitter_conf\frequire\0",
+        "\27LJ\2\n+\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\16indent_conf\frequire\0",
         "config",
-        "nvim-treesitter"
+        "indent-blankline.nvim"
     )
-    time([[Config for nvim-treesitter]], false)
-    -- Config for: nvim-dap
-    time([[Config for nvim-dap]], true)
-    try_loadstring("\27LJ\2\n(\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\rdap_conf\frequire\0", "config", "nvim-dap")
-    time([[Config for nvim-dap]], false)
+    time([[Config for indent-blankline.nvim]], false)
+    -- Config for: null-ls.nvim
+    time([[Config for null-ls.nvim]], true)
+    try_loadstring(
+        "\27LJ\2\n,\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\17null_ls_conf\frequire\0",
+        "config",
+        "null-ls.nvim"
+    )
+    time([[Config for null-ls.nvim]], false)
     -- Config for: noice.nvim
     time([[Config for noice.nvim]], true)
     try_loadstring(
@@ -436,6 +339,86 @@ local no_errors, error_msg = pcall(function()
         "noice.nvim"
     )
     time([[Config for noice.nvim]], false)
+    -- Config for: nvim-dap-ui
+    time([[Config for nvim-dap-ui]], true)
+    try_loadstring(
+        "\27LJ\2\n*\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\15dapui_conf\frequire\0",
+        "config",
+        "nvim-dap-ui"
+    )
+    time([[Config for nvim-dap-ui]], false)
+    -- Config for: neotest
+    time([[Config for neotest]], true)
+    try_loadstring(
+        "\27LJ\2\n,\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\17neotest_conf\frequire\0",
+        "config",
+        "neotest"
+    )
+    time([[Config for neotest]], false)
+    -- Config for: nvim-cmp
+    time([[Config for nvim-cmp]], true)
+    try_loadstring("\27LJ\2\n(\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\rcmp_conf\frequire\0", "config", "nvim-cmp")
+    time([[Config for nvim-cmp]], false)
+    -- Config for: nvim-lspconfig
+    time([[Config for nvim-lspconfig]], true)
+    try_loadstring(
+        "\27LJ\2\n(\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\rlsp_conf\frequire\0",
+        "config",
+        "nvim-lspconfig"
+    )
+    time([[Config for nvim-lspconfig]], false)
+    -- Config for: telescope.nvim
+    time([[Config for telescope.nvim]], true)
+    try_loadstring(
+        "\27LJ\2\n.\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\19telescope_conf\frequire\0",
+        "config",
+        "telescope.nvim"
+    )
+    time([[Config for telescope.nvim]], false)
+    -- Config for: gitsigns.nvim
+    time([[Config for gitsigns.nvim]], true)
+    try_loadstring(
+        "\27LJ\2\n-\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\18gitsigns_conf\frequire\0",
+        "config",
+        "gitsigns.nvim"
+    )
+    time([[Config for gitsigns.nvim]], false)
+    -- Config for: nvim-treesitter
+    time([[Config for nvim-treesitter]], true)
+    try_loadstring(
+        "\27LJ\2\n/\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\20treesitter_conf\frequire\0",
+        "config",
+        "nvim-treesitter"
+    )
+    time([[Config for nvim-treesitter]], false)
+    -- Config for: fidget.nvim
+    time([[Config for fidget.nvim]], true)
+    try_loadstring(
+        "\27LJ\2\n+\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\16fidget_conf\frequire\0",
+        "config",
+        "fidget.nvim"
+    )
+    time([[Config for fidget.nvim]], false)
+    -- Config for: LuaSnip
+    time([[Config for LuaSnip]], true)
+    try_loadstring(
+        "\27LJ\2\n,\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\17luasnip_conf\frequire\0",
+        "config",
+        "LuaSnip"
+    )
+    time([[Config for LuaSnip]], false)
+    -- Config for: nvim-dap
+    time([[Config for nvim-dap]], true)
+    try_loadstring("\27LJ\2\n(\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\rdap_conf\frequire\0", "config", "nvim-dap")
+    time([[Config for nvim-dap]], false)
+    -- Config for: nvim-dap-python
+    time([[Config for nvim-dap-python]], true)
+    try_loadstring(
+        "\27LJ\2\n/\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\20dap_python_conf\frequire\0",
+        "config",
+        "nvim-dap-python"
+    )
+    time([[Config for nvim-dap-python]], false)
 
     -- Command lazy-loads
     time([[Defining lazy-load commands]], true)
@@ -583,24 +566,6 @@ local no_errors, error_msg = pcall(function()
             return vim.fn.getcompletion("SudoEdit ", "cmdline")
         end,
     })
-    pcall(vim.api.nvim_create_user_command, "SidewaysRight", function(cmdargs)
-        require("packer.load")({ "sideways.vim" }, {
-            cmd = "SidewaysRight",
-            l1 = cmdargs.line1,
-            l2 = cmdargs.line2,
-            bang = cmdargs.bang,
-            args = cmdargs.args,
-            mods = cmdargs.mods,
-        }, _G.packer_plugins)
-    end, {
-        nargs = "*",
-        range = true,
-        bang = true,
-        complete = function()
-            require("packer.load")({ "sideways.vim" }, {}, _G.packer_plugins)
-            return vim.fn.getcompletion("SidewaysRight ", "cmdline")
-        end,
-    })
     pcall(vim.api.nvim_create_user_command, "UndotreeToggle", function(cmdargs)
         require("packer.load")({ "undotree" }, {
             cmd = "UndotreeToggle",
@@ -617,6 +582,24 @@ local no_errors, error_msg = pcall(function()
         complete = function()
             require("packer.load")({ "undotree" }, {}, _G.packer_plugins)
             return vim.fn.getcompletion("UndotreeToggle ", "cmdline")
+        end,
+    })
+    pcall(vim.api.nvim_create_user_command, "SidewaysRight", function(cmdargs)
+        require("packer.load")({ "sideways.vim" }, {
+            cmd = "SidewaysRight",
+            l1 = cmdargs.line1,
+            l2 = cmdargs.line2,
+            bang = cmdargs.bang,
+            args = cmdargs.args,
+            mods = cmdargs.mods,
+        }, _G.packer_plugins)
+    end, {
+        nargs = "*",
+        range = true,
+        bang = true,
+        complete = function()
+            require("packer.load")({ "sideways.vim" }, {}, _G.packer_plugins)
+            return vim.fn.getcompletion("SidewaysRight ", "cmdline")
         end,
     })
     pcall(vim.api.nvim_create_user_command, "SidewaysLeft", function(cmdargs)

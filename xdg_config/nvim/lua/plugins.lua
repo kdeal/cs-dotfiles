@@ -200,6 +200,7 @@ return require("packer").startup(function()
         end,
         requires = {
             "MunifTanjim/nui.nvim",
+            "rcarriga/nvim-notify",
         },
     })
 
