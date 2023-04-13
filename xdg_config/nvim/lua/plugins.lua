@@ -54,16 +54,7 @@ return require("packer").startup(function()
     use({ "junegunn/fzf", run = "./install --all --no-zsh --no-bash" })
 
     -- Syntax and highlighting for languages
-    use({
-        "sheerun/vim-polyglot",
-        setup = function()
-            -- Disable polyglot python since I read built in python is actually good
-            -- This has to be set before polyglot is loaded
-            vim.g.polyglot_disabled = { "python" }
-        end,
-    })
     use("Vimjas/vim-python-pep8-indent")
-    use("raimon49/requirements.txt.vim")
 
     -- Visual made * and # search
     use("bronson/vim-visual-star-search")
