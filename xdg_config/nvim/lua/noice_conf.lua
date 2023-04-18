@@ -6,6 +6,8 @@ require("noice").setup({
         command_palette = true,
     },
     lsp = {
+        -- let fidget.nvim handle lsp progress since it does it per buffer
+        progress = { enabled = false },
         -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
         override = {
             ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
