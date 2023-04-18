@@ -71,4 +71,5 @@ require("notify").setup({
         WARN = "⚑",
     },
     fps = 10,
+    max_width = 50,
 })
