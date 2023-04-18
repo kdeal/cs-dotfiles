@@ -1,9 +1,3 @@
-require("plugins")
-
-_G.plugin_installed = function(plugin_name)
-    return packer_plugins[plugin_name] and packer_plugins[plugin_name].loaded
-end
-
 _G.nnoremap = function(key, command, opts)
     opts = opts or {}
     opts.noremap = true
@@ -233,3 +227,5 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "🞇", texthl = "DiagnosticSi
 -- Run formatter
 nnoremap("<space>f", "<cmd>lua vim.lsp.buf.format { async = true }<CR>", { silent = true })
 vnoremap("<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", { silent = true })
+
+require("plugins")
