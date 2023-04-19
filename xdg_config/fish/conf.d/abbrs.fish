@@ -1,86 +1,73 @@
-# Updating abbreviations is slow so we should be smart about it and only do it
-# when it is required
 function update_abbrs
-    echo 'Updating abbreviations'
-
-    # Delete old abbreviations
-    for abbr in (abbr -l)
-        abbr -e $abbr
-    end
-
     # Command specifc
     if command -qs exa
-        abbr -a x exa
-        abbr -a ls exa
-        abbr -a ll 'exa -la'
-        abbr -a la 'exa -a'
-        abbr -a find fd
+        abbr -ga x exa
+        abbr -ga ls exa
+        abbr -ga ll 'exa -la'
+        abbr -ga la 'exa -a'
+        abbr -ga find fd
     end
 
     if command -qs rg
-        abbr -a grep rg
+        abbr -ga grep rg
     end
 
     if command -qs bat
-        abbr -a cat 'bat -p'
+        abbr -ga cat 'bat -p'
     end
 
     if command -qs nvim
-        abbr -a edit nvim
+        abbr -ga edit nvim
     else
-        abbr -a edit vim
+        abbr -ga edit vim
     end
 
-    abbr -a ps 'ps -ef | rg'
-    abbr -a ta "tmux attach"
-    abbr -a cg gitroot
-    abbr -a g git
-    abbr -a testify 'testify -v --summary '
-    abbr -a pydoc 'python -m pydoc '
-    abbr -a rsync 'rsync --stats -avz'
+    abbr -ga ps 'ps -ef | rg'
+    abbr -ga ta "tmux attach"
+    abbr -ga cg gitroot
+    abbr -ga g git
+    abbr -ga testify 'testify -v --summary '
+    abbr -ga pydoc 'python -m pydoc '
+    abbr -ga rsync 'rsync --stats -avz'
 
     # Make git aliases be fish abbreviations too
-    abbr -a ga 'git add'
-    abbr -a gau 'git add --update'
-    abbr -a gas 'git add-staged'
-    abbr -a gaup 'git add --update --patch'
-    abbr -a gb 'git branch'
-    abbr -a gc 'git commit'
-    abbr -a gca 'git commit --amend'
-    abbr -a gcf 'git commit --fixup'
-    abbr -a gd 'git diff'
-    abbr -a gdw 'git diff --word-diff=color'
-    abbr -a gdws 'git diff --word-diff=color --cached'
-    abbr -a gdsw 'git diff --word-diff=color --cached'
-    abbr -a gds 'git diff --cached'
-    abbr -a gdt 'git difftool'
-    abbr -a gdts 'git difftool --cached'
-    abbr -a gdst 'git difftool --cached'
-    abbr -a gf 'git fetch origin'
-    abbr -a gic git-icheckout
-    abbr -a gl 'git l'
-    abbr -a gml 'git merge -'
-    abbr -a gph 'git push origin'
-    abbr -a gpf 'git push --force-with-lease origin'
-    abbr -a gpl 'git pull origin'
-    abbr -a gr 'git reset'
-    abbr -a grb 'git rebase'
-    abbr -a grbi 'git rebase -i'
-    abbr -a grbc 'git rebase --continue'
-    abbr -a grba 'git rebase --abort'
-    abbr -a grso 'git reset --hard origin/master'
-    abbr -a gs 'git status'
-    abbr -a gsh 'git show'
-    abbr -a gst 'git stash'
-    abbr -a gsw 'git switch'
+    abbr -ga ga 'git add'
+    abbr -ga gau 'git add --update'
+    abbr -ga gas 'git add-staged'
+    abbr -ga gaup 'git add --update --patch'
+    abbr -ga gb 'git branch'
+    abbr -ga gc 'git commit'
+    abbr -ga gca 'git commit --amend'
+    abbr -ga gcf 'git commit --fixup'
+    abbr -ga gd 'git diff'
+    abbr -ga gdw 'git diff --word-diff=color'
+    abbr -ga gdws 'git diff --word-diff=color --cached'
+    abbr -ga gdsw 'git diff --word-diff=color --cached'
+    abbr -ga gds 'git diff --cached'
+    abbr -ga gdt 'git difftool'
+    abbr -ga gdts 'git difftool --cached'
+    abbr -ga gdst 'git difftool --cached'
+    abbr -ga gf 'git fetch origin'
+    abbr -ga gic git-icheckout
+    abbr -ga gl 'git l'
+    abbr -ga gml 'git merge -'
+    abbr -ga gph 'git push origin'
+    abbr -ga gpf 'git push --force-with-lease origin'
+    abbr -ga gpl 'git pull origin'
+    abbr -ga gr 'git reset'
+    abbr -ga grb 'git rebase'
+    abbr -ga grbi 'git rebase -i'
+    abbr -ga grbc 'git rebase --continue'
+    abbr -ga grba 'git rebase --abort'
+    abbr -ga grso 'git reset --hard origin/master'
+    abbr -ga gs 'git status'
+    abbr -ga gsh 'git show'
+    abbr -ga gst 'git stash'
+    abbr -ga gsw 'git switch'
 
-    abbr -a watch 'watch -c'
+    abbr -ga watch 'watch -c'
 end
 
 if status is-interactive
-    set -l latest_version (sha1sum ~/.config/fish/conf.d/abbrs.fish | awk '{print $1}')
-    if test "$latest_version" != "$__fish_abbr_version"
-        update_abbrs
-        set -U __fish_abbr_version $latest_version
-    end
+    update_abbrs
 end
