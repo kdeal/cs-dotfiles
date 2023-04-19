@@ -32,12 +32,12 @@ function subcompact_render(bufnr, notif, highlights)
     })
 end
 
--- Same as static stages, but doesn't overlap winbar
+-- Same as static stages, but doesn't overlap bottom bar
 -- https://github.com/rcarriga/nvim-notify/blob/master/lua/notify/stages/static.lua
 local static_skip_winbar_stages = {
     function(state)
         local next_height = state.message.height + 2
-        local next_row = stages_util.available_slot(state.open_windows, next_height, "top_down")
+        local next_row = stages_util.available_slot(state.open_windows, next_height, "bottom_up")
         if not next_row then
             return nil
         end
@@ -47,7 +47,7 @@ local static_skip_winbar_stages = {
             width = state.message.width,
             height = state.message.height,
             col = vim.opt.columns:get(),
-            row = next_row + 1,
+            row = next_row - 1,
             border = "rounded",
             style = "minimal",
         }
