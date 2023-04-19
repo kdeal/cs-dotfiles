@@ -1,6 +1,14 @@
 function fish_prompt --description 'Write out the prompt'
     set -l last_status $status
 
+    if set -q VIRTUAL_ENV
+        printf "%s❱%s" (set_color cyan) (set_color normal)
+    end
+
+    if set -q NODE_MODULES_PATH
+        printf "%s❱%s" (set_color yellow) (set_color normal)
+    end
+
     set -l jobs_list (jobs)
     if test -n "$jobs_list"
         set_color red
