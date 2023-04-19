@@ -1,4 +1,10 @@
 function cmd_install --description="Install extra commands that I might want"
+    for cmd in $argv
+        __cmd_install_single_command $cmd
+    end
+end
+
+function __cmd_install_single_command
     function __cmd_install_checksha_download
         # arg1 = url, arg2 = sha
         set -l tmp_file (mktemp)
