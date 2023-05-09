@@ -99,6 +99,36 @@ function __cmd_install_single_command
             else
                 echo "Hashes don't match expected"
             end
+        case helix
+            set -l helix_hash c3840a51ef6a255eed192e7d7b929d37d280345ee165f819718bd016ae3f46be
+            set -l url "https://github.com/helix-editor/helix/releases/download/23.03/helix-23.03-x86_64.AppImage"
+            set -l tmp_file (__cmd_install_checksha_download $url $helix_hash)
+            if test -n "$tmp_file"
+                chmod +x "$tmp_file"
+                mkdir $CACHE_DIR/helix
+                cd $CACHE_DIR/helix
+                command $tmp_file --appimage-extract
+                cp -r squashfs-root/usr/* $HOME/.local/
+                rm -r squashfs-root/
+                prevd
+            else
+                echo "Hashes don't match expected"
+            end
+        case exa
+            set -l exa_hash a65a87bd545e969979ae9388f6333167f041a1f09fa9d60b32fd3072348ff6ce
+            set -l url "https://github.com/ogham/exa/releases/download/v0.10.1/exa-linux-x86_64-v0.10.1.zip"
+            set -l tmp_file (__cmd_install_checksha_download $url $exa_hash)
+            if test -n "$tmp_file"
+                mkdir $CACHE_DIR/exa
+                unzip $tmp_file -d $CACHE_DIR/exa
+                cp $CACHE_DIR/exa/bin/exa $BIN_DIR
+                cp $CACHE_DIR/exa/man/* $HOME/.local/share/man/man1/
+                cp $CACHE_DIR/exa/completions/exa.fish $HOME/.config/fish/completions/
+                # Update abbrs to make ls expand to exa
+                update_abbrs
+            else
+                echo "Hashes don't match expected"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
