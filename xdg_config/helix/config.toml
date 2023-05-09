@@ -1,0 +1,5 @@
+theme = "gruvbox"
+
+[editor]
+true-color = true
+gutters = ["diagnostics", "spacer", "diff"]
