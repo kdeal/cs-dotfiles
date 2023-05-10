@@ -1,6 +1,6 @@
 require("fidget").setup({
     text = {
-        spinner = "dots",
+        spinner = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃" },
     },
     align = {
         bottom = false,
