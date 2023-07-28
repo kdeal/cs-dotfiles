@@ -27,6 +27,7 @@ end
 -- and map buffer local keybindings when the language server attaches
 local servers = {
     gopls = {},
+    lua_ls = {},
     pyright = {
         python = {
             analysis = {
