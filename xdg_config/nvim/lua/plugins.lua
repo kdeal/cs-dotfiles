@@ -24,7 +24,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- Colorscheme
-    "morhetz/gruvbox",
+    { "morhetz/gruvbox", lazy = false, priority = 1000 },
 
     -- Easy commenting in any language
     "tpope/vim-commentary",
@@ -35,9 +35,12 @@ require("lazy").setup({
     -- Git in vim
     {
         "tpope/vim-fugitive",
-        config = function()
-            require("fugitive_conf")
-        end,
+        keys = {
+            { "<leader>ge", "<cmd>Gedit", silent = true },
+            { "<leader>gl", "<cmd>Glog", silent = true },
+            { "<leader>gb", "<cmd>Git blame<CR>", silent = true },
+            { "<leader>gs", "<cmd>Git<CR>", silent = true },
+        },
     },
 
     -- Repeat stuff
@@ -66,9 +69,6 @@ require("lazy").setup({
     -- Fuzzy finding all the things
     { "junegunn/fzf", build = "./install --all --no-zsh --no-bash" },
 
-    -- Syntax and highlighting for languages
-    "Vimjas/vim-python-pep8-indent",
-
     -- Visual made * and # search
     "bronson/vim-visual-star-search",
 
@@ -91,37 +91,60 @@ require("lazy").setup({
     -- Shows language server progress
     {
         "j-hui/fidget.nvim",
-        config = function()
-            require("fidget_conf")
-        end,
+        event = "VeryLazy",
+        opts = {
+            text = {
+                spinner = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃" },
+            },
+            align = {
+                bottom = false,
+            },
+        },
     },
 
     -- Hook commands up to nvim lsp
     {
         "jose-elias-alvarez/null-ls.nvim",
         dependencies = "nvim-lua/plenary.nvim",
+        event = "VeryLazy",
         config = function()
             require("null_ls_conf")
         end,
     },
 
     -- Lua helper library
-    "nvim-lua/plenary.nvim",
+    { "nvim-lua/plenary.nvim", lazy = true },
 
     -- Lua Fuzzy Finder
     {
         "nvim-telescope/telescope.nvim",
-        config = function()
-            require("telescope_conf")
-        end,
+        keys = {
+            { "<leader>/a", ":Telescope lsp_code_actions<CR>", silent = true },
+            { "<leader>/b", ":Telescope buffers<CR>", silent = true },
+            { "<leader>/e", ":Telescope loclist<CR>", silent = true },
+            { "<leader>/f", ":Telescope find_files<CR>", silent = true },
+            { "<leader>/g", ":Telescope live_grep<CR>", silent = true },
+            { "<leader>/h", ":Telescope help_tags<CR>", silent = true },
+            { "<leader>/r", ":Telescope registers<CR>", silent = true },
+            { "<leader>/q", ":Telescope quickfix<CR>", silent = true },
+        },
+        config = true,
     },
 
     -- FZF like filtering for telescope
-    { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",
+        cmd = "Telescope",
+        config = function()
+            require("telescope").load_extension("fzf")
+        end,
+    },
 
     -- Lua completion tool
     {
         "hrsh7th/nvim-cmp",
+        event = "InsertEnter",
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
@@ -136,16 +159,11 @@ require("lazy").setup({
 
     {
         "L3MON4D3/LuaSnip",
+        event = "InsertEnter",
         config = function()
             require("luasnip_conf")
         end,
     },
-
-    -- Simplifies the Vim ui to help you to focus on writing
-    "junegunn/goyo.vim",
-
-    -- Javascript stuff
-    "pangloss/vim-javascript",
 
     -- Tree sitter based syntax highlighting
     {
@@ -161,24 +179,30 @@ require("lazy").setup({
     -- Debugging things
     {
         "mfussenegger/nvim-dap",
-        config = function()
-            require("dap_conf")
-        end,
+        keys = {
+            { "<leader>bt", "<cmd>lua require('dap').toggle_breakpoint()<cr>", silent = true },
+            { "<leader>bc", "<cmd>lua require('dap').continue()<cr>", silent = true },
+            { "<leader>bo", "<cmd>lua require('dap').step_over()<cr>", silent = true },
+            { "<leader>bi", "<cmd>lua require('dap').step_into()<cr>", silent = true },
+            { "<leader>bu", "<cmd>lua require('dap').step_out()<cr>", silent = true },
+        },
     },
 
     {
         "mfussenegger/nvim-dap-python",
         dependencies = { "mfussenegger/nvim-dap" },
+        ft = "python",
         config = function()
-            require("dap_python_conf")
+            local dap_python = require("dap-python")
+            dap_python.setup()
+            dap_python.test_runner = "pytest"
         end,
     },
     {
         "rcarriga/nvim-dap-ui",
         dependencies = { "mfussenegger/nvim-dap" },
-        config = function()
-            require("dapui_conf")
-        end,
+        keys = { { "<leader>og", "<cmd>lua require('dapui').toggle()<cr>", silent = true } },
+        config = true,
     },
 
     -- Show tests in a side panel
@@ -201,13 +225,15 @@ require("lazy").setup({
         dependencies = {
             "nvim-lua/plenary.nvim",
         },
-        config = function()
-            require("gitsigns_conf")
-        end,
+        opts = {
+            signcolumn = false,
+        },
+        keys = { { "<leader>gd", "<cmd>Gitsigns toggle_signs<CR>", silent = true } },
     },
 
     {
         "folke/noice.nvim",
+        event = "VeryLazy",
         config = function()
             require("noice_conf")
         end,
