@@ -87,6 +87,7 @@ require("lazy").setup({
             require("lsp_conf")
         end,
     },
+    { "folke/neodev.nvim", config = true },
 
     -- Shows language server progress
     {
@@ -175,6 +176,7 @@ require("lazy").setup({
             require("treesitter_conf")
         end,
     },
+    { "nvim-treesitter/playground", cmd = "TSPlaygroundToggle" },
 
     -- Debugging things
     {
