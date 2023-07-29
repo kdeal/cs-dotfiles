@@ -36,6 +36,7 @@ require("lazy").setup({
     {
         "tpope/vim-fugitive",
         ft = "gitcommit",
+        cmd = "Git",
         keys = {
             { "<leader>ge", "<cmd>Gedit<cr>", silent = true },
             { "<leader>gl", "<cmd>Glog<cr>", silent = true },
