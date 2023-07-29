@@ -1,6 +1,6 @@
 " Add command to copy to clipboard
-nmap <silent> <leader>y :set opfunc=CopyText<CR>g@
-vmap <silent> <leader>y :<C-U>call CopyText(visualmode(), 1)<CR>
+nmap <silent> <leader>y <cmd>set opfunc=CopyText<CR>g@
+vmap <silent> <leader>y <cmd><C-U>call CopyText(visualmode(), 1)<CR>
 
 function! CopyText(type, ...)
     let l:sel_save = &selection

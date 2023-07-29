@@ -153,43 +153,43 @@ nnoremap("gj", "j")
 nnoremap("gk", "k")
 
 -- Random maps
-nnoremap("<leader>nh", ":nohlsearch<CR>", { silent = true })
-nnoremap("<leader>ot", ":terminal<CR>", { silent = true })
-nnoremap("<leader>ol", ":lopen<CR>", { silent = true })
-nnoremap("<leader>oc", ":copen<CR>", { silent = true })
+nnoremap("<leader>nh", "<cmd>nohlsearch<CR>", { silent = true })
+nnoremap("<leader>ot", "<cmd>terminal<CR>", { silent = true })
+nnoremap("<leader>ol", "<cmd>lopen<CR>", { silent = true })
+nnoremap("<leader>oc", "<cmd>copen<CR>", { silent = true })
 
-nnoremap("<leader>ss", ":syntax sync fromstart<CR>", { silent = true })
+nnoremap("<leader>ss", "<cmd>syntax sync fromstart<CR>", { silent = true })
 
 -- Basic editing mappings
-noremap("<leader>w", ":w<CR>", { silent = true })
-noremap("<leader>q", ":q<CR>", { silent = true })
-noremap("<leader>Q", ":qall<CR>", { silent = true })
-noremap("<leader>cq", ":cq<CR>", { silent = true })
+noremap("<leader>w", "<cmd>w<CR>", { silent = true })
+noremap("<leader>q", "<cmd>q<CR>", { silent = true })
+noremap("<leader>Q", "<cmd>qall<CR>", { silent = true })
+noremap("<leader>cq", "<cmd>cq<CR>", { silent = true })
 noremap("<leader>e", ":e ")
-noremap("<leader>/e", ":ll<CR>")
+noremap("<leader>/e", "<cmd>ll<CR>")
 noremap("<leader>Eh", ":e %%")
 
 vim.cmd("cabbr <expr> %% expand('%:p:h')")
-noremap("<leader>Ev", ":e $MYVIMRC<CR>", { silent = true })
+noremap("<leader>Ev", "<cmd>e $MYVIMRC<CR>", { silent = true })
 
 -- Better visual mode pasting
 vnoremap("P", "p")
 vnoremap("p", "pgvy")
 
 -- Tabs mappings
-noremap("<leader>tc", ":tabnew<CR>", { silent = true })
+noremap("<leader>tc", "<cmd>tabnew<CR>", { silent = true })
 
 -- buffer mappings
-noremap("<leader>bd", ":bn <bar> bd #<CR>", { silent = true })
+noremap("<leader>bd", "<cmd>bn <bar> bd #<CR>", { silent = true })
 
 -- window mappings
 noremap("<leader>j", "<C-W><C-J>")
 noremap("<leader>k", "<C-W><C-K>")
 noremap("<leader>h", "<C-W><C-H>")
 noremap("<leader>l", "<C-W><C-L>")
-noremap("<leader>sp", ":sp<CR>", { silent = true })
-noremap("<leader>vs", ":vs<CR>", { silent = true })
-noremap("<leader>bh", ":hide<CR>", { silent = true })
+noremap("<leader>sp", "<cmd>sp<CR>", { silent = true })
+noremap("<leader>vs", "<cmd>vs<CR>", { silent = true })
+noremap("<leader>bh", "<cmd>hide<CR>", { silent = true })
 
 -- Terminal mappings
 tnoremap("<c-_>", "<c-\\><c-n>")
@@ -207,7 +207,7 @@ vim.cmd([[
     endfunction
 ]])
 
-noremap("<leader>os", ":call SyntaxItem()<cr>", { silent = true })
+noremap("<leader>os", "<cmd>call SyntaxItem()<cr>", { silent = true })
 
 -- Color of text after yanking
 vim.cmd([[
@@ -218,8 +218,8 @@ vim.cmd([[
 ]])
 
 -- Diagnostic config
-nnoremap("<leader>od", ":lua vim.diagnostic.setloclist({ open = true })<cr>", { silent = true })
-nnoremap("<leader>d", ':lua vim.diagnostic.open_float(nil, { scope = "cursor" })<cr>', { silent = true })
+nnoremap("<leader>od", "<cmd>lua vim.diagnostic.setloclist({ open = true })<cr>", { silent = true })
+nnoremap("<leader>d", '<cmd>lua vim.diagnostic.open_float(nil, { scope = "cursor" })<cr>', { silent = true })
 nnoremap("[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", { silent = true })
 nnoremap("]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", { silent = true })
 
