@@ -24,8 +24,8 @@ function __cmd_install_single_command
 
     switch $argv[1]
         case nvim
-            set -l nvim_hash fa93f06bec111fea6f316f186b96e19ba289a2dca2d0731e23597398b7397c8f
-            set -l url "https://github.com/neovim/neovim/releases/download/v0.9.0/nvim-linux64.tar.gz"
+            set -l nvim_hash 6c083017304213c3a3efde8d332a52231b8df8206d35146942097c303ebf93d5
+            set -l url "https://github.com/neovim/neovim/releases/download/v0.9.1/nvim-linux64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
@@ -52,7 +52,7 @@ function __cmd_install_single_command
             end
         case debugpy
             if command -q pip
-                pip install debugpy==1.6.3
+                pip install debugpy==1.6.7
             else
                 echo "Pip unavailable can't install"
             end
@@ -79,21 +79,21 @@ function __cmd_install_single_command
                 npm install -g pyright
             end
         case delta
-            set -l delta_hash f2499f34a4355a808c084764dcb37b613af4d45af28d8f8fb5a0739eeb2839f9
-            set -l url "https://github.com/dandavison/delta/releases/download/0.15.1/delta-0.15.1-x86_64-unknown-linux-musl.tar.gz"
+            set -l delta_hash 737d318ab15d4ca68e3bdb0753867d0d3944ff78d37fc44c79941104fbbdbb12
+            set -l url "https://github.com/dandavison/delta/releases/download/0.16.5/delta-0.16.5-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $delta_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/delta-0.15.1-x86_64-unknown-linux-musl/delta" "$BIN_DIR"
+                cp "$CACHE_DIR/delta-0.16.5-x86_64-unknown-linux-musl/delta" "$BIN_DIR"
             end
         case bat
-            set -l bat_hash 917844685025552d9fb3d66e233ce55d3b3c2ea85a6c0ad3dc703705adea9525
-            set -l url "https://github.com/sharkdp/bat/releases/download/v0.22.1/bat-v0.22.1-x86_64-unknown-linux-musl.tar.gz"
+            set -l bat_hash e7f97bc826878283775fdb02a53a871fab1be920b921057549b2bc7da81bb771
+            set -l url "https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $bat_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/bat-v0.22.1-x86_64-unknown-linux-musl/bat" "$BIN_DIR"
-                cp "$CACHE_DIR/bat-v0.22.1-x86_64-unknown-linux-musl/autocomplete/bat.fish" ~/.config/fish/completions/
+                cp "$CACHE_DIR/bat-v0.23.0-x86_64-unknown-linux-musl/bat" "$BIN_DIR"
+                cp "$CACHE_DIR/bat-v0.23.0-x86_64-unknown-linux-musl/autocomplete/bat.fish" ~/.config/fish/completions/
                 # Update abbrs to make cat expand to rg
                 update_abbrs
             else
