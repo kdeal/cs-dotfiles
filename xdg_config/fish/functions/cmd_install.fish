@@ -129,6 +129,19 @@ function __cmd_install_single_command
             else
                 echo "Hashes don't match expected"
             end
+        case fd
+            set -l fd_hash ced2541984b765994446958206b3411f3dea761a5e618cb18b4724c523727d68
+            set -l url "https://github.com/sharkdp/fd/releases/download/v8.7.0/fd-v8.7.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $fd_hash)
+            if test -n "$tmp_file"
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp "$CACHE_DIR/fd-v8.7.0-x86_64-unknown-linux-musl/fd" "$BIN_DIR"
+                cp $CACHE_DIR/fd-v8.7.0-x86_64-unknown-linux-musl/autocomplete/fd.fish $HOME/.config/fish/completions/
+                # Update abbrs to make grep expand to rg
+                update_abbrs
+            else
+                echo "Hashes don't match expected"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
