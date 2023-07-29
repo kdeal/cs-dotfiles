@@ -137,8 +137,18 @@ function __cmd_install_single_command
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
                 cp "$CACHE_DIR/fd-v8.7.0-x86_64-unknown-linux-musl/fd" "$BIN_DIR"
                 cp $CACHE_DIR/fd-v8.7.0-x86_64-unknown-linux-musl/autocomplete/fd.fish $HOME/.config/fish/completions/
-                # Update abbrs to make grep expand to rg
-                update_abbrs
+            else
+                echo "Hashes don't match expected"
+            end
+        case lua_ls
+            set -l lua_ls_hash 88a0d15efd54742bae9464138f9fb657a07f40af105ffb5ce3466dd6c8269c5d
+            set -l url "https://github.com/LuaLS/lua-language-server/releases/download/3.6.25/lua-language-server-3.6.25-linux-x64.tar.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $lua_ls_hash)
+            if test -n "$tmp_file"
+                mkdir -p $HOME/.local/share/lua_ls/
+                tar xzf "$tmp_file" -C "$HOME/.local/share/lua_ls/"
+                echo -e "#!/bin/bash\nexec \"$HOME/.local/share/lua_ls/bin/lua-language-server\" \"\$@\"" >$BIN_DIR/lua-language-server
+                chmod +x $BIN_DIR/lua-language-server
             else
                 echo "Hashes don't match expected"
             end
