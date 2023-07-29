@@ -86,24 +86,24 @@ set encoding=utf-8
 set fileencoding=utf-8
 
 " Random maps
-noremap <leader>w :w<CR>
-noremap <leader>q :q<CR>
-noremap <leader>x :x<CR>
-noremap <leader>ev :e ~/.vimrc<CR>
-noremap <leader>r :source ~/.vimrc<CR>
-noremap ]b :bnext<CR>
-noremap [b :bprevious<CR>
+noremap <leader>w <cmd>w<CR>
+noremap <leader>q <cmd>q<CR>
+noremap <leader>x <cmd>x<CR>
+noremap <leader>ev <cmd>e ~/.vimrc<CR>
+noremap <leader>r <cmd>source ~/.vimrc<CR>
+noremap ]b <cmd>bnext<CR>
+noremap [b <cmd>bprevious<CR>
 noremap <leader>j <C-W><C-J>
 noremap <leader>k <C-W><C-K>
 noremap <leader>h <C-W><C-H>
 noremap <leader>l <C-W><C-L>
-noremap <leader>sp :sp<CR>
-noremap <leader>vs :vs<CR>
-noremap <leader>bd :bn <bar> bd #<CR>
-noremap <UP> :resize +5<CR>
-noremap <DOWN> :resize -5<CR>
-noremap <RIGHT> :vertical resize +5<CR>
-noremap <LEFT> :vertical resize -5<CR>
+noremap <leader>sp <cmd>sp<CR>
+noremap <leader>vs <cmd>vs<CR>
+noremap <leader>bd <cmd>bn <bar> bd #<CR>
+noremap <UP> <cmd>resize +5<CR>
+noremap <DOWN> <cmd>resize -5<CR>
+noremap <RIGHT> <cmd>vertical resize +5<CR>
+noremap <LEFT> <cmd>vertical resize -5<CR>
 
 " Remember more things
 set history=1000

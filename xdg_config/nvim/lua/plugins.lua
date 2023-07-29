@@ -37,10 +37,10 @@ require("lazy").setup({
         "tpope/vim-fugitive",
         ft = "gitcommit",
         keys = {
-            { "<leader>ge", "<cmd>Gedit", silent = true },
-            { "<leader>gl", "<cmd>Glog", silent = true },
-            { "<leader>gb", "<cmd>Git blame<CR>", silent = true },
-            { "<leader>gs", "<cmd>Git<CR>", silent = true },
+            { "<leader>ge", "<cmd>Gedit<cr>", silent = true },
+            { "<leader>gl", "<cmd>Glog<cr>", silent = true },
+            { "<leader>gb", "<cmd>Git blame<cr>", silent = true },
+            { "<leader>gs", "<cmd>Git<cr>", silent = true },
         },
     },
 
@@ -125,14 +125,14 @@ require("lazy").setup({
     {
         "nvim-telescope/telescope.nvim",
         keys = {
-            { "<leader>/a", ":Telescope lsp_code_actions<CR>", silent = true },
-            { "<leader>/b", ":Telescope buffers<CR>", silent = true },
-            { "<leader>/e", ":Telescope loclist<CR>", silent = true },
-            { "<leader>/f", ":Telescope find_files<CR>", silent = true },
-            { "<leader>/g", ":Telescope live_grep<CR>", silent = true },
-            { "<leader>/h", ":Telescope help_tags<CR>", silent = true },
-            { "<leader>/r", ":Telescope registers<CR>", silent = true },
-            { "<leader>/q", ":Telescope quickfix<CR>", silent = true },
+            { "<leader>/a", "<cmd>Telescope lsp_code_actions<cr>", silent = true },
+            { "<leader>/b", "<cmd>Telescope buffers<cr>", silent = true },
+            { "<leader>/e", "<cmd>Telescope loclist<cr>", silent = true },
+            { "<leader>/f", "<cmd>Telescope find_files<cr>", silent = true },
+            { "<leader>/g", "<cmd>Telescope live_grep<cr>", silent = true },
+            { "<leader>/h", "<cmd>Telescope help_tags<cr>", silent = true },
+            { "<leader>/r", "<cmd>Telescope registers<cr>", silent = true },
+            { "<leader>/q", "<cmd>Telescope quickfix<cr>", silent = true },
         },
         config = true,
         dependencies = {
@@ -238,7 +238,7 @@ require("lazy").setup({
         opts = {
             signcolumn = false,
         },
-        keys = { { "<leader>gd", "<cmd>Gitsigns toggle_signs<CR>", silent = true } },
+        keys = { { "<leader>gd", "<cmd>Gitsigns toggle_signs<cr>", silent = true } },
     },
 
     {

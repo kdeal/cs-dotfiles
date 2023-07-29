@@ -1,6 +1,6 @@
 scriptencoding utf-8
 
-nnoremap <silent> <leader>ou :UndotreeToggle<CR>
+nnoremap <silent> <leader>ou <cmd>UndotreeToggle<CR>
 
 " Move cursor into window when opening
 let g:undotree_SetFocusWhenToggle = 1
