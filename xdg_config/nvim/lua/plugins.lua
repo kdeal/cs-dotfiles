@@ -35,6 +35,7 @@ require("lazy").setup({
     -- Git in vim
     {
         "tpope/vim-fugitive",
+        ft = "gitcommit",
         keys = {
             { "<leader>ge", "<cmd>Gedit", silent = true },
             { "<leader>gl", "<cmd>Glog", silent = true },
@@ -75,6 +76,10 @@ require("lazy").setup({
     -- Move function argument left or right
     {
         "AndrewRadev/sideways.vim",
+        keys = {
+            { "gsh", "<cmd>SidewaysLeft<CR>", silent = true },
+            { "gsl", "<cmd>SidewaysRight<CR>", silent = true },
+        },
         cmd = { "SidewaysLeft", "SidewaysRight" },
     },
     -- Join or split things (lists, function line, tuples)
@@ -130,6 +135,9 @@ require("lazy").setup({
             { "<leader>/q", ":Telescope quickfix<CR>", silent = true },
         },
         config = true,
+        dependencies = {
+            "nvim-telescope/telescope-fzf-native.nvim",
+        },
     },
 
     -- FZF like filtering for telescope
