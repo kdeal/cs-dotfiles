@@ -68,13 +68,7 @@ vim.cmd([[
 vim.opt.mouse = "ar"
 
 vim.opt.foldmethod = "indent"
-vim.cmd([[
-    augroup autoset_foldlevel
-        autocmd!
-        " Set fold level to max foldlevel of buffer when added to window
-        autocmd BufWinEnter * normal zR
-    augroup END
-]])
+vim.opt.foldlevel = 99
 
 -- Autoload files from disk
 vim.opt.autoread = true
