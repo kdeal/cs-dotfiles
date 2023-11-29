@@ -100,11 +100,10 @@ require("lazy").setup({
         "j-hui/fidget.nvim",
         event = "VeryLazy",
         opts = {
-            text = {
-                spinner = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃" },
-            },
-            align = {
-                bottom = false,
+            notification = {
+                window = {
+                    align = "top",
+                },
             },
         },
     },
