@@ -107,7 +107,36 @@ require("lazy").setup({
             },
         },
     },
-
+    -- Runs formattters
+    {
+        "stevearc/conform.nvim",
+        cmd = { "ConformInfo" },
+        keys = {
+            {
+                "<leader>f",
+                function()
+                    require("conform").format({ async = true, lsp_fallback = true })
+                end,
+                mode = "",
+                desc = "Format buffer",
+            },
+        },
+        -- Everything in opts will be passed to setup()
+        opts = {
+            -- Define your formatters
+            formatters_by_ft = {
+                fish = { "fish_indent" },
+                javascript = { "prettier" },
+                lua = { "stylua" },
+                python = { "isort", "black" },
+                rust = { "rustfm" },
+            },
+        },
+        init = function()
+            -- If you want the formatexpr, here is the place to set it
+            vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+        end,
+    },
     -- Hook commands up to nvim lsp
     {
         "jose-elias-alvarez/null-ls.nvim",
