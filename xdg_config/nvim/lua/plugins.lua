@@ -137,13 +137,20 @@ require("lazy").setup({
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
         end,
     },
-    -- Hook commands up to nvim lsp
     {
-        "jose-elias-alvarez/null-ls.nvim",
-        dependencies = "nvim-lua/plenary.nvim",
-        event = "VeryLazy",
-        config = function()
-            require("null_ls_conf")
+        "mfussenegger/nvim-lint",
+        event = { "BufWritePre" },
+        init = function()
+            require("lint").linters_by_ft = {
+                markdown = { "vale" },
+                python = { "flake8", "mypy", "codespell" },
+                yaml = { "yamllint" },
+            }
+            vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+                callback = function()
+                    require("lint").try_lint()
+                end,
+            })
         end,
     },
 
