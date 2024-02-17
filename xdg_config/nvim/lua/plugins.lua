@@ -107,7 +107,7 @@ require("lazy").setup({
             },
         },
     },
-    -- Runs formattters
+    -- Runs formatters
     {
         "stevearc/conform.nvim",
         cmd = { "ConformInfo" },
@@ -119,21 +119,22 @@ require("lazy").setup({
                 end,
                 mode = "",
                 desc = "Format buffer",
+                silent = true,
             },
         },
-        -- Everything in opts will be passed to setup()
         opts = {
-            -- Define your formatters
             formatters_by_ft = {
                 fish = { "fish_indent" },
+                graphql = { "prettier" },
                 javascript = { "prettier" },
+                json = { "jq" },
                 lua = { "stylua" },
-                python = { "isort", "black" },
-                rust = { "rustfm" },
+                mdformat = { "mdformat" },
+                python = { "black", "ruff_format" },
+                rust = { "rustfmt" },
             },
         },
         init = function()
-            -- If you want the formatexpr, here is the place to set it
             vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
         end,
     },
@@ -142,8 +143,12 @@ require("lazy").setup({
         event = { "BufWritePre" },
         init = function()
             require("lint").linters_by_ft = {
-                markdown = { "vale" },
-                python = { "flake8", "mypy", "codespell" },
+                fish = { "fish", "cspell" },
+                javascript = { "eslint", "cspell" },
+                lua = { "cspell" },
+                markdown = { "vale", "cspell" },
+                python = { "ruff", "mypy", "cspell" },
+                rust = { "cspell" },
                 yaml = { "yamllint" },
             }
             vim.api.nvim_create_autocmd({ "BufWritePost" }, {
