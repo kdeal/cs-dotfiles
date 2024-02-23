@@ -224,4 +224,7 @@ vim.fn.sign_define("DiagnosticSignWarn", { text = "⚑", texthl = "DiagnosticSig
 vim.fn.sign_define("DiagnosticSignInfo", { text = "ℹ", texthl = "DiagnosticSignInfo", linehl = "", numhl = "" })
 vim.fn.sign_define("DiagnosticSignHint", { text = "🞇", texthl = "DiagnosticSignHint", linehl = "", numhl = "" })
 
+-- Restore cursor position
+vim.api.nvim_create_autocmd("BufReadPost", { command = 'silent! normal! g`"zv' })
+
 require("plugins")
