@@ -26,12 +26,6 @@ require("lazy").setup({
     -- Colorscheme
     { "morhetz/gruvbox", lazy = false, priority = 1000 },
 
-    -- Easy commenting in any language
-    "tpope/vim-commentary",
-
-    -- Shortcuts for next and previous <quickfix|location>
-    "tpope/vim-unimpaired",
-
     -- Git in vim
     {
         "tpope/vim-fugitive",
@@ -83,8 +77,6 @@ require("lazy").setup({
         },
         cmd = { "SidewaysLeft", "SidewaysRight" },
     },
-    -- Join or split things (lists, function line, tuples)
-    "AndrewRadev/splitjoin.vim",
 
     -- Config for neovim language servers
     {
@@ -292,6 +284,22 @@ require("lazy").setup({
             "MunifTanjim/nui.nvim",
             "rcarriga/nvim-notify",
         },
+    },
+    {
+        "echasnovski/mini.nvim",
+        config = function()
+            -- Better Around/Inside textobjects
+            require("mini.ai").setup({ n_lines = 500 })
+            -- Shortcuts for next and previous <quickfix|location>
+            require("mini.bracketed").setup()
+            -- Buffer removing (unshow, delete, wipeout), which saves window layout
+            require("mini.bufremove").setup()
+            -- Easy commenting in any language
+            require("mini.comment").setup()
+            require("mini.splitjoin").setup()
+            -- Easily change surrounding characters
+            require("mini.surround").setup()
+        end,
     },
 }, {
     ui = {
