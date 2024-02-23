@@ -214,8 +214,6 @@ vim.cmd([[
 -- Diagnostic config
 nnoremap("<leader>od", "<cmd>lua vim.diagnostic.setloclist({ open = true })<cr>", { silent = true })
 nnoremap("<leader>d", '<cmd>lua vim.diagnostic.open_float(nil, { scope = "cursor" })<cr>', { silent = true })
-nnoremap("[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", { silent = true })
-nnoremap("]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", { silent = true })
 
 vim.diagnostic.config({ virtual_text = false })
 
