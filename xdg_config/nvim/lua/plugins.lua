@@ -297,7 +297,7 @@ require("lazy").setup({
             -- Easy commenting in any language
             require("mini.comment").setup()
             -- Automatic read/write of session
-            require("mini.sessions").setup({ autoread = true })
+            require("mini.sessions").setup()
             require("mini.splitjoin").setup()
             -- Easily change surrounding characters
             require("mini.surround").setup()
