@@ -1,10 +1,8 @@
 function! AdjustHighlights() abort
-    highlight MatchParen cterm=bold ctermfg=red ctermbg=darkgrey
-    highlight IncSearch ctermfg=lightgreen ctermbg=green guifg=#3c3836 guibg=#fadb2f
-    highlight Substitute ctermfg=lightgreen ctermbg=green guifg=#3c3836 guibg=#fadb2f
-    highlight Search ctermfg=lightgreen ctermbg=green guifg=#3c3836 guibg=#fadb2f
-    highlight link gitcommitSummary GruvboxAqua
-    highlight link gitcommitOverflow GruvboxRed
+    highlight! MatchParen cterm=bold ctermfg=red ctermbg=darkgrey
+    highlight! IncSearch ctermfg=lightgreen ctermbg=green guifg=#3c3836 guibg=#fadb2f
+    highlight! Substitute ctermfg=lightgreen ctermbg=green guifg=#3c3836 guibg=#fadb2f
+    highlight! Search ctermfg=lightgreen ctermbg=green guifg=#3c3836 guibg=#fadb2f
 
     " Fix Diagnostic theme
     highlight! link DiagnosticSignError GruvboxRedSign
@@ -25,6 +23,23 @@ function! AdjustHighlights() abort
     highlight! link NoiceCmdlineIconSearch DiagnosticWarn
     highlight! link NoiceCmdlinePopupBorderSearch DiagnosticWarn
     highlight! link NoiceConfirmBorder DiagnosticInfo
+
+    " Flip foreground/background for diff
+    highlight! link DiffAdd GruvboxGreen
+    highlight! link DiffDelete GruvboxRed
+    highlight! link DiffChange GruvboxAqua
+
+    " tree-sitter highlight groups
+    highlight! link @text Normal
+    highlight! link @variable Normal
+    highlight! link @variable.parameter GruvboxBlue
+    highlight! link @attribute GruvboxAqua
+
+    " Fix diff highlighting
+    highlight! link @diff.plus DiffAdd
+    highlight! link @diff.minus DiffDelete
+    highlight! link @diff.delta DiffChange
+
 endfunction
 
 augroup AdjustColors
