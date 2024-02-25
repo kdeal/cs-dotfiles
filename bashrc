@@ -4,7 +4,12 @@ case $- in
       *) return;;
 esac
 
-if command -v fish &> /dev/null
+if ! command -v fish &> /dev/null
 then
-    exec fish -l
+    echo "Fish not installed, installing via apt..."
+    sleep 2
+    sudo apt update
+    sudo apt install fish
 fi
+
+exec fish -l
