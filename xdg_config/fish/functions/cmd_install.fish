@@ -24,8 +24,8 @@ function __cmd_install_single_command
 
     switch $argv[1]
         case nvim
-            set -l nvim_hash 6c083017304213c3a3efde8d332a52231b8df8206d35146942097c303ebf93d5
-            set -l url "https://github.com/neovim/neovim/releases/download/v0.9.1/nvim-linux64.tar.gz"
+            set -l nvim_hash 44ee395d9b5f8a14be8ec00d3b8ead34e18fe6461e40c9c8c50e6956d643b6ca
+            set -l url "https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
@@ -39,12 +39,13 @@ function __cmd_install_single_command
                 echo "Hashes don't match expected"
             end
         case rg
-            set -l rg_hash ee4e0751ab108b6da4f47c52da187d5177dc371f0f512a7caaec5434e711c091
-            set -l url "https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l rg_hash f84757b07f425fe5cf11d87df6644691c644a5cd2348a2c670894272999d3ba7
+            set -l url "https://github.com/BurntSushi/ripgrep/releases/download/14.1.0/ripgrep-14.1.0-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $rg_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/ripgrep-13.0.0-x86_64-unknown-linux-musl/rg" "$BIN_DIR"
+                cp "$CACHE_DIR/ripgrep-14.1.0-x86_64-unknown-linux-musl/rg" "$BIN_DIR"
+                cp "$CACHE_DIR/ripgrep-14.1.0-x86_64-unknown-linux-musl/complete/rg.fish" ~/.config/fish/completions/
                 # Update abbrs to make grep expand to rg
                 update_abbrs
             else
@@ -52,7 +53,7 @@ function __cmd_install_single_command
             end
         case debugpy
             if command -q pip
-                pip install debugpy==1.6.7
+                pip install debugpy==1.8.1
             else
                 echo "Pip unavailable can't install"
             end
@@ -100,8 +101,8 @@ function __cmd_install_single_command
                 echo "Hashes don't match expected"
             end
         case helix
-            set -l helix_hash c3840a51ef6a255eed192e7d7b929d37d280345ee165f819718bd016ae3f46be
-            set -l url "https://github.com/helix-editor/helix/releases/download/23.03/helix-23.03-x86_64.AppImage"
+            set -l helix_hash 60d6337c4d748cef1f936cde66dc7dbd009c70a7f068c96cfc319250e513256f
+            set -l url "https://github.com/helix-editor/helix/releases/download/23.10/helix-23.10-x86_64.AppImage"
             set -l tmp_file (__cmd_install_checksha_download $url $helix_hash)
             if test -n "$tmp_file"
                 chmod +x "$tmp_file"
@@ -130,19 +131,19 @@ function __cmd_install_single_command
                 echo "Hashes don't match expected"
             end
         case fd
-            set -l fd_hash ced2541984b765994446958206b3411f3dea761a5e618cb18b4724c523727d68
-            set -l url "https://github.com/sharkdp/fd/releases/download/v8.7.0/fd-v8.7.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l fd_hash 069e2d58127ddd944c03a2684ad79f72e3f9bd3e0d2642c36adc5b367c134592
+            set -l url "https://github.com/sharkdp/fd/releases/download/v9.0.0/fd-v9.0.0-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $fd_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/fd-v8.7.0-x86_64-unknown-linux-musl/fd" "$BIN_DIR"
-                cp $CACHE_DIR/fd-v8.7.0-x86_64-unknown-linux-musl/autocomplete/fd.fish $HOME/.config/fish/completions/
+                cp "$CACHE_DIR/fd-v9.0.0-x86_64-unknown-linux-musl/fd" "$BIN_DIR"
+                cp $CACHE_DIR/fd-v9.0.0-x86_64-unknown-linux-musl/autocomplete/fd.fish $HOME/.config/fish/completions/
             else
                 echo "Hashes don't match expected"
             end
         case lua_ls
-            set -l lua_ls_hash 88a0d15efd54742bae9464138f9fb657a07f40af105ffb5ce3466dd6c8269c5d
-            set -l url "https://github.com/LuaLS/lua-language-server/releases/download/3.6.25/lua-language-server-3.6.25-linux-x64.tar.gz"
+            set -l lua_ls_hash e8aaabfa3b94b9afa51245d4ca73fe8196ac31625653b8dd83f6027183f596a5
+            set -l url "https://github.com/LuaLS/lua-language-server/releases/download/3.7.4/lua-language-server-3.7.4-linux-x64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $lua_ls_hash)
             if test -n "$tmp_file"
                 mkdir -p $HOME/.local/share/lua_ls/
