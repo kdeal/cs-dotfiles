@@ -1,1 +1,1 @@
-complete -c cmd_install --no-files --require-parameter --arguments "nvim rg debugpy gopls pre-commit pyright delta bat helix exa fd lua_ls"
+complete -c cmd_install --no-files --require-parameter --arguments "nvim rg debugpy gopls pre-commit pyright delta bat helix exa fd lua_ls rust-analyzer rustfmt"

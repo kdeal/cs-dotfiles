@@ -5,6 +5,8 @@ function devenv
             set env python
         else if [ -d xdg_config ]
             set env lua
+        else if [ -e cargo.toml ]
+            set env rust
         else
             set env base
         end
@@ -19,6 +21,8 @@ function devenv
             set -a packages lua_ls
         case python
             set -a packages pyright debugpy
+        case rust
+            set -a packages rustfmt rust-analyzer
     end
 
     if [ -e .pre-commit-config.yaml ]
