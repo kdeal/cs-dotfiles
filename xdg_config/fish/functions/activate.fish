@@ -19,7 +19,7 @@ function activate
     set -l potential_venvs virtualenv_run venv devenv
 
     if set -q VIRTUAL_ENV
-        if [ "$argv" != -q ]
+        if not set -q _flag_quiet
             printf "%sAlready in virtual environment!%s\n" (set_color red) (set_color normal)
         end
     else
@@ -44,13 +44,13 @@ function activate
     end
 end
 
-function activate_venv
+function activate_venv --argument-names venv_dir
     # My fish_prompt checks if VIRTUAL_ENV variable is set and adjust the prompt
     set VIRTUAL_ENV_DISABLE_PROMPT true # The value doesn't actually matter
-    source $argv/bin/activate.fish
+    source $venv_dir/bin/activate.fish
 end
 
-function activate_node_modules
-    set -g NODE_MODULES_PATH $argv/.bin
+function activate_node_modules --argument-names node_dir
+    set -g NODE_MODULES_PATH $node_dir/.bin
     set -x PATH $NODE_MODULES_PATH $PATH
 end
