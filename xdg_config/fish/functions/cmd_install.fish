@@ -153,6 +153,22 @@ function __cmd_install_single_command
             else
                 echo "Hashes don't match expected"
             end
+        case rustfmt
+            if command -q rustup
+                rustup component add rustfmt
+            else
+                printf "%sERROR:%s rustup unavailable can't install %srustfmt%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
+            end
+        case rust-analyzer
+            set -l rust_analyzer_hash 80d1a59e87820b65d4a86e6994a5dfda14edfd9fb5133a2394f28634bbc19eb2
+            set -l url "https://github.com/rust-lang/rust-analyzer/releases/download/2024-02-19/rust-analyzer-x86_64-unknown-linux-musl.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $rust_analyzer_hash)
+            if [ -n "$tmp_file" ]
+                gunzip -c $tmp_file >$BIN_DIR/rust-analyzer
+                chmod +x $BIN_DIR/rust-analyzer
+            else
+                printf "%sError:%s Hashes don't match expected for %srust-analyzer%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
