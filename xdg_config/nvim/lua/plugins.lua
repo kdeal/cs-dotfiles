@@ -24,7 +24,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- Colorscheme
-    { "morhetz/gruvbox", lazy = false, priority = 1000 },
+    { "dracula/vim", lazy = false, priority = 1000 },
 
     -- Git in vim
     {
