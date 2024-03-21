@@ -24,7 +24,18 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     -- Colorscheme
-    { "dracula/vim", lazy = false, priority = 1000 },
+    {
+        "EdenEast/nightfox.nvim",
+        lazy = false,
+        priority = 1000,
+        opts = {
+            options = {
+                styles = {
+                    comments = "italic",
+                },
+            },
+        },
+    },
 
     -- Git in vim
     {

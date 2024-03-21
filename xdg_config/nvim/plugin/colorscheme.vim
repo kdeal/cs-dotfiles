@@ -1,1 +1,1 @@
-silent! colorscheme dracula
+silent! colorscheme nordfox

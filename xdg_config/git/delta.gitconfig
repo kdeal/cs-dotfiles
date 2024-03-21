@@ -3,7 +3,7 @@
 
 [delta]
     side-by-side = true
-    syntax-theme = gruvbox-dark
+    syntax-theme = nord
     file-style = bold yellow
     file-decoration-style = blue ol ul
     hunk-header-decoration-style = dim blue ul
