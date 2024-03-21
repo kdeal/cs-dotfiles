@@ -1,3 +1,5 @@
+local colors = require("nightfox.palette").load("nordfox")
+
 _G.status_filetype = function()
     if vim.o.filetype ~= "" then
         return vim.o.filetype
@@ -58,15 +60,17 @@ _G.status_record_status = function()
 end
 
 -- Read-only
-vim.api.nvim_set_hl(0, "User1", { fg = "#cc241d", bg = "#32302f", ctermfg = 1, ctermbg = 10 })
+vim.api.nvim_set_hl(0, "User1", { fg = colors.red.base, bg = colors.bg0, ctermfg = 1, ctermbg = 10 })
 -- filename
-vim.api.nvim_set_hl(0, "User2", { fg = "#ebdbb2", bg = "#32302f", ctermfg = 8, ctermbg = 10 })
+vim.api.nvim_set_hl(0, "User2", { fg = colors.fg2, bg = colors.bg0, ctermfg = 8, ctermbg = 10 })
 -- Modified
-vim.api.nvim_set_hl(0, "User3", { fg = "#d65d0e", bg = "#32302f", bold = true, ctermfg = 166, ctermbg = 10 })
+vim.api.nvim_set_hl(0, "User3", { fg = colors.orange.base, bg = colors.bg0, bold = true, ctermfg = 166, ctermbg = 10 })
 -- Linter
-vim.api.nvim_set_hl(0, "User4", { fg = "#1d2021", bg = "#fb4934", ctermfg = 254, ctermbg = 1 })
+vim.api.nvim_set_hl(0, "User4", { fg = colors.black.base, bg = colors.red.base, ctermfg = 254, ctermbg = 1 })
+-- Beginning/End
+vim.api.nvim_set_hl(0, "User5", { fg = colors.fg, bg = colors.bg2, ctermfg = 254, ctermbg = 1 })
 
 vim.o.statusline =
-    " %{v:lua.status_current_project()} %2* %{v:lua.status_record_status()}%<%=%{v:lua.status_filetype()} %4*%{v:lua.diagnostics_statusline()}%2*%* %l:%c %P "
+    "%5* %{v:lua.status_current_project()} %2* %{v:lua.status_record_status()}%<%=%{v:lua.status_filetype()} %4*%{v:lua.diagnostics_statusline()}%5* %l:%c %P "
 
 vim.o.winbar = "%2* %f%h%q%3*%{v:lua.status_modified()}%2* %1*%{v:lua.status_readonly()}%2*"

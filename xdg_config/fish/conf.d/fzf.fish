@@ -1,8 +1,9 @@
-# colors taken from https://draculatheme.com/fzf
+# colors taken from https://github.com/ianchesal/nord-fzf
 set -Ux FZF_COLORS "
-    --color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9
-    --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6
-    --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4
+    --color=fg:#e5e9f0,bg:#2e333f,hl:#81a1c1
+    --color=fg+:#e5e9f0,bg+:#2e333f,hl+:#81a1c1
+    --color=info:#eacb8a,prompt:#bf6069,pointer:#b48dac
+    --color=marker:#a3be8b,spinner:#b48dac,header:#a3be8b
 "
 
 set -Ux FZF_DEFAULT_COMMAND 'fd --type f --hidden --follow --exclude .git'
