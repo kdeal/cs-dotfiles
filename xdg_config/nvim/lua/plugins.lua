@@ -132,7 +132,7 @@ require("lazy").setup({
                 javascript = { "prettier" },
                 json = { "jq" },
                 lua = { "stylua" },
-                mdformat = { "mdformat" },
+                markdown = { "mdformat" },
                 python = { "black", "ruff_format" },
                 rust = { "rustfmt" },
             },
