@@ -118,7 +118,15 @@ require("lazy").setup({
             {
                 "<leader>f",
                 function()
-                    require("conform").format({ async = true, lsp_fallback = true })
+                    local progress = require("fidget.progress")
+                    local handle = progress.handle.create({
+                        title = "Formatting",
+                        lsp_client = { name = "confirm.nvim" },
+                        percentage = 0,
+                    })
+                    require("conform").format({ async = true, lsp_fallback = true }, function(err)
+                        handle:finish()
+                    end)
                 end,
                 mode = "",
                 desc = "Format buffer",
@@ -156,7 +164,14 @@ require("lazy").setup({
             }
             vim.api.nvim_create_autocmd({ "BufWritePost" }, {
                 callback = function()
+                    local progress = require("fidget.progress")
+                    local handle = progress.handle.create({
+                        title = "Linting",
+                        lsp_client = { name = "nvim-lint" },
+                        percentage = 0,
+                    })
                     require("lint").try_lint()
+                    handle:finish()
                 end,
             })
         end,
