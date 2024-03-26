@@ -4,7 +4,7 @@ require("neotest").setup({
         require("neotest-go"),
     },
     icons = {
-        running_animated = { "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃" },
+        running_animated = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
         passed = "✔",
         running = "…",
         failed = "✖",
