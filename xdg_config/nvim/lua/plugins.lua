@@ -34,6 +34,11 @@ require("lazy").setup({
                     comments = "italic",
                 },
             },
+            groups = {
+                all = {
+                    IblScope = { fg = "palette.blue" },
+                },
+            },
         },
     },
 
