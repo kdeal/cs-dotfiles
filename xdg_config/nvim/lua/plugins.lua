@@ -148,6 +148,8 @@ require("lazy").setup({
                 markdown = { "mdformat" },
                 python = { "black", "ruff_format" },
                 rust = { "rustfmt" },
+                svelte = { "prettier" },
+                typescript = { "prettier" },
             },
         },
         init = function()
@@ -165,8 +167,6 @@ require("lazy").setup({
                 markdown = { "vale", "cspell" },
                 python = { "ruff", "mypy", "cspell" },
                 rust = { "cspell" },
-                svelte = { "prettier" },
-                typescript = { "prettier" },
                 yaml = { "yamllint" },
             }
             vim.api.nvim_create_autocmd({ "BufWritePost" }, {
