@@ -1,4 +1,6 @@
 /xdg_config/fish/fish_variables
+/xdg_config/fish/conf.d/local.fish
+
 /vim/undo/
 
 # Completions that are installed via cmd_install
