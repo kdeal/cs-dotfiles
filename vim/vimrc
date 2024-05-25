@@ -89,6 +89,8 @@ set showcmd
 set encoding=utf-8
 set fileencoding=utf-8
 
+set colorcolumn=80,120
+
 " Random maps
 noremap <leader>w <cmd>w<CR>
 noremap <leader>q <cmd>q<CR>
