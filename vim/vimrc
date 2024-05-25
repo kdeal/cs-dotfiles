@@ -30,6 +30,7 @@ set gdefault
 " Color scheme settings
 syntax on
 set background=dark
+colorscheme nord
 
 " Change backup and swap location
 set backupdir=~/.vim/backup
