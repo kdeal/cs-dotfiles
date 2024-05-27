@@ -352,8 +352,6 @@ require("lazy").setup({
             require("mini.bracketed").setup()
             -- Buffer removing (unshow, delete, wipeout), which saves window layout
             require("mini.bufremove").setup()
-            -- Easy commenting in any language
-            require("mini.comment").setup()
             -- Automatic read/write of session
             require("mini.sessions").setup()
             require("mini.splitjoin").setup()
