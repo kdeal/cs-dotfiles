@@ -26,12 +26,7 @@ _G.status_current_project = function()
 end
 
 _G.diagnostics_statusline = function()
-    local diagnostics = vim.diagnostic.get(0)
-    local counts = {}
-    for _, diagnostic in pairs(diagnostics) do
-        local cur_count = counts[diagnostic.severity] or 0
-        counts[diagnostic.severity] = cur_count + 1
-    end
+    local diagnostic_counts = vim.diagnostic.count(0)
 
     local severity_symbol = {
         [vim.diagnostic.severity.ERROR] = "✘",
@@ -40,7 +35,7 @@ _G.diagnostics_statusline = function()
         [vim.diagnostic.severity.HINT] = "🞇",
     }
     local status = ""
-    for severity, count in pairs(counts) do
+    for severity, count in pairs(diagnostic_counts) do
         local section = string.format(" %d %s", count, severity_symbol[severity])
         status = status .. section
     end
