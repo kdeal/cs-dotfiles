@@ -1,28 +1,4 @@
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-local utils = require("misc")
-
-if not vim.loop.fs_stat(lazypath) then
-    local lock_filepath = vim.fn.stdpath("config") .. "/lazy-lock.json"
-    local lazy_lock_data = vim.json.decode(utils.read_file(lock_filepath))["lazy.nvim"]
-    vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
-        string.format("--branch=%s", lazy_lock_data.branch), -- latest stable release
-        lazypath,
-    })
-    vim.fn.system({
-        "git",
-        "-C",
-        lazypath,
-        "checkout",
-        lazy_lock_data.commit,
-    })
-end
-vim.opt.rtp:prepend(lazypath)
-
-require("lazy").setup({
+return {
     -- Colorscheme
     {
         "EdenEast/nightfox.nvim",
@@ -372,21 +348,4 @@ require("lazy").setup({
             "DBUIFindBuffer",
         },
     },
-}, {
-    ui = {
-        icons = {
-            cmd = "⌘",
-            config = "🛠",
-            event = "📅",
-            ft = "📂",
-            init = "⚙",
-            keys = "🗝",
-            plugin = "🔌",
-            runtime = "💻",
-            source = "📄",
-            start = "🚀",
-            task = "📌",
-            lazy = "💤 ",
-        },
-    },
-})
+}
