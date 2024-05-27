@@ -24,8 +24,8 @@ function __cmd_install_single_command
 
     switch $argv[1]
         case nvim
-            set -l nvim_hash 44ee395d9b5f8a14be8ec00d3b8ead34e18fe6461e40c9c8c50e6956d643b6ca
-            set -l url "https://github.com/neovim/neovim/releases/download/v0.9.5/nvim-linux64.tar.gz"
+            set -l nvim_hash be1f0988d0de71c375982b87b86cd28d2bab35ece8285abe3b0aac57604dfc5a
+            set -l url "https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
