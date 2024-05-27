@@ -1,2 +1,8 @@
 /xdg_config/fish/fish_variables
 /vim/undo/
+
+# Completions that are installed via cmd_install
+xdg_config/fish/completions/bat.fish
+xdg_config/fish/completions/exa.fish
+xdg_config/fish/completions/fd.fish
+xdg_config/fish/completions/rg.fish
