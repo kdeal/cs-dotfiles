@@ -74,4 +74,6 @@ return {
     },
     -- Lua helper library
     { "nvim-lua/plenary.nvim", lazy = true },
+    -- Edit the filesystem as a buffer
+    { "stevearc/oil.nvim", config = true, keys = { { "-", "<CMD>Oil<CR>", silent = true } } },
 }

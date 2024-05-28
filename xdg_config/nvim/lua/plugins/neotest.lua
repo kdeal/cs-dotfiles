@@ -4,6 +4,7 @@ return {
         "nvim-neotest/neotest",
         dependencies = {
             "nvim-lua/plenary.nvim",
+            "nvim-neotest/nvim-nio",
             "nvim-treesitter/nvim-treesitter",
             -- This isn't really required, but is lang implementations for it
             "nvim-neotest/neotest-go",
