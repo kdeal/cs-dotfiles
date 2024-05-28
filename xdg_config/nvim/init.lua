@@ -225,6 +225,15 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "🞇", texthl = "DiagnosticSi
 -- Restore cursor position
 vim.api.nvim_create_autocmd("BufReadPost", { command = 'silent! normal! g`"zv' })
 
+vim.filetype.add({
+    extension = {
+        Jenkinsfile = "groovy",
+    },
+    filename = {
+        ["OWNERS"] = "yaml",
+    },
+})
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local utils = require("misc")
 
