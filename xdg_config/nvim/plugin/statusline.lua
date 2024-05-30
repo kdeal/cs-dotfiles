@@ -54,6 +54,12 @@ _G.status_record_status = function()
     end
 end
 
+_G.status_tabline = function()
+    local cur_tab = vim.fn.tabpagenr()
+    local total_tabs = vim.fn.tabpagenr("$")
+    return string.format("[%d/%d]", cur_tab, total_tabs)
+end
+
 -- Read-only
 vim.api.nvim_set_hl(0, "User1", { fg = colors.red.base, bg = colors.bg0, ctermfg = 1, ctermbg = 10 })
 -- filename
@@ -65,7 +71,8 @@ vim.api.nvim_set_hl(0, "User4", { fg = colors.black.base, bg = colors.red.base, 
 -- Beginning/End
 vim.api.nvim_set_hl(0, "User5", { fg = colors.fg, bg = colors.bg2, ctermfg = 254, ctermbg = 1 })
 
-vim.o.statusline =
-    "%5* %{v:lua.status_current_project()} %2* %{v:lua.status_record_status()}%<%=%{v:lua.status_filetype()} %4*%{v:lua.diagnostics_statusline()}%5* %l:%c %P "
+vim.o.statusline = "%5* %{v:lua.status_current_project()} %{v:lua.status_tabline()} %2* "
+    .. "%{v:lua.status_record_status()}%<%=%{v:lua.status_filetype()} "
+    .. "%4*%{v:lua.diagnostics_statusline()}%5* %l:%c %P "
 
 vim.o.winbar = "%2* %f%h%q%3*%{v:lua.status_modified()}%2* %1*%{v:lua.status_readonly()}%2*"
