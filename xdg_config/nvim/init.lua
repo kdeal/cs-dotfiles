@@ -120,6 +120,9 @@ vim.opt.inccommand = "split"
 vim.opt.cmdheight = 2
 vim.opt.showcmd = true
 
+-- Don't show the tabline
+vim.opt.showtabline = 0
+
 -- Encoding
 vim.opt.fileencoding = "utf-8"
 
