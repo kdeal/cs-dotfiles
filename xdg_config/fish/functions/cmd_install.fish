@@ -169,6 +169,14 @@ function __cmd_install_single_command
             else
                 printf "%sError:%s Hashes don't match expected for %srust-analyzer%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
             end
+        case typescript-language-server
+            if command -q npm
+                npm install -g typescript typescript-language-server
+            end
+        case tailwindcss-language-server
+            if command -q npm
+                npm install -g @tailwindcss/language-server
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
