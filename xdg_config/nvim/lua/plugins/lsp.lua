@@ -38,6 +38,7 @@ return {
                 },
                 rust_analyzer = {},
                 svelte = {},
+                tailwindcss = {},
                 tsserver = {},
             }
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
