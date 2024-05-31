@@ -151,7 +151,8 @@ nnoremap("gk", "k")
 
 -- Random maps
 nnoremap("<leader>nh", "<cmd>nohlsearch<CR>", { silent = true })
-nnoremap("<leader>ot", "<cmd>terminal<CR>", { silent = true })
+nnoremap("<leader>ot", "<cmd>lua require('float_term').toggle()<CR>", { silent = true })
+nnoremap("<leader>oT", "<cmd>terminal<CR>", { silent = true })
 nnoremap("<leader>ol", "<cmd>lopen<CR>", { silent = true })
 nnoremap("<leader>oc", "<cmd>copen<CR>", { silent = true })
 
