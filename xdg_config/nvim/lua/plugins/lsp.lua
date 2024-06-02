@@ -43,12 +43,39 @@ return {
             }
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             for lsp, lsp_settings in pairs(servers) do
-                settings = { on_attach = on_attach, capabilities = capabilities, settings = lsp_settings }
+                local settings = { on_attach = on_attach, capabilities = capabilities, settings = lsp_settings }
                 nvim_lsp[lsp].setup(settings)
             end
         end,
     },
-    { "folke/neodev.nvim", config = true },
+    {
+        "folke/lazydev.nvim",
+        opts = {
+            -- This is the same as the default, but also checks if the
+            -- root_dir is my dotfiles repo
+            ---@type boolean|(fun(client:vim.lsp.Client):boolean?)
+            enabled = function(client)
+                if vim.g.lazydev_enabled ~= nil then
+                    return vim.g.lazydev_enabled
+                end
+
+                if not client.root_dir then
+                    return false
+                end
+
+                if string.match(client.root_dir, "cs%-dotfiles$") then
+                    return true
+                end
+
+                if vim.uv.fs_stat(client.root_dir .. "/lua") then
+                    return true
+                end
+
+                return false
+            end,
+        },
+        ft = "lua",
+    },
 
     -- Shows language server progress
     {
