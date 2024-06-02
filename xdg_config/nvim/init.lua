@@ -178,7 +178,7 @@ vnoremap("p", "pgvy")
 noremap("<leader>tc", "<cmd>tabnew<CR>", { silent = true })
 
 -- buffer mappings
-noremap("<leader>bd", "<cmd>bn <bar> bd #<CR>", { silent = true })
+noremap("<leader>bd", "<cmd>lua MiniBufremove.delete(0, false)<CR>", { silent = true })
 
 -- window mappings
 noremap("<leader>j", "<C-W><C-J>")
