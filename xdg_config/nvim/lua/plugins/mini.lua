@@ -77,6 +77,10 @@ return {
             require("mini.pick").setup()
             -- Add for some more pickers
             require("mini.extra").setup()
+
+            require("mini.misc").setup()
+            MiniMisc.setup_auto_root({ "Cargo.toml", "package.json", ".git" })
+            MiniMisc.setup_restore_cursor()
         end,
     },
 }

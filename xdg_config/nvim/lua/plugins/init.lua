@@ -27,24 +27,6 @@ return {
         cmd = { "Delete", "Unlink", "Move", "Rename", "Chmod", "Mkdir", "SudoWrite", "SudoEdit" },
     },
 
-    -- Set the cwd to repo root
-    {
-        "airblade/vim-rooter",
-        config = function()
-            vim.g.rooter_patterns = {
-                "Cargo.toml",
-                "package.json",
-                -- Below are the default patterns
-                ".git",
-                ".git/",
-                "_darcs/",
-                ".hg/",
-                ".bzr/",
-                ".svn/",
-            }
-        end,
-    },
-
     -- Show how far indented a line is
     {
         "lukas-reineke/indent-blankline.nvim",
