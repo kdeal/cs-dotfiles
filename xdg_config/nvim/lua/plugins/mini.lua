@@ -6,6 +6,15 @@ return {
             -- Have to reenable the plugin, since I disable it during startup
             { "<leader>gd", "<cmd>lua vim.g.minidiff_disable = false; MiniDiff.toggle()<cr>", silent = true },
             { "<leader>gb", "<cmd>vertical leftabove Git blame --date human -- %<cr>", silent = true },
+            -- Picker commands
+            { "<leader>/b", "<cmd>Pick buffers<cr>", silent = true },
+            { "<leader>/d", "<cmd>Pick diagnostics<cr>", silent = true },
+            { "<leader>/e", "<cmd>Pick list scop='location-list'<cr>", silent = true },
+            { "<leader>/f", "<cmd>Pick files<cr>", silent = true },
+            { "<leader>/g", "<cmd>Pick grep_live<cr>", silent = true },
+            { "<leader>/h", "<cmd>Pick help<cr>", silent = true },
+            { "<leader>/q", "<cmd>Pick list scop='quickfix'<cr>", silent = true },
+            { "<leader>/s", "<cmd>Pick spellsuggest<cr>", silent = true },
         },
         config = function()
             -- Better Around/Inside textobjects
@@ -64,6 +73,10 @@ return {
 
             local au_opts = { pattern = "MiniGitCommandSplit", callback = align_blame }
             vim.api.nvim_create_autocmd("User", au_opts)
+
+            require("mini.pick").setup()
+            -- Add for some more pickers
+            require("mini.extra").setup()
         end,
     },
 }
