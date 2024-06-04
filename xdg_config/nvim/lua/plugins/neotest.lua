@@ -7,14 +7,12 @@ return {
             "nvim-neotest/nvim-nio",
             "nvim-treesitter/nvim-treesitter",
             -- This isn't really required, but is lang implementations for it
-            "nvim-neotest/neotest-go",
             "nvim-neotest/neotest-python",
         },
         config = function()
             require("neotest").setup({
                 adapters = {
                     require("neotest-python")({}),
-                    require("neotest-go"),
                 },
                 icons = {
                     running_animated = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
