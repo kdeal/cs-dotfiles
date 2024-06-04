@@ -15,6 +15,8 @@ return {
             { "<leader>/h", "<cmd>Pick help<cr>", silent = true },
             { "<leader>/q", "<cmd>Pick list scop='quickfix'<cr>", silent = true },
             { "<leader>/s", "<cmd>Pick spellsuggest<cr>", silent = true },
+            -- Open up file explorer
+            { "-", "<CMD>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<cr>", silent = true },
         },
         config = function()
             -- Better Around/Inside textobjects
@@ -84,6 +86,8 @@ return {
 
             -- Try out doing auto-pairs
             require("mini.pairs").setup()
+
+            require("mini.files").setup()
         end,
     },
 }
