@@ -16,7 +16,7 @@ function activate
         end
     end
 
-    set -l potential_venvs virtualenv_run venv devenv
+    set -l potential_venvs virtualenv_run venv devenv .venv
 
     if set -q VIRTUAL_ENV
         if not set -q _flag_quiet
