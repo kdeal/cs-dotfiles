@@ -11,7 +11,7 @@ local function get_window_args()
     local height = math.ceil(vim.o.lines * 0.9)
 
     local col = math.ceil((vim.o.columns - width) * 0.5)
-    local row = math.ceil((vim.o.lines - height) * 0.5 - 2)
+    local row = math.ceil((vim.o.lines - height) * 0.5)
 
     return {
         relative = "editor",
@@ -19,7 +19,6 @@ local function get_window_args()
         col = col,
         width = width,
         height = height,
-        border = "rounded",
     }
 end
 
