@@ -1,31 +1,32 @@
 local colors = require("nightfox.palette").load("nordfox")
+local MiniStatusline = require("mini.statusline")
 
-_G.status_filetype = function()
+function filetype_display()
     if vim.o.filetype ~= "" then
         return vim.o.filetype
     end
     return "no filetype"
 end
 
-_G.status_readonly = function()
+function readonly_display()
     if vim.o.readonly then
         return "RO"
     end
     return ""
 end
 
-_G.status_modified = function()
+function modified_display()
     if vim.o.modified then
         return " ●"
     end
     return ""
 end
 
-_G.status_current_project = function()
+function current_project()
     return vim.fn.fnamemodify(vim.loop.cwd(), ":t")
 end
 
-_G.diagnostics_statusline = function()
+function diagnostics_display()
     local diagnostic_counts = vim.diagnostic.count(0)
 
     local severity_symbol = {
@@ -45,7 +46,7 @@ _G.diagnostics_statusline = function()
     return status
 end
 
-_G.status_record_status = function()
+function record_status()
     local status_mode = require("noice").api.statusline.mode.get()
     if status_mode == nil or string.match(status_mode, "-- .+ --") then
         return ""
@@ -54,25 +55,48 @@ _G.status_record_status = function()
     end
 end
 
-_G.status_tabline = function()
+function tab_position()
     local cur_tab = vim.fn.tabpagenr()
     local total_tabs = vim.fn.tabpagenr("$")
-    return string.format("[%d/%d]", cur_tab, total_tabs)
+    return string.format("%d/%d", cur_tab, total_tabs)
 end
 
--- Read-only
-vim.api.nvim_set_hl(0, "User1", { fg = colors.red.base, bg = colors.bg0, ctermfg = 1, ctermbg = 10 })
--- filename
-vim.api.nvim_set_hl(0, "User2", { fg = colors.fg2, bg = colors.bg0, ctermfg = 8, ctermbg = 10 })
--- Modified
-vim.api.nvim_set_hl(0, "User3", { fg = colors.orange.base, bg = colors.bg0, bold = true, ctermfg = 166, ctermbg = 10 })
--- Linter
-vim.api.nvim_set_hl(0, "User4", { fg = colors.black.base, bg = colors.red.base, ctermfg = 254, ctermbg = 1 })
--- Beginning/End
-vim.api.nvim_set_hl(0, "User5", { fg = colors.fg, bg = colors.bg2, ctermfg = 254, ctermbg = 1 })
+_G.statusline_content = function()
+    local search = MiniStatusline.section_searchcount({ trunc_width = 75 })
+    return MiniStatusline.combine_groups({
+        { hl = "StatusLineEnds", strings = { current_project() } },
+        { hl = "StatusLineSecond", strings = { tab_position() } },
+        { hl = "StatusLineCenter", strings = { record_status() } },
+        "%<%=",
+        { hl = "StatusLineCenter", strings = { filetype_display() } },
+        { hl = "StatusLineDiagnostics", strings = { diagnostics_display() } },
+        { hl = "StatusLineSecond", strings = { search } },
+        { hl = "StatusLineEnds", strings = { "%l:%c %P " } },
+    })
+end
 
-vim.o.statusline = "%5* %{v:lua.status_current_project()} %{v:lua.status_tabline()} %2* "
-    .. "%{v:lua.status_record_status()}%<%=%{v:lua.status_filetype()} "
-    .. "%4*%{v:lua.diagnostics_statusline()}%5* %l:%c %P "
+_G.winbar_content = function()
+    return MiniStatusline.combine_groups({
+        { hl = "StatusLineCenter", strings = { "%f%h%q" } },
+        { hl = "StatusLineModified", strings = { modified_display() } },
+        { hl = "StatusLineReadOnly", strings = { readonly_display() } },
+    })
+end
 
-vim.o.winbar = "%2* %f%h%q%3*%{v:lua.status_modified()}%2* %1*%{v:lua.status_readonly()}%2*"
+vim.api.nvim_set_hl(0, "StatusLineReadOnly", { fg = colors.red.base, bg = colors.bg0, ctermfg = 1, ctermbg = 10 })
+vim.api.nvim_set_hl(0, "StatusLineCenter", { fg = colors.fg2, bg = colors.bg0, ctermfg = 8, ctermbg = 10 })
+vim.api.nvim_set_hl(
+    0,
+    "StatusLineModified",
+    { fg = colors.orange.base, bg = colors.bg0, bold = true, ctermfg = 166, ctermbg = 10 }
+)
+vim.api.nvim_set_hl(
+    0,
+    "StatusLineDiagnostics",
+    { fg = colors.black.base, bg = colors.red.base, ctermfg = 254, ctermbg = 1 }
+)
+vim.api.nvim_set_hl(0, "StatusLineEnds", { fg = colors.fg, bg = colors.bg2, ctermfg = 254, ctermbg = 1 })
+vim.api.nvim_set_hl(0, "StatusLineSecond", { fg = colors.fg, bg = colors.bg3, ctermfg = 254, ctermbg = 1 })
+
+vim.o.statusline = "%{%v:lua.statusline_content()%}"
+vim.o.winbar = "%{%v:lua.winbar_content()%}"
