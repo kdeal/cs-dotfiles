@@ -14,26 +14,10 @@ return {
                 adapters = {
                     require("neotest-python")({}),
                 },
-                icons = {
-                    running_animated = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
-                    passed = "✔",
-                    running = "…",
-                    failed = "✖",
-                    skipped = "↷",
-                    unknown = "🞅",
-                },
                 quickfix = {
                     open = false,
                 },
             })
-
-            -- Add background to the gutter icons
-            vim.cmd([[
-            highlight! link NeotestPassed GruvboxGreenSign
-            highlight! link NeotestFailed GruvboxRedSign
-            highlight! link NeotestRunning GruvboxPurpleSign
-            highlight! link NeotestSkipped GruvboxBlueSign
-            ]])
 
             nnoremap("<leader>op", '<cmd>lua require("neotest").summary.toggle()<cr>', { silent = true })
 
