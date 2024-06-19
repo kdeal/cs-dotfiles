@@ -1,0 +1,7 @@
+{
+    "if __name__ == __main__": {
+        "prefix": "ifmain",
+        "body": ["def main():","\t${1:pass}", "", "if __name__ == \"__main__\":", "\t${2:main()}"],
+        "description": "Execute code if the file is executed directly"
+    }
+}
