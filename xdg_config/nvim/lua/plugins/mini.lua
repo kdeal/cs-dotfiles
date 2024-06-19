@@ -1,6 +1,9 @@
 return {
     {
         "echasnovski/mini.nvim",
+        dependencies = {
+            "nvim-tree/nvim-web-devicons",
+        },
         lazy = false,
         keys = {
             -- Have to reenable the plugin, since I disable it during startup
