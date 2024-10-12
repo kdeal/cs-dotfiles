@@ -28,6 +28,9 @@ function devenv
     if [ -e .pre-commit-config.yaml ]
         set -a packages pre-commit
     end
+    if [ -e justfile ]
+        set -a packages just
+    end
 
     printf "Installing packages for the %s$env%s environment (%s$packages%s)\n" (set_color green) (set_color normal) (set_color yellow) (set_color normal)
     cmd_install $packages

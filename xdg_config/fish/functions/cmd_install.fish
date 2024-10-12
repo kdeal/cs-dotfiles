@@ -177,6 +177,19 @@ function __cmd_install_single_command
             if command -q npm
                 npm install -g @tailwindcss/language-server
             end
+        case just
+            set -l just_hash bc7c9f377944f8de9cd0418b11d2955adebfa25a488c0b5e3dd2d2c0e9d732da
+            set -l url "https://github.com/casey/just/releases/download/1.36.0/just-1.36.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $just_hash)
+            if [ -n "$tmp_file" ]
+                mkdir "$CACHE_DIR/just"
+                tar xzf "$tmp_file" -C "$CACHE_DIR/just"
+                cp "$CACHE_DIR/just/just" "$BIN_DIR"
+                cp "$CACHE_DIR/just/just.1" "$HOME/.local/share/man/man1/"
+                cp "$CACHE_DIR/just/completions/just.fish" $HOME/.config/fish/completions/
+            else
+                printf "%sError:%s Hashes don't match expected for %sjust%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
