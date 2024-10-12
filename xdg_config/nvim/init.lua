@@ -164,7 +164,6 @@ noremap("<leader>q", "<cmd>q<CR>", { silent = true })
 noremap("<leader>Q", "<cmd>qall<CR>", { silent = true })
 noremap("<leader>cq", "<cmd>cq<CR>", { silent = true })
 noremap("<leader>e", ":e ")
-noremap("<leader>/e", "<cmd>ll<CR>")
 noremap("<leader>Eh", ":e %%")
 
 vim.cmd("cabbr <expr> %% expand('%:p:h')")
