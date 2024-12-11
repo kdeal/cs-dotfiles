@@ -1,0 +1,55 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      // "j k": ["workspace::SendKeystrokes", "escape"]
+    }
+  },
+  {
+    "context": "Dock",
+    "bindings": {
+      "ctrl-w h": ["workspace::ActivatePaneInDirection", "Left"],
+      "ctrl-w l": ["workspace::ActivatePaneInDirection", "Right"],
+      "ctrl-w k": ["workspace::ActivatePaneInDirection", "Up"],
+      "ctrl-w j": ["workspace::ActivatePaneInDirection", "Down"]
+      // ... or other keybindings
+    }
+  },
+  {
+    "context": "vim_mode == normal",
+    "bindings": {
+      "space w": "workspace::Save",
+      "space q": "pane::CloseActiveItem",
+
+      "space c b": "workspace::ToggleBottomDock",
+      "space c l": "workspace::ToggleLeftDock",
+      "space c r": "workspace::ToggleRightDock",
+
+      "space o l": "outline_panel::ToggleFocus",
+      "space o t": "terminal_panel::ToggleFocus",
+      "space o p": "project_panel::ToggleFocus",
+
+      "space p b": "tab_switcher::Toggle",
+      "space p g": "workspace::NewSearch",
+      "space p f": "file_finder::Toggle",
+      "space p o": "outline::Toggle",
+
+      // Split controls
+      "space s p": "pane::SplitVertical",
+      "space v s": "pane::SplitHorizontal"
+    }
+  }
+]
