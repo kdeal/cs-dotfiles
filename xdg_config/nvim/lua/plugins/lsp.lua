@@ -2,6 +2,7 @@ return {
     -- Config for neovim language servers
     {
         "neovim/nvim-lspconfig",
+        dependencies = { "saghen/blink.cmp" },
         config = function()
             local nvim_lsp = require("lspconfig")
 
@@ -41,7 +42,7 @@ return {
                 tailwindcss = {},
                 tsserver = {},
             }
-            local capabilities = require("cmp_nvim_lsp").default_capabilities()
+            local capabilities = require("blink.cmp").get_lsp_capabilities()
             for lsp, lsp_settings in pairs(servers) do
                 local settings = { on_attach = on_attach, capabilities = capabilities, settings = lsp_settings }
                 nvim_lsp[lsp].setup(settings)
