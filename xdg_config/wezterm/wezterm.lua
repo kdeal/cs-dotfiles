@@ -10,6 +10,7 @@ config.window_decorations = "RESIZE"
 config.font = wezterm.font("Iosevka Term")
 config.font_size = 13
 config.freetype_load_target = "Normal"
+config.allow_square_glyphs_to_overflow_width = "Never"
 
 config.keys = {
     -- Send ssh end session code
