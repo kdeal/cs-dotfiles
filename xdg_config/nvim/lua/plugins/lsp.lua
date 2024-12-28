@@ -15,13 +15,17 @@ return {
                 end
 
                 local opts = { noremap = true, silent = true }
-                buf_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+                buf_set_keymap("n", "gd", "<C-]>", opts)
                 buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
-                buf_set_keymap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
-                buf_set_keymap("n", "gI", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
-                buf_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
-                buf_set_keymap("n", "<leader>rn", "<cmd>lua require('rename_popup').rename()<CR>", opts)
-                buf_set_keymap("n", "<space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+                buf_set_keymap("n", "grI", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+                buf_set_keymap("n", "grn", "<cmd>lua require('rename_popup').rename()<CR>", opts)
+                -- These are the default on nightly
+                buf_set_keymap("n", "grr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+                buf_set_keymap("n", "gra", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+                buf_set_keymap("v", "gra", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+                buf_set_keymap("n", "gri", "<cmd>lua vim.lsp.buf.implementation()<CR>", opts)
+                buf_set_keymap("n", "gO", "<cmd>vim.lsp.buf.document_symbol()<CR>", opts)
+                buf_set_keymap("i", "<C-s>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
             end
 
             -- Use a loop to conveniently both setup defined servers
