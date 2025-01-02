@@ -13,7 +13,7 @@ function devenv
     end
 
 
-    set -l packages bat delta exa fd nvim rg
+    set -l packages bat delta eza fd nvim rg
     switch $env
         case go
             set -a packages gopls

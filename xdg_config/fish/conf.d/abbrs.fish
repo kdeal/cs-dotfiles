@@ -1,10 +1,12 @@
 function update_abbrs
     # Command specifc
-    if command -qs exa
-        abbr -ga x exa
-        abbr -ga ls exa
-        abbr -ga ll 'exa -la'
-        abbr -ga la 'exa -a'
+    if command -qs eza
+        abbr -ga ls eza
+        abbr -ga ll 'eza -la'
+        abbr -ga la 'eza -a'
+    end
+
+    if command -qs fd
         abbr -ga find fd
     end
 
