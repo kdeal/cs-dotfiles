@@ -2,7 +2,22 @@ local wezterm = require("wezterm")
 
 local config = wezterm.config_builder()
 
-config.color_scheme = "nord"
+function get_appearance()
+    if wezterm.gui then
+        return wezterm.gui.get_appearance()
+    end
+    return "Dark"
+end
+
+function scheme_for_appearance(appearance)
+    if appearance:find("Dark") then
+        return "Everforest Dark (Gogh)"
+    else
+        return "Everforest Light (Gogh)"
+    end
+end
+
+config.color_scheme = scheme_for_appearance(get_appearance())
 config.bold_brightens_ansi_colors = "No"
 
 config.window_decorations = "RESIZE"
