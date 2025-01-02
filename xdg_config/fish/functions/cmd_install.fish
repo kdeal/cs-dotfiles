@@ -24,8 +24,8 @@ function __cmd_install_single_command
 
     switch $argv[1]
         case nvim
-            set -l nvim_hash be1f0988d0de71c375982b87b86cd28d2bab35ece8285abe3b0aac57604dfc5a
-            set -l url "https://github.com/neovim/neovim/releases/download/v0.10.0/nvim-linux64.tar.gz"
+            set -l nvim_hash be189915a2a0da3615576e2db06a7c714aef0ae926b4da6107e589a3cc623e5c
+            set -l url "https://github.com/neovim/neovim/releases/download/v0.10.3/nvim-linux64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
@@ -80,21 +80,23 @@ function __cmd_install_single_command
                 npm install -g pyright
             end
         case delta
-            set -l delta_hash 737d318ab15d4ca68e3bdb0753867d0d3944ff78d37fc44c79941104fbbdbb12
-            set -l url "https://github.com/dandavison/delta/releases/download/0.16.5/delta-0.16.5-x86_64-unknown-linux-musl.tar.gz"
+            set -l delta_hash b7ea845004762358a00ef9127dd9fd723e333c7e4b9cb1da220c3909372310ee
+            set -l delta_version "0.18.2"
+            set -l url "https://github.com/dandavison/delta/releases/download/$delta_version/delta-$delta_version-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $delta_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/delta-0.16.5-x86_64-unknown-linux-musl/delta" "$BIN_DIR"
+                cp "$CACHE_DIR/delta-$delta_version-x86_64-unknown-linux-musl/delta" "$BIN_DIR"
             end
         case bat
-            set -l bat_hash e7f97bc826878283775fdb02a53a871fab1be920b921057549b2bc7da81bb771
-            set -l url "https://github.com/sharkdp/bat/releases/download/v0.23.0/bat-v0.23.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l bat_hash d39a21e3da57fe6a3e07184b3c1dc245f8dba379af569d3668b6dcdfe75e3052
+            set -l bat_version "0.24.0"
+            set -l url "https://github.com/sharkdp/bat/releases/download/v$bat_version/bat-v$bat_version-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $bat_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/bat-v0.23.0-x86_64-unknown-linux-musl/bat" "$BIN_DIR"
-                cp "$CACHE_DIR/bat-v0.23.0-x86_64-unknown-linux-musl/autocomplete/bat.fish" ~/.config/fish/completions/
+                cp "$CACHE_DIR/bat-v$bat_version-x86_64-unknown-linux-musl/bat" "$BIN_DIR"
+                cp "$CACHE_DIR/bat-v$bat_version-x86_64-unknown-linux-musl/autocomplete/bat.fish" ~/.config/fish/completions/
                 # Update abbrs to make cat expand to rg
                 update_abbrs
             else
@@ -115,35 +117,33 @@ function __cmd_install_single_command
             else
                 echo "Hashes don't match expected"
             end
-        case exa
-            set -l exa_hash a65a87bd545e969979ae9388f6333167f041a1f09fa9d60b32fd3072348ff6ce
-            set -l url "https://github.com/ogham/exa/releases/download/v0.10.1/exa-linux-x86_64-v0.10.1.zip"
-            set -l tmp_file (__cmd_install_checksha_download $url $exa_hash)
+        case eza
+            set -l eza_hash cb5953a866a5fb3ec8d4fb0f6b0275511c5caa4d6b3019e5378d970ea85d2ef0
+            set -l url "https://github.com/eza-community/eza/releases/download/v0.20.14/eza_x86_64-unknown-linux-musl.tar.gz"
+            set -l tmp_file (__cmd_install_checksha_download $url $eza_hash)
             if test -n "$tmp_file"
-                mkdir $CACHE_DIR/exa
-                unzip $tmp_file -d $CACHE_DIR/exa
-                cp $CACHE_DIR/exa/bin/exa $BIN_DIR
-                cp $CACHE_DIR/exa/man/* $HOME/.local/share/man/man1/
-                cp $CACHE_DIR/exa/completions/exa.fish $HOME/.config/fish/completions/
-                # Update abbrs to make ls expand to exa
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp $CACHE_DIR/eza $BIN_DIR
+                # Update abbrs to make ls expand to eza
                 update_abbrs
             else
                 echo "Hashes don't match expected"
             end
         case fd
-            set -l fd_hash 069e2d58127ddd944c03a2684ad79f72e3f9bd3e0d2642c36adc5b367c134592
-            set -l url "https://github.com/sharkdp/fd/releases/download/v9.0.0/fd-v9.0.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l fd_hash d9bfa25ec28624545c222992e1b00673b7c9ca5eb15393c40369f10b28f9c932
+            set -l fd_version "10.2.0"
+            set -l url "https://github.com/sharkdp/fd/releases/download/v$fd_version/fd-v$fd_version-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $fd_hash)
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp "$CACHE_DIR/fd-v9.0.0-x86_64-unknown-linux-musl/fd" "$BIN_DIR"
-                cp $CACHE_DIR/fd-v9.0.0-x86_64-unknown-linux-musl/autocomplete/fd.fish $HOME/.config/fish/completions/
+                cp "$CACHE_DIR/fd-v$fd_version-x86_64-unknown-linux-musl/fd" "$BIN_DIR"
+                cp $CACHE_DIR/fd-v$fd_version-x86_64-unknown-linux-musl/autocomplete/fd.fish $HOME/.config/fish/completions/
             else
                 echo "Hashes don't match expected"
             end
         case lua_ls
-            set -l lua_ls_hash e8aaabfa3b94b9afa51245d4ca73fe8196ac31625653b8dd83f6027183f596a5
-            set -l url "https://github.com/LuaLS/lua-language-server/releases/download/3.7.4/lua-language-server-3.7.4-linux-x64.tar.gz"
+            set -l lua_ls_hash 5d4316291b8c79b145002318fbb7cc294a327c314e2711e590609b178478eb59
+            set -l url "https://github.com/LuaLS/lua-language-server/releases/download/3.13.5/lua-language-server-3.13.5-linux-x64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $lua_ls_hash)
             if test -n "$tmp_file"
                 mkdir -p $HOME/.local/share/lua_ls/
@@ -178,8 +178,8 @@ function __cmd_install_single_command
                 npm install -g @tailwindcss/language-server
             end
         case just
-            set -l just_hash bc7c9f377944f8de9cd0418b11d2955adebfa25a488c0b5e3dd2d2c0e9d732da
-            set -l url "https://github.com/casey/just/releases/download/1.36.0/just-1.36.0-x86_64-unknown-linux-musl.tar.gz"
+            set -l just_hash c803e67fd7b0af01667bd537197bc3df319938eacf9e8d51a441c71d03035bb5
+            set -l url "https://github.com/casey/just/releases/download/1.38.0/just-1.38.0-x86_64-unknown-linux-musl.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $just_hash)
             if [ -n "$tmp_file" ]
                 mkdir "$CACHE_DIR/just"
