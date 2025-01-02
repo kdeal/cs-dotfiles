@@ -1,1 +1,1 @@
-silent! colorscheme nordfox
+silent! colorscheme everforest

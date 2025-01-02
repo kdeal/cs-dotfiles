@@ -1,20 +1,19 @@
 return {
     -- Colorscheme
     {
-        "EdenEast/nightfox.nvim",
+        "neanias/everforest-nvim",
         lazy = false,
         priority = 1000,
+        main = "everforest",
         opts = {
-            options = {
-                styles = {
-                    comments = "italic",
-                },
-            },
-            groups = {
-                all = {
-                    IblScope = { fg = "palette.blue" },
-                },
-            },
+            on_highlights = function(hl, palette)
+                hl.StatusLineReadOnly = { fg = palette.red, bg = palette.bg3 }
+                hl.StatusLineCenter = { fg = palette.fg, bg = palette.bg3 }
+                hl.StatusLineModified = { fg = palette.orange, bg = palette.bg3, bold = true }
+                hl.StatusLineDiagnostics = { fg = palette.bg_dim, bg = palette.red }
+                hl.StatusLineEnds = { fg = palette.fg, bg = palette.bg4 }
+                hl.StatusLineSecond = { fg = palette.fg, bg = palette.bg5 }
+            end,
         },
     },
 

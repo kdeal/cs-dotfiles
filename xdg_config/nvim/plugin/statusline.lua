@@ -1,4 +1,3 @@
-local colors = require("nightfox.palette").load("nordfox")
 local MiniStatusline = require("mini.statusline")
 
 function filetype_display()
@@ -82,21 +81,6 @@ _G.winbar_content = function()
         { hl = "StatusLineReadOnly", strings = { readonly_display() } },
     })
 end
-
-vim.api.nvim_set_hl(0, "StatusLineReadOnly", { fg = colors.red.base, bg = colors.bg0, ctermfg = 1, ctermbg = 10 })
-vim.api.nvim_set_hl(0, "StatusLineCenter", { fg = colors.fg2, bg = colors.bg0, ctermfg = 8, ctermbg = 10 })
-vim.api.nvim_set_hl(
-    0,
-    "StatusLineModified",
-    { fg = colors.orange.base, bg = colors.bg0, bold = true, ctermfg = 166, ctermbg = 10 }
-)
-vim.api.nvim_set_hl(
-    0,
-    "StatusLineDiagnostics",
-    { fg = colors.black.base, bg = colors.red.base, ctermfg = 254, ctermbg = 1 }
-)
-vim.api.nvim_set_hl(0, "StatusLineEnds", { fg = colors.fg, bg = colors.bg2, ctermfg = 254, ctermbg = 1 })
-vim.api.nvim_set_hl(0, "StatusLineSecond", { fg = colors.fg, bg = colors.bg3, ctermfg = 254, ctermbg = 1 })
 
 vim.o.statusline = "%{%v:lua.statusline_content()%}"
 vim.o.winbar = "%{%v:lua.winbar_content()%}"
