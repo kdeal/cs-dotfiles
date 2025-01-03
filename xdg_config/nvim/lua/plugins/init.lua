@@ -7,12 +7,12 @@ return {
         main = "everforest",
         opts = {
             on_highlights = function(hl, palette)
-                hl.StatusLineReadOnly = { fg = palette.red, bg = palette.bg3 }
-                hl.StatusLineCenter = { fg = palette.fg, bg = palette.bg3 }
-                hl.StatusLineModified = { fg = palette.orange, bg = palette.bg3, bold = true }
+                hl.StatusLineReadOnly = { fg = palette.red, bg = palette.bg2 }
+                hl.StatusLineCenter = { fg = palette.fg, bg = palette.bg2 }
+                hl.StatusLineModified = { fg = palette.orange, bg = palette.bg2, bold = true }
                 hl.StatusLineDiagnostics = { fg = palette.bg_dim, bg = palette.red }
-                hl.StatusLineEnds = { fg = palette.fg, bg = palette.bg4 }
-                hl.StatusLineSecond = { fg = palette.fg, bg = palette.bg5 }
+                hl.StatusLineEnds = { fg = palette.bg0, bg = palette.statusline1 }
+                hl.StatusLineSecond = { fg = palette.bg0, bg = palette.statusline2 }
             end,
         },
     },
