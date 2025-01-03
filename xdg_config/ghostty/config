@@ -1,0 +1,19 @@
+font-family = Iosevka Term
+theme = light:everforest_light,dark:everforest_dark
+macos-titlebar-style = tabs
+
+shell-integration-features = no-cursor
+window-inherit-working-directory = false
+
+keybind = super+-=unbind
+keybind = super+shift+d=text:\n~.\n
+keybind = super+w=unbind
+
+keybind = super+w>h=goto_split:left
+keybind = super+w>l=goto_split:right
+keybind = super+w>j=goto_split:top
+keybind = super+w>k=goto_split:bottom
+keybind = super+w>escape=ignore
+keybind = super+w>space=ignore
+
+keybind = super+s=new_split:auto
