@@ -1,0 +1,7 @@
+{
+    "todo": {
+        "prefix": "-td",
+        "body": ["- [ ] ${1:}"],
+        "description": "Add a new todo item"
+    }
+}
