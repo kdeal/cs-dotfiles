@@ -18,3 +18,21 @@ ls xdg_config | xargs -I+ ln -s "$HERE/xdg_config/+" $HOME/.config/
 if ! /bin/infocmp xterm-ghostty >/dev/null 2>&1; then
     /bin/tic -x $HERE/xterm-ghostty
 fi
+
+FISH_VERSION="4.0b1"
+EXPECTED_HASH="3ece2862f1954d7984176d507567af18d4548441dee3ed778ceff5c3aad9c57c"
+
+if [ ! -f "$HOME/.local/bin/fish" ]; then
+    cd $(mktemp -d)
+    curl -L -o fish.tar.xz "https://github.com/fish-shell/fish-shell/releases/download/$FISH_VERSION/fish-static-linux-x86_64.tar.xz"
+
+    ACTUAL_FISH_HASH=$(sha256sum fish.tar.xz | cut -d' ' -f1)
+    if [ "$ACTUAL_FISH_HASH" = "$EXPECTED_HASH" ]; then
+        tar xf fish.tar.xz
+        rm fish.tar.xz
+        mkdir -p "$HOME/.local/bin"
+        mv * "$HOME/.local/bin/"
+        # Installs the asset files
+        $HOME/.local/bin/fish --install -c true
+    fi
+fi
