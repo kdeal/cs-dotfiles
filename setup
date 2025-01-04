@@ -12,3 +12,9 @@ done
 
 mkdir -p $HOME/.config
 ls xdg_config | xargs -I+ ln -s "$HERE/xdg_config/+" $HOME/.config/
+
+# Need to use the full path because conda packages special infocmp and tic
+# versions that use the wrong terminfo databases
+if ! /bin/infocmp xterm-ghostty >/dev/null 2>&1; then
+    /bin/tic -x $HERE/xterm-ghostty
+fi
