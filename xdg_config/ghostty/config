@@ -13,7 +13,11 @@ keybind = super+w>h=goto_split:left
 keybind = super+w>l=goto_split:right
 keybind = super+w>j=goto_split:top
 keybind = super+w>k=goto_split:bottom
+keybind = super+w>shift+h=previous_tab
+keybind = super+w>shift+l=next_tab
 keybind = super+w>escape=ignore
 keybind = super+w>space=ignore
 
 keybind = super+s=new_split:auto
+
+keybind = global:super+ctrl+`=toggle_quick_terminal
