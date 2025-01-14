@@ -189,7 +189,7 @@ noremap("<leader>vs", "<cmd>vs<CR>", { silent = true })
 noremap("<leader>bh", "<cmd>hide<CR>", { silent = true })
 
 -- Terminal mappings
-tnoremap("<c-_>", "<c-\\><c-n>")
+tnoremap("<c-->", "<c-\\><c-n>")
 vim.cmd([[
     augroup vimrcterminal
         autocmd!
