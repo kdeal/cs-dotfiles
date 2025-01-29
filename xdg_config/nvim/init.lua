@@ -188,6 +188,10 @@ noremap("<leader>sp", "<cmd>sp<CR>", { silent = true })
 noremap("<leader>vs", "<cmd>vs<CR>", { silent = true })
 noremap("<leader>bh", "<cmd>hide<CR>", { silent = true })
 
+-- Add command to copy to clipboard
+noremap("<leader>y", '"+y')
+vnoremap("<leader>y", '"+y')
+
 -- Terminal mappings
 tnoremap("<c-->", "<c-\\><c-n>")
 vim.cmd([[
