@@ -30,7 +30,7 @@ return {
                 json = { "jq" },
                 lua = { "stylua" },
                 markdown = { "mdformat" },
-                python = { "black", "ruff_format" },
+                python = { "ruff_format", "ruff_organize_imports" },
                 rust = { "rustfmt" },
                 svelte = { "prettier" },
                 typescript = { "prettier" },
