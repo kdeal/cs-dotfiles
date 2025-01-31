@@ -3,6 +3,7 @@ return {
     {
         "neovim/nvim-lspconfig",
         dependencies = { "saghen/blink.cmp" },
+        event = "BufReadPre",
         config = function()
             local nvim_lsp = require("lspconfig")
 
@@ -33,7 +34,7 @@ return {
             local servers = {
                 gopls = {},
                 lua_ls = {},
-                pyright = {
+                basedpyright = {
                     python = {
                         analysis = {
                             typeCheckingMode = "off",
@@ -41,6 +42,7 @@ return {
                         },
                     },
                 },
+                ruff = {},
                 rust_analyzer = {},
                 svelte = {},
                 tailwindcss = {},
