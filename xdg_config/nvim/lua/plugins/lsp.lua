@@ -35,7 +35,7 @@ return {
                 gopls = {},
                 lua_ls = {},
                 basedpyright = {
-                    python = {
+                    basedpyright = {
                         analysis = {
                             typeCheckingMode = "off",
                             diagnosticMode = "openFilesOnly",
