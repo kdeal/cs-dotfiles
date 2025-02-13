@@ -70,7 +70,7 @@ _G.statusline_content = function()
         { hl = "StatusLineCenter", strings = { filetype_display() } },
         { hl = "StatusLineDiagnostics", strings = { diagnostics_display() } },
         { hl = "StatusLineSecond", strings = { search } },
-        { hl = "StatusLineEnds", strings = { "%l:%c %P " } },
+        { hl = "StatusLineEnds", strings = { "%S %l:%c %P " } },
     })
 end
 
@@ -82,5 +82,6 @@ _G.winbar_content = function()
     })
 end
 
+vim.o.showcmdloc = "statusline"
 vim.o.statusline = "%{%v:lua.statusline_content()%}"
 vim.o.winbar = "%{%v:lua.winbar_content()%}"
