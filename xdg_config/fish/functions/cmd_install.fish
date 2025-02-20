@@ -177,6 +177,10 @@ function __cmd_install_single_command
             if command -q npm
                 npm install -g @tailwindcss/language-server
             end
+        case css-language-server html-language-server
+            if command -q npm
+                npm install -g vscode-langservers-extracted
+            end
         case just
             set -l just_hash c803e67fd7b0af01667bd537197bc3df319938eacf9e8d51a441c71d03035bb5
             set -l url "https://github.com/casey/just/releases/download/1.38.0/just-1.38.0-x86_64-unknown-linux-musl.tar.gz"
