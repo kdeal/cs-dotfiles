@@ -21,4 +21,4 @@ keybind = super+w>space=ignore
 
 keybind = super+s=new_split:auto
 
-keybind = global:super+ctrl+`=toggle_quick_terminal
+keybind = global:super+ctrl+\=toggle_quick_terminal
