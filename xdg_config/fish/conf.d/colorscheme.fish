@@ -12,3 +12,6 @@ set fish_cursor_external block
 
 # Have to force cursor because it doesn't detect ghostty
 set fish_vi_force_cursor true
+
+# Use the default theme
+fish_config theme choose "fish default"
