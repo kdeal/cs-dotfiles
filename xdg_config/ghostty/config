@@ -15,6 +15,7 @@ keybind = super+w>j=goto_split:top
 keybind = super+w>k=goto_split:bottom
 keybind = super+w>shift+h=previous_tab
 keybind = super+w>shift+l=next_tab
+keybind = super+w>z=toggle_split_zoom
 keybind = super+w>escape=ignore
 keybind = super+w>space=ignore
 
