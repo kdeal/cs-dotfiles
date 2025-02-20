@@ -32,7 +32,9 @@ return {
             -- Use a loop to conveniently both setup defined servers
             -- and map buffer local keybindings when the language server attaches
             local servers = {
+                cssls = {},
                 gopls = {},
+                html = {},
                 lua_ls = {},
                 basedpyright = {
                     basedpyright = {
