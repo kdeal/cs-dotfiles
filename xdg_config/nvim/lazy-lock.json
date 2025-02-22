@@ -1,6 +1,8 @@
 {
+  "blink-copilot": { "branch": "main", "commit": "fb1042aa0c450dd5920fa02f2a1e542b5e042581" },
   "blink.cmp": { "branch": "main", "commit": "18b352d12b35bca148427b607098df14b75a218f" },
   "conform.nvim": { "branch": "master", "commit": "a6f5bdb78caa305496357d17e962bbc4c0b392e2" },
+  "copilot.lua": { "branch": "master", "commit": "30321e33b03cb924fdcd6a806a0dc6fa0b0eafb9" },
   "everforest-nvim": { "branch": "main", "commit": "76cd62618afd415215e5bcdd7d2667c0323669bb" },
   "fidget.nvim": { "branch": "main", "commit": "d9ba6b7bfe29b3119a610892af67602641da778e" },
   "fzf": { "branch": "master", "commit": "77568e114ff531f4fe14cfaeab6febd53a99b1bc" },
