@@ -1,5 +1,6 @@
 /xdg_config/fish/fish_variables
 /xdg_config/fish/conf.d/local.fish
+local.lua
 
 /vim/undo/
 
