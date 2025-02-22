@@ -19,9 +19,9 @@ return {
             sources = {
                 default = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev" },
                 providers = {
+                    dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
                     -- dont show LuaLS require statements when lazydev has items
-                    lsp = { fallback_for = { "lazydev" } },
-                    lazydev = { name = "LazyDev", module = "lazydev.integrations.blink" },
+                    lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", fallbacks = { "lsp" } },
                 },
             },
 
