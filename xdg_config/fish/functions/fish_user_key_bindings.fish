@@ -4,3 +4,5 @@ function fish_user_key_bindings
         bind --mode $mode \cf forward-char
     end
 end
+
+fzf --fish | source
