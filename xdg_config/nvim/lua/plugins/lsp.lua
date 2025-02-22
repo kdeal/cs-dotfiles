@@ -48,7 +48,7 @@ return {
                 rust_analyzer = {},
                 svelte = {},
                 tailwindcss = {},
-                tsserver = {},
+                ts_ls = {},
             }
             local capabilities = require("blink.cmp").get_lsp_capabilities()
             for lsp, lsp_settings in pairs(servers) do
