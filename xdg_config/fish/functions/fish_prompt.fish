@@ -9,6 +9,10 @@ function fish_prompt --description 'Write out the prompt'
         printf "%s❱%s" (set_color yellow) (set_color normal)
     end
 
+    if set -q NVIM
+        printf "🐢"
+    end
+
     set -l jobs_list (jobs)
     if test -n "$jobs_list"
         set_color red
