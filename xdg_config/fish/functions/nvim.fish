@@ -6,8 +6,8 @@ function nvim --wraps nvim
         end
     end
     if set -q NVIM
-        printf "%sFYI:%s your in vim\n" (set_color red) (set_color normal)
-        if confirm "Do you want to continue?"
+        printf "%sFYI:%s your in nvim\n" (set_color red) (set_color normal)
+        if not confirm "Do you want to continue?"
             return 1
         end
     end
