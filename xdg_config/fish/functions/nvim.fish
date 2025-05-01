@@ -5,5 +5,11 @@ function nvim --wraps nvim
             activate
         end
     end
+    if set -q NVIM
+        printf "%sFYI:%s your in vim\n" (set_color red) (set_color normal)
+        if confirm "Do you want to continue?"
+            return 1
+        end
+    end
     command nvim $argv
 end
