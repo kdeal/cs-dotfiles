@@ -180,13 +180,8 @@ noremap("<leader>tc", "<cmd>tabnew<CR>", { silent = true })
 noremap("<leader>bd", "<cmd>lua MiniBufremove.delete(0, false)<CR>", { silent = true })
 
 -- window mappings
-noremap("<leader>j", "<C-W><C-J>")
-noremap("<leader>k", "<C-W><C-K>")
-noremap("<leader>h", "<C-W><C-H>")
-noremap("<leader>l", "<C-W><C-L>")
 noremap("<leader>sp", "<cmd>sp<CR>", { silent = true })
 noremap("<leader>vs", "<cmd>vs<CR>", { silent = true })
-noremap("<leader>bh", "<cmd>hide<CR>", { silent = true })
 
 -- Add command to copy to clipboard
 noremap("<leader>y", '"+y')
