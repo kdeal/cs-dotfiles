@@ -67,7 +67,6 @@ vim.cmd([[
 -- Don't use mouse most of the time, annoying for copying
 vim.opt.mouse = "ar"
 
-vim.opt.foldmethod = "indent"
 vim.opt.foldlevel = 99
 
 -- Autoload files from disk
@@ -75,19 +74,14 @@ vim.opt.autoread = true
 
 -- Show special things
 vim.opt.list = true
-vim.opt.listchars = { tab = "··»", trail = "·" }
+vim.opt.listchars = { tab = "··»", trail = "·", nbsp = "+" }
 vim.opt.showbreak = "»»"
 
 -- Indenting
-vim.opt.cindent = true
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 0
 vim.opt.expandtab = true
-vim.opt.smarttab = true
 vim.opt.shiftround = true
-vim.opt.autoindent = true
-vim.opt.wrap = true
-vim.opt.startofline = false
 vim.cmd("filetype plugin indent on")
 
 -- Can hide motified buffers

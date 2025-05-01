@@ -55,4 +55,15 @@ return {
     },
     -- Lua helper library
     { "nvim-lua/plenary.nvim", lazy = true },
+
+    -- Guess file indent plugin
+    {
+        "NMAC427/guess-indent.nvim",
+        opts = {
+            on_tab_options = {
+                ["expandtab"] = false,
+                ["listchars"] = { tab = "  ", trail = "·", nbsp = "+" },
+            },
+        },
+    },
 }
