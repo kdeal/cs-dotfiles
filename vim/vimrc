@@ -99,10 +99,6 @@ noremap <leader>ev <cmd>e ~/.vimrc<CR>
 noremap <leader>r <cmd>source ~/.vimrc<CR>
 noremap ]b <cmd>bnext<CR>
 noremap [b <cmd>bprevious<CR>
-noremap <leader>j <C-W><C-J>
-noremap <leader>k <C-W><C-K>
-noremap <leader>h <C-W><C-H>
-noremap <leader>l <C-W><C-L>
 noremap <leader>sp <cmd>sp<CR>
 noremap <leader>vs <cmd>vs<CR>
 noremap <leader>bd <cmd>bn <bar> bd #<CR>
