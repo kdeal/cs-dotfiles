@@ -37,6 +37,7 @@ return {
                 python = { "ruff_format", "ruff_organize_imports" },
                 rust = { "rustfmt" },
                 svelte = { "prettier" },
+                templ = { "templ" },
                 typescript = { "prettier" },
             },
         },
