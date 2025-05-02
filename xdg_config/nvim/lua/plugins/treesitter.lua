@@ -40,7 +40,6 @@ return {
             },
             indent = {
                 enable = true,
-                disable = { "python", "javascript" },
             },
         },
         config = function(_, opts)
