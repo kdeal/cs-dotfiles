@@ -11,7 +11,7 @@ return {
     {
         "saghen/blink.cmp",
 
-        version = "v0.*",
+        version = "1.*",
         dependencies = { "fang2hou/blink-copilot" },
 
         ---@module 'blink.cmp'
