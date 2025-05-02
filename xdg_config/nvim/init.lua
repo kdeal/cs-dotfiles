@@ -221,6 +221,7 @@ vim.fn.sign_define("DiagnosticSignHint", { text = "🞇", texthl = "DiagnosticSi
 vim.filetype.add({
     extension = {
         Jenkinsfile = "groovy",
+        templ = "templ",
     },
     filename = {
         ["OWNERS"] = "yaml",

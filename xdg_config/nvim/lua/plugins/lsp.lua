@@ -48,6 +48,7 @@ return {
                 rust_analyzer = {},
                 svelte = {},
                 tailwindcss = {},
+                templ = {},
                 ts_ls = {},
             }
             local capabilities = require("blink.cmp").get_lsp_capabilities()
