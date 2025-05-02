@@ -33,7 +33,14 @@ return {
             -- and map buffer local keybindings when the language server attaches
             local servers = {
                 cssls = {},
-                gopls = {},
+                gopls = {
+                    gopls = {
+                        analyses = {
+                            shadow = true,
+                        },
+                        staticcheck = true,
+                    },
+                },
                 html = {},
                 lua_ls = {},
                 basedpyright = {
