@@ -32,6 +32,7 @@ return {
         config = function()
             require("ibl").setup({
                 scope = { show_start = false, show_end = false },
+                indent = { tab_char = "║" },
             })
             local hooks = require("ibl.hooks")
             hooks.register(hooks.type.WHITESPACE, hooks.builtin.hide_first_space_indent_level)
@@ -59,11 +60,6 @@ return {
     -- Guess file indent plugin
     {
         "NMAC427/guess-indent.nvim",
-        opts = {
-            on_tab_options = {
-                ["expandtab"] = false,
-                ["listchars"] = { tab = "  ", trail = "·", nbsp = "+" },
-            },
-        },
+        opts = {},
     },
 }
