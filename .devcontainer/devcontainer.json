@@ -1,0 +1,8 @@
+{
+    "name": "Default",
+    "image": "mcr.microsoft.com/devcontainers/universal:noble",
+    "features": {
+        "sshd": "latest"
+    }
+}
+

@@ -24,13 +24,13 @@ function __cmd_install_single_command
 
     switch $argv[1]
         case nvim
-            set -l nvim_hash be189915a2a0da3615576e2db06a7c714aef0ae926b4da6107e589a3cc623e5c
-            set -l url "https://github.com/neovim/neovim/releases/download/v0.10.3/nvim-linux64.tar.gz"
+            set -l nvim_hash a9b24157672eb218ff3e33ef3f8c08db26f8931c5c04bdb0e471371dd1dfe63e
+            set -l url "https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.tar.gz"
             set -l tmp_file (__cmd_install_checksha_download $url $nvim_hash)
 
             if test -n "$tmp_file"
                 tar xzf "$tmp_file" -C "$CACHE_DIR"
-                rsync -a "$CACHE_DIR/nvim-linux64/" ~/.local/
+                rsync -a "$CACHE_DIR/nvim-linux-x86_64/" ~/.local/
                 # Update abbrs to make edit expand to nvim
                 update_abbrs
                 # Reload editor settings
