@@ -194,6 +194,13 @@ function __cmd_install_single_command
             else
                 printf "%sError:%s Hashes don't match expected for %sjust%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
             end
+        case codex
+            if command -q npm
+                npm install -g @openai/codex
+            else
+                echo "npm unavailable can't install codex"
+            end
+
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end

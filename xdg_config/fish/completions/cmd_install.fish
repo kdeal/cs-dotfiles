@@ -1,1 +1,1 @@
-complete -c cmd_install --no-files --require-parameter --arguments "nvim rg debugpy gopls pre-commit pyright delta bat helix eza fd lua_ls rust-analyzer rustfmt tailwindcss-language-server typescript-language-server just css-language-server html-language-server"
+complete -c cmd_install --no-files --require-parameter --arguments "nvim rg debugpy gopls pre-commit pyright delta bat helix eza fd lua_ls rust-analyzer rustfmt tailwindcss-language-server typescript-language-server just css-language-server html-language-server codex"
