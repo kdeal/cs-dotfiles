@@ -201,6 +201,13 @@ function __cmd_install_single_command
                 echo "npm unavailable can't install codex"
             end
 
+        case claude
+            if command -q npm
+                npm install -g @anthropic-ai/claude-code
+            else
+                echo "npm unavailable can't install claude"
+            end
+
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
