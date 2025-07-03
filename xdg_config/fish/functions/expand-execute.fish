@@ -7,9 +7,11 @@ function expand-execute -d 'Executes word expansion on the current token'
         if eval "$expansion[1]" >/dev/null
             if [ -n "$expansion[3]" ]
                 set preview "--preview=$expansion[3]"
+            else
+                set preview ""
             end
-            set replacement (eval "$expansion[2]" | sed '/^\s*$/d' | fzf --ansi --select-1 $preview)
-            set replacement (echo $replacement | eval "$expansion[4]")
+            set replacement (fish -c "$expansion[2]" | sed '/^\s*$/d' | fzf --ansi --select-1 $preview)
+            set replacement (echo $replacement | fish -c "$expansion[4]")
             break
         end
     end
