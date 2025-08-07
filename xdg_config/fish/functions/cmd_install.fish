@@ -207,7 +207,20 @@ function __cmd_install_single_command
             else
                 echo "npm unavailable can't install claude"
             end
-
+        case crush
+            set -l VERSION "0.2.2"
+            set -l crush_hash 5c1eaed7f245ab0fc21d731d43fb038cddcc7f038d55f38b3a1263be5721a94a
+            set -l url https://github.com/charmbracelet/crush/releases/download/v$VERSION/crush_{$VERSION}_Linux_x86_64.tar.gz
+            echo $url
+            set -l tmp_file (__cmd_install_checksha_download $url $crush_hash)
+            if [ -n "$tmp_file" ]
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp $CACHE_DIR/crush_{$VERSION}_Linux_x86_64/crush "$BIN_DIR"
+                cp $CACHE_DIR/crush_{$VERSION}_Linux_x86_64/manpages/crush.1.gz "$HOME/.local/share/man/man1/"
+                cp $CACHE_DIR/crush_{$VERSION}_Linux_x86_64/completions/crush.fish $HOME/.config/fish/completions/
+            else
+                printf "%sError:%s Hashes don't match expected for %scrush%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
