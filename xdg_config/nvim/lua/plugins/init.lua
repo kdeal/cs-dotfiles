@@ -63,4 +63,135 @@ return {
         "NMAC427/guess-indent.nvim",
         opts = {},
     },
+    {
+        "folke/snacks.nvim",
+        priority = 999,
+        lazy = false,
+        keys = {
+            -- Picker commands
+            {
+                "<leader>pb",
+                function()
+                    Snacks.picker.buffers()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>pd",
+                function()
+                    Snacks.picker.diagnostics()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>pe",
+                function()
+                    Snacks.picker.loclist()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>pf",
+                function()
+                    Snacks.picker.files()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>pF",
+                function()
+                    Snacks.picker.smart()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>pg",
+                function()
+                    Snacks.picker.grep()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>ph",
+                function()
+                    Snacks.picker.help()
+                end,
+                silent = true,
+            },
+            {
+                "<leader>pq",
+                function()
+                    Snacks.picker.qflist()
+                end,
+                silent = true,
+            },
+            -- Buffer delete
+            {
+                "<leader>bd",
+                function()
+                    Snacks.bufdelete.delete()
+                end,
+                silent = true,
+            },
+            -- Scratch
+            {
+                "<leader>.",
+                function()
+                    Snacks.scratch()
+                end,
+                desc = "Toggle Scratch Buffer",
+            },
+            -- Git Browse
+            {
+                "<leader>gB",
+                function()
+                    Snacks.gitbrowse()
+                end,
+                desc = "Git Browse",
+                mode = { "n", "v" },
+            },
+            {
+                "<leader>gb",
+                function()
+                    Snacks.git.blame_line()
+                end,
+                desc = "Git Blame line",
+            },
+            -- References
+            {
+                "]]",
+                function()
+                    Snacks.words.jump(vim.v.count1)
+                end,
+                desc = "Next Reference",
+                mode = { "n", "t" },
+            },
+            {
+                "[[",
+                function()
+                    Snacks.words.jump(-vim.v.count1)
+                end,
+                desc = "Prev Reference",
+                mode = { "n", "t" },
+            },
+        },
+        ---@type snacks.Config
+        opts = {
+            bigfile = { enabled = true },
+            dashboard = { enabled = true },
+            explorer = { enabled = true },
+            indent = {
+                -- It doesn't support showing tabs vs spaces
+                enabled = false,
+                scope = { enabled = false },
+            },
+            picker = { enabled = true },
+            notifier = { enabled = true },
+            quickfile = { enabled = true },
+            scope = { enabled = true },
+            scroll = { enabled = true },
+            statuscolumn = { enabled = true },
+            words = { enabled = true },
+        },
+    },
 }

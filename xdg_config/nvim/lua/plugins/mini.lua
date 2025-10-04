@@ -9,17 +9,6 @@ return {
             -- Have to reenable the plugin, since I disable it during startup
             { "<leader>gd", "<cmd>lua vim.g.minidiff_disable = false; MiniDiff.toggle()<cr>", silent = true },
             { "<leader>gb", "<cmd>vertical leftabove Git blame --date human -- %<cr>", silent = true },
-            -- Picker commands
-            { "<leader>pb", "<cmd>Pick buffers<cr>", silent = true },
-            { "<leader>pd", "<cmd>Pick diagnostics<cr>", silent = true },
-            { "<leader>pe", "<cmd>Pick list scop='location-list'<cr>", silent = true },
-            { "<leader>pf", "<cmd>Pick files<cr>", silent = true },
-            { "<leader>pg", "<cmd>Pick grep_live<cr>", silent = true },
-            { "<leader>ph", "<cmd>Pick help<cr>", silent = true },
-            { "<leader>pq", "<cmd>Pick list scop='quickfix'<cr>", silent = true },
-            { "<leader>ps", "<cmd>Pick spellsuggest<cr>", silent = true },
-            -- Open up file explorer
-            { "-", "<CMD>lua MiniFiles.open(vim.api.nvim_buf_get_name(0))<cr>", silent = true },
         },
         config = function()
             -- Better Around/Inside textobjects
@@ -79,7 +68,6 @@ return {
             local au_opts = { pattern = "MiniGitCommandSplit", callback = align_blame }
             vim.api.nvim_create_autocmd("User", au_opts)
 
-            require("mini.pick").setup()
             -- Add for some more pickers
             require("mini.extra").setup()
 
@@ -89,8 +77,6 @@ return {
 
             -- Try out doing auto-pairs
             require("mini.pairs").setup()
-
-            require("mini.files").setup()
         end,
     },
 }

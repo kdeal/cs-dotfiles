@@ -170,9 +170,6 @@ vnoremap("p", "pgvy")
 -- Tabs mappings
 noremap("<leader>tc", "<cmd>tabnew<CR>", { silent = true })
 
--- buffer mappings
-noremap("<leader>bd", "<cmd>lua MiniBufremove.delete(0, false)<CR>", { silent = true })
-
 -- window mappings
 noremap("<leader>sp", "<cmd>sp<CR>", { silent = true })
 noremap("<leader>vs", "<cmd>vs<CR>", { silent = true })
