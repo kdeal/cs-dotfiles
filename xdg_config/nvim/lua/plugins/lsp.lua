@@ -5,8 +5,6 @@ return {
         dependencies = { "saghen/blink.cmp" },
         event = "BufReadPre",
         config = function()
-            local nvim_lsp = require("lspconfig")
-
             local on_attach = function(client, bufnr)
                 local function buf_set_keymap(...)
                     vim.api.nvim_buf_set_keymap(bufnr, ...)
@@ -32,6 +30,7 @@ return {
             -- Use a loop to conveniently both setup defined servers
             -- and map buffer local keybindings when the language server attaches
             local servers = {
+                copilot = {},
                 cssls = {},
                 gopls = {
                     gopls = {
@@ -61,7 +60,8 @@ return {
             local capabilities = require("blink.cmp").get_lsp_capabilities()
             for lsp, lsp_settings in pairs(servers) do
                 local settings = { on_attach = on_attach, capabilities = capabilities, settings = lsp_settings }
-                nvim_lsp[lsp].setup(settings)
+                vim.lsp.enable(lsp)
+                vim.lsp.config(lsp, settings)
             end
         end,
     },
