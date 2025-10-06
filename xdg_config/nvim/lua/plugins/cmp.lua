@@ -1,7 +1,7 @@
 return {
     {
         "saghen/blink.cmp",
-
+        dependencies = { "fang2hou/blink-copilot" },
         version = "1.*",
 
         ---@module 'blink.cmp'
@@ -29,8 +29,14 @@ return {
             -- default list of enabled providers defined so that you can extend it
             -- elsewhere in your config, without redefining it, via `opts_extend`
             sources = {
-                default = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev" },
+                default = { "lsp", "path", "snippets", "buffer", "dadbod", "lazydev", "copilot" },
                 providers = {
+                    copilot = {
+                        name = "copilot",
+                        module = "blink-copilot",
+                        score_offset = 100,
+                        async = true,
+                    },
                     dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
                     -- dont show LuaLS require statements when lazydev has items
                     lazydev = { name = "LazyDev", module = "lazydev.integrations.blink", fallbacks = { "lsp" } },

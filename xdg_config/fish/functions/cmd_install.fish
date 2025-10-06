@@ -221,6 +221,12 @@ function __cmd_install_single_command
             else
                 printf "%sError:%s Hashes don't match expected for %scrush%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
             end
+        case copilot-language-server
+            if command -q npm
+                npm install -g @github/copilot-language-server
+            else
+                echo "npm unavailable can't install copilot-language-server"
+            end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
     end
