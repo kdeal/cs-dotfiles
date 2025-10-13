@@ -13,6 +13,7 @@ return {
                 hl.StatusLineDiagnostics = { fg = palette.bg_dim, bg = palette.red }
                 hl.StatusLineEnds = { fg = palette.bg0, bg = palette.statusline1 }
                 hl.StatusLineSecond = { fg = palette.bg0, bg = palette.statusline2 }
+                hl.SidekickChat = { fg = palette.fg, bg = palette.bg0 }
             end,
         },
     },
