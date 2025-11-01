@@ -19,12 +19,12 @@ if ! /bin/infocmp xterm-ghostty >/dev/null 2>&1; then
     /bin/tic -x $HERE/xterm-ghostty
 fi
 
-FISH_VERSION="4.0b1"
-EXPECTED_HASH="3ece2862f1954d7984176d507567af18d4548441dee3ed778ceff5c3aad9c57c"
+FISH_VERSION="4.1.2"
+EXPECTED_HASH="3d68eb2617fb1f07006723893f078784e37e7e2923d4bc61ab4654c2966fd369"
 
 if [ ! -f "$HOME/.local/bin/fish" ]; then
     cd $(mktemp -d)
-    curl -L -o fish.tar.xz "https://github.com/fish-shell/fish-shell/releases/download/$FISH_VERSION/fish-static-linux-x86_64.tar.xz"
+    curl -L -o fish.tar.xz "https://github.com/fish-shell/fish-shell/releases/download/$FISH_VERSION/fish-$FISH_VERSION-linux-x86_64.tar.xz"
 
     ACTUAL_FISH_HASH=$(sha256sum fish.tar.xz | cut -d' ' -f1)
     if [ "$ACTUAL_FISH_HASH" = "$EXPECTED_HASH" ]; then
