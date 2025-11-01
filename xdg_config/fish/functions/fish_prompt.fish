@@ -29,7 +29,10 @@ function fish_prompt --description 'Write out the prompt'
     set -g __fish_git_prompt_show_informative_status true
     set -g ___fish_git_prompt_char_cleanstate ""
     set -g ___fish_git_prompt_char_stateseparator ""
-    __fish_git_prompt
+
+    if not fish_jj_prompt
+        fish_git_prompt
+    end
 
     set_color normal
 
