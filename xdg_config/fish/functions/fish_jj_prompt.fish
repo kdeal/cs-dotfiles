@@ -31,22 +31,11 @@ function fish_jj_prompt
     set -l copied 0
     set -l renamed 0
 
-    set -l count_entries $wc_lines
-    if set -q count_entries[1]
-        set added (string trim -- $count_entries[1])
-    end
-    if set -q count_entries[2]
-        set modified (string trim -- $count_entries[2])
-    end
-    if set -q count_entries[3]
-        set removed (string trim -- $count_entries[3])
-    end
-    if set -q count_entries[4]
-        set copied (string trim -- $count_entries[4])
-    end
-    if set -q count_entries[5]
-        set renamed (string trim -- $count_entries[5])
-    end
+    set added (string trim -- $wc_lines[1])
+    set modified (string trim -- $wc_lines[2])
+    set removed (string trim -- $wc_lines[3])
+    set copied (string trim -- $wc_lines[4])
+    set renamed (string trim -- $wc_lines[5])
 
     # Determine if there are commits ahead of the working copy commit
     set -l ahead_lines (jj log --no-graph --ignore-working-copy --color=never \
