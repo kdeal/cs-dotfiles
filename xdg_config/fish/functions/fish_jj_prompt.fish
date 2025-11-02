@@ -12,6 +12,8 @@ function fish_jj_prompt
     set description (string trim -- $description)
     if test -n "$description"
         set description (string replace -r '[[:space:]]+' ' ' -- $description)
+    else
+        set description unnamed
     end
 
     # Collect working copy change counts via the template system
@@ -25,17 +27,11 @@ function fish_jj_prompt
             )' 2>/dev/null)
     or return 1
 
-    set -l added 0
-    set -l modified 0
-    set -l removed 0
-    set -l copied 0
-    set -l renamed 0
-
-    set added (string trim -- $wc_lines[1])
-    set modified (string trim -- $wc_lines[2])
-    set removed (string trim -- $wc_lines[3])
-    set copied (string trim -- $wc_lines[4])
-    set renamed (string trim -- $wc_lines[5])
+    set -l added (string trim -- $wc_lines[1])
+    set -l modified (string trim -- $wc_lines[2])
+    set -l removed (string trim -- $wc_lines[3])
+    set -l copied (string trim -- $wc_lines[4])
+    set -l renamed (string trim -- $wc_lines[5])
 
     # Determine if there are commits ahead of the working copy commit
     set -l ahead_lines (jj log --no-graph --ignore-working-copy --color=never \
@@ -62,33 +58,41 @@ function fish_jj_prompt
         set has_conflicts 1
     end
 
-    printf ' '
+    printf '('
 
-    if test -n "$description"
-        set_color brwhite
-        printf '%s' $description
+    set_color brwhite
+    printf '%s' $description
+    set_color normal
+
+    if test $added -gt 0
+        set_color green
+        printf '+%s' $added
         set_color normal
     end
 
-    set_color green
-    printf ' +%s' $added
-    set_color normal
+    if test $modified -gt 0
+        set_color blue
+        printf '~%s' $modified
+        set_color normal
+    end
 
-    set_color blue
-    printf ' ~%s' $modified
-    set_color normal
+    if test $removed -gt 0
+        set_color red
+        printf '-%s' $removed
+        set_color normal
+    end
 
-    set_color red
-    printf ' -%s' $removed
-    set_color normal
+    if test $copied -gt 0
+        set_color magenta
+        printf 'c%s' $copied
+        set_color normal
+    end
 
-    set_color magenta
-    printf ' c%s' $copied
-    set_color normal
-
-    set_color cyan
-    printf ' r%s' $renamed
-    set_color normal
+    if test $renamed -gt 0
+        set_color cyan
+        printf 'r%s' $renamed
+        set_color normal
+    end
 
     if test $ahead_count -gt 0
         set_color yellow
@@ -101,6 +105,8 @@ function fish_jj_prompt
         printf ' ×'
         set_color normal
     end
+
+    printf ')'
 
     return 0
 end
