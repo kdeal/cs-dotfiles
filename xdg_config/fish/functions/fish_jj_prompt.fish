@@ -16,37 +16,26 @@ function fish_jj_prompt
 
     # Collect working copy change counts via the template system
     set -l wc_lines (jj log --no-graph --ignore-working-copy --color=never --revisions @ \
-        --template 'working_copies().map(|wc|
-                separate(" ",
-                    wc.paths().added().len(),
-                    wc.paths().modified().len(),
-                    wc.paths().removed().len()
-                )
-            ).join("\n")' 2>/dev/null)
+        --template 'separate("\n",
+                diff.files().filter(|file| file.status() == "added").len(),
+                diff.files().filter(|file| file.status() == "modified").len(),
+                diff.files().filter(|file| file.status() == "removed").len(),
+                diff.files().filter(|file| file.status() == "copied").len(),
+                diff.files().filter(|file| file.status() == "renamed").len()
+            )' 2>/dev/null)
     or return 1
 
     set -l added 0
     set -l modified 0
     set -l removed 0
+    set -l copied 0
+    set -l renamed 0
 
-    for wc_line in $wc_lines
-        set -l trimmed (string trim -- $wc_line)
-        if test -z "$trimmed"
-            continue
-        end
-
-        set -l counts (string split ' ' -- $trimmed)
-        if test (count $counts) -ge 1
-            set added $counts[1]
-        end
-        if test (count $counts) -ge 2
-            set modified $counts[2]
-        end
-        if test (count $counts) -ge 3
-            set removed $counts[3]
-        end
-        break
-    end
+    set added (string trim -- $wc_lines[1])
+    set modified (string trim -- $wc_lines[2])
+    set removed (string trim -- $wc_lines[3])
+    set copied (string trim -- $wc_lines[4])
+    set renamed (string trim -- $wc_lines[5])
 
     # Determine if there are commits ahead of the working copy commit
     set -l ahead_lines (jj log --no-graph --ignore-working-copy --color=never \
@@ -91,6 +80,14 @@ function fish_jj_prompt
 
     set_color red
     printf ' -%s' $removed
+    set_color normal
+
+    set_color magenta
+    printf ' c%s' $copied
+    set_color normal
+
+    set_color cyan
+    printf ' r%s' $renamed
     set_color normal
 
     if test $ahead_count -gt 0
