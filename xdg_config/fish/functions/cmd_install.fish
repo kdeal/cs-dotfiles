@@ -52,10 +52,10 @@ function __cmd_install_single_command
                 echo "Hashes don't match expected"
             end
         case debugpy
-            if command -q pip
-                pip install debugpy==1.8.1
+            if command -q uv
+                uv tool install debugpy==1.8.1
             else
-                echo "Pip unavailable can't install"
+                echo "UV unavailable can't install"
             end
         case gopls
             if command -q go
@@ -64,16 +64,13 @@ function __cmd_install_single_command
                 echo "Go unavailable can't install"
             end
         case pre-commit
-            if command -q virtualenv
-                mkdir -p "$HOME/.local/share/pre-commit"
-                virtualenv "$HOME/.local/share/pre-commit/venv"
-                $HOME/.local/share/pre-commit/venv/bin/pip install pre-commit
-                ln -s "$HOME/.local/share/pre-commit/venv/bin/pre-commit" "$BIN_DIR/"
+            if command -q uv
+                uv tool install pre-commit
                 if git rev-parse
                     pre-commit install
                 end
             else
-                echo "virtualenv unavailable can't install"
+                echo "uv unavailable can't install"
             end
         case pyright
             if command -q npm
@@ -200,32 +197,28 @@ function __cmd_install_single_command
             else
                 echo "npm unavailable can't install codex"
             end
-
         case claude
             if command -q npm
                 npm install -g @anthropic-ai/claude-code
             else
                 echo "npm unavailable can't install claude"
             end
-        case crush
-            set -l VERSION "0.2.2"
-            set -l crush_hash 5c1eaed7f245ab0fc21d731d43fb038cddcc7f038d55f38b3a1263be5721a94a
-            set -l url https://github.com/charmbracelet/crush/releases/download/v$VERSION/crush_{$VERSION}_Linux_x86_64.tar.gz
-            echo $url
-            set -l tmp_file (__cmd_install_checksha_download $url $crush_hash)
-            if [ -n "$tmp_file" ]
-                tar xzf "$tmp_file" -C "$CACHE_DIR"
-                cp $CACHE_DIR/crush_{$VERSION}_Linux_x86_64/crush "$BIN_DIR"
-                cp $CACHE_DIR/crush_{$VERSION}_Linux_x86_64/manpages/crush.1.gz "$HOME/.local/share/man/man1/"
-                cp $CACHE_DIR/crush_{$VERSION}_Linux_x86_64/completions/crush.fish $HOME/.config/fish/completions/
-            else
-                printf "%sError:%s Hashes don't match expected for %scrush%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
-            end
         case copilot-language-server
             if command -q npm
                 npm install -g @github/copilot-language-server
             else
                 echo "npm unavailable can't install copilot-language-server"
+            end
+        case uv
+            set -l VERSION "0.9.24"
+            set -l uv_hash fb13ad85106da6b21dd16613afca910994446fe94a78ee0b5bed9c75cd066078
+            set -l url https://github.com/astral-sh/uv/releases/download/$VERSION/uv-x86_64-unknown-linux-gnu.tar.gz
+            set -l tmp_file (__cmd_install_checksha_download $url $uv_hash)
+            if [ -n "$tmp_file" ]
+                tar xzf "$tmp_file" -C "$CACHE_DIR"
+                cp $CACHE_DIR/uv-x86_64-unknown-linux-gnu/* "$BIN_DIR"
+            else
+                printf "%sError:%s Hashes don't match expected for %suv%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
             end
         case '' '*'
             echo "Command not recognized: \"$argv[1]\""
