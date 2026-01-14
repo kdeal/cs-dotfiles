@@ -19,7 +19,7 @@ function devenv
         case lua
             set -a packages lua_ls
         case python
-            set -a packages pyright debugpy
+            set -a packages ty
         case rust
             set -a packages rustfmt rust-analyzer
     end
