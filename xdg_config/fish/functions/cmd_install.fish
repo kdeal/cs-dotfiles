@@ -66,9 +66,11 @@ function __cmd_install_single_command
             else
                 echo "uv unavailable can't install"
             end
-        case pyright
-            if command -q npm
-                npm install -g pyright
+        case ty
+            if command -q uv
+                uv tool install ty@latest
+            else
+                echo "uv unavailable can't install"
             end
         case delta
             set -l delta_hash b7ea845004762358a00ef9127dd9fd723e333c7e4b9cb1da220c3909372310ee

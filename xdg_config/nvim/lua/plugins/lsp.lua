@@ -42,14 +42,7 @@ return {
                 },
                 html = {},
                 lua_ls = {},
-                basedpyright = {
-                    basedpyright = {
-                        analysis = {
-                            typeCheckingMode = "off",
-                            diagnosticMode = "openFilesOnly",
-                        },
-                    },
-                },
+                ty = {},
                 ruff = {},
                 rust_analyzer = {},
                 svelte = {},
