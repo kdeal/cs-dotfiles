@@ -51,12 +51,6 @@ function __cmd_install_single_command
             else
                 echo "Hashes don't match expected"
             end
-        case debugpy
-            if command -q uv
-                uv tool install debugpy==1.8.1
-            else
-                echo "UV unavailable can't install"
-            end
         case gopls
             if command -q go
                 go install golang.org/x/tools/gopls@latest
@@ -96,21 +90,6 @@ function __cmd_install_single_command
                 cp "$CACHE_DIR/bat-v$bat_version-x86_64-unknown-linux-musl/autocomplete/bat.fish" ~/.config/fish/completions/
                 # Update abbrs to make cat expand to rg
                 update_abbrs
-            else
-                echo "Hashes don't match expected"
-            end
-        case helix
-            set -l helix_hash 60d6337c4d748cef1f936cde66dc7dbd009c70a7f068c96cfc319250e513256f
-            set -l url "https://github.com/helix-editor/helix/releases/download/23.10/helix-23.10-x86_64.AppImage"
-            set -l tmp_file (__cmd_install_checksha_download $url $helix_hash)
-            if test -n "$tmp_file"
-                chmod +x "$tmp_file"
-                mkdir $CACHE_DIR/helix
-                cd $CACHE_DIR/helix
-                command $tmp_file --appimage-extract
-                cp -r squashfs-root/usr/* $HOME/.local/
-                rm -r squashfs-root/
-                prevd
             else
                 echo "Hashes don't match expected"
             end
@@ -196,12 +175,6 @@ function __cmd_install_single_command
                 npm install -g @openai/codex
             else
                 echo "npm unavailable can't install codex"
-            end
-        case claude
-            if command -q npm
-                npm install -g @anthropic-ai/claude-code
-            else
-                echo "npm unavailable can't install claude"
             end
         case copilot-language-server
             if command -q npm
