@@ -18,7 +18,7 @@ return {
             {
                 "<leader>aa",
                 function()
-                    require("sidekick.cli").toggle({ name = vim.g.sidekick_cli or "claude", focus = true })
+                    require("sidekick.cli").toggle({ name = vim.g.sidekick_cli or "opencode", focus = true })
                 end,
                 desc = "Sidekick Toggle CLI",
             },

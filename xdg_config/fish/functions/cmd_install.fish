@@ -170,11 +170,11 @@ function __cmd_install_single_command
             else
                 printf "%sError:%s Hashes don't match expected for %sjust%s\n" (set_color red) (set_color normal) (set_color yellow) (set_color normal)
             end
-        case codex
+        case opencode
             if command -q npm
-                npm install -g @openai/codex
+                npm install -g opencode-ai@latest
             else
-                echo "npm unavailable can't install codex"
+                echo "npm unavailable can't install opencode"
             end
         case copilot-language-server
             if command -q npm
