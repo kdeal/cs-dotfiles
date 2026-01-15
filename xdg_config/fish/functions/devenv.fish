@@ -19,13 +19,13 @@ function devenv
         case lua
             set -a packages lua_ls
         case python
-            set -a packages ty
+            set -a packages uv ty
         case rust
             set -a packages rustfmt rust-analyzer
     end
 
     if [ -e .pre-commit-config.yaml ]
-        set -a packages pre-commit
+        set -a packages uv pre-commit
     end
     if [ -e justfile ]
         set -a packages just
