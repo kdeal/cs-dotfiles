@@ -22,13 +22,15 @@ local function create_popup(word, data)
     -- Create buffer with initial word
     local buf_id = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_option(buf_id, "bufhidden", "wipe")
-    vim.api.nvim_buf_set_lines(buf_id, 0, -1, true, {word})
+    vim.api.nvim_buf_set_lines(buf_id, 0, -1, true, { word })
 
     local win_id = vim.api.nvim_open_win(buf_id, true, get_window_args())
     vim.wo[win_id].winhl = "Normal:Normal,FloatBorder:Normal"
 
-    vim.keymap.set({"n", "i"}, "<CR>", function() require("rename_popup").on_submit(win_id, buf_id, data) end, {buffer = buf_id})
-    vim.keymap.set({"n"}, "<esc>", "<cmd>quit<CR>", {buffer = buf_id})
+    vim.keymap.set({ "n", "i" }, "<CR>", function()
+        require("rename_popup").on_submit(win_id, buf_id, data)
+    end, { buffer = buf_id })
+    vim.keymap.set({ "n" }, "<esc>", "<cmd>quit<CR>", { buffer = buf_id })
 end
 
 local function get_new_word(buffer_id)
@@ -74,7 +76,6 @@ end
 
 local function configure_window(prompt_win_id, data)
     local buf_id = vim.api.nvim_win_get_buf(prompt_win_id)
-
 end
 
 function rename_popup.rename()
