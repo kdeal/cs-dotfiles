@@ -20,8 +20,6 @@ return {
             })
 
             nnoremap("<leader>op", '<cmd>lua require("neotest").summary.toggle()<cr>', { silent = true })
-
-            nnoremap("<leader>rt", '<cmd>lua require("neotest").run.run({strategy = "dap"})<cr>', { silent = true })
             nnoremap("<leader>rf", '<cmd>lua require("neotest").run.run(vim.fn.expand("%"))<cr>', { silent = true })
         end,
     },
