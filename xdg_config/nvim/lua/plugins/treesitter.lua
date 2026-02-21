@@ -2,7 +2,7 @@ return {
     -- Tree sitter based syntax highlighting
     {
         "nvim-treesitter/nvim-treesitter",
-        branch = 'master',
+        branch = "master",
         build = function()
             require("nvim-treesitter.install").update({ with_sync = true })
         end,
