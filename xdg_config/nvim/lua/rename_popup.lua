@@ -1,19 +1,40 @@
-local log = require("plenary.log").new({
-    plugin = "rename_popup",
-    level = "info",
-})
-local popup = require("plenary.popup")
-
 local rename_popup = {}
 
--- Stores information for callback to use
-rename_popup._window_to_metadata = {}
+local function get_window_args()
+    local col = 0
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    if cursor[2] == 0 then
+        col = 1
+    end
 
-local function get_new_word(win_id)
-    local buf_id = vim.api.nvim_win_get_buf(win_id)
-    local buf_lines = vim.api.nvim_buf_get_lines(buf_id, 0, -1, false)
+    return {
+        relative = "cursor",
+        row = 2,
+        col = col,
+        width = 30,
+        height = 1,
+        border = "rounded",
+        style = "minimal",
+    }
+end
+
+local function create_popup(word, data)
+    -- Create buffer with initial word
+    local buf_id = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf_id, "bufhidden", "wipe")
+    vim.api.nvim_buf_set_lines(buf_id, 0, -1, true, {word})
+
+    local win_id = vim.api.nvim_open_win(buf_id, true, get_window_args())
+    vim.wo[win_id].winhl = "Normal:Normal,FloatBorder:Normal"
+
+    vim.keymap.set({"n", "i"}, "<CR>", function() require("rename_popup").on_submit(win_id, buf_id, data) end, {buffer = buf_id})
+    vim.keymap.set({"n"}, "<esc>", "<cmd>quit<CR>", {buffer = buf_id})
+end
+
+local function get_new_word(buffer_id)
+    local buf_lines = vim.api.nvim_buf_get_lines(buffer_id, 0, -1, false)
     if #buf_lines > 1 then
-        log.warn("Popup buffer longer than 1 line, using last line")
+        vim.notify("Popup buffer longer than 1 line, using last line", vim.log.levels.WARN)
     end
     return buf_lines[1]
 end
@@ -36,77 +57,34 @@ local function restore_mode(initial_mode)
     end
 end
 
-local function on_submit(win_id)
-    local new_word = get_new_word(win_id)
+function rename_popup.on_submit(win_id, buf_id, data)
+    local new_word = get_new_word(buf_id)
+    vim.api.nvim_win_close(win_id, true)
 
-    local callback_data = rename_popup._window_to_metadata[win_id]
-    if callback_data then
+    if data then
         -- Switch back to initial window, so we can use builtin rename
-        vim.api.nvim_set_current_win(callback_data.win_id)
+        vim.api.nvim_set_current_win(data.win_id)
         vim.lsp.buf.rename(new_word)
 
-        restore_mode(callback_data.initial_mode)
-
-        rename_popup._window_to_metadata[win_id] = nil
+        restore_mode(data.initial_mode)
     else
-        log.warn("No callback data, can't rename")
+        vim.notify("No callback data, can't rename", vim.log.levels.WARN)
     end
 end
 
-local function popup_options()
-    local col_add = 0
-    local cursor = vim.api.nvim_win_get_cursor(0)
-    if cursor[2] == 0 then
-        col_add = 1
-    end
-    return {
-        callback = on_submit,
-        -- Position on the line after the cursor
-        line = "cursor+2",
-        col = "cursor+" .. col_add,
-        border = true,
-
-        -- Formatting related settings
-        -- These characters make the border look nicer
-        borderchars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
-        borderhighlight = "RenamePopupBackground",
-        highlight = "RenamePopupBackground",
-        minheight = 1,
-        minwidth = 30,
-        wrap = false,
-    }
-end
-
-local function configure_window(prompt_win_id)
+local function configure_window(prompt_win_id, data)
     local buf_id = vim.api.nvim_win_get_buf(prompt_win_id)
 
-    -- Start in popup in normal mode
-    vim.api.nvim_command("stopinsert")
-
-    vim.api.nvim_buf_set_keymap(
-        buf_id,
-        "i",
-        "<CR>",
-        '<cmd>lua require("plenary.popup").execute_callback(' .. buf_id .. ")<CR>",
-        { noremap = true }
-    )
-    vim.api.nvim_buf_set_keymap(buf_id, "n", "<esc>", "<cmd>quit<CR>", { noremap = true })
 end
 
 function rename_popup.rename()
-    local callback_data = {
+    local data = {
         win_id = vim.api.nvim_get_current_win(),
         initial_mode = vim.api.nvim_get_mode().mode,
     }
 
     local cword = vim.fn.expand("<cword>")
-    local popup_opt = popup_options()
-    local prompt_win_id, _ = popup.create(cword, popup_opt)
-
-    configure_window(prompt_win_id)
-
-    -- Metadata used by the callback
-    rename_popup._window_to_metadata[prompt_win_id] = callback_data
+    local prompt_win_id = create_popup(cword, data)
 end
 
 return rename_popup
