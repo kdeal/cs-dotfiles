@@ -56,8 +56,6 @@ return {
         },
         cmd = { "SidewaysLeft", "SidewaysRight" },
     },
-    -- Lua helper library
-    { "nvim-lua/plenary.nvim", lazy = true },
 
     -- Guess file indent plugin
     {
