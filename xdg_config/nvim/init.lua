@@ -1,40 +1,37 @@
 _G.nnoremap = function(key, command, opts)
     opts = opts or {}
-    opts.noremap = true
-    vim.api.nvim_set_keymap("n", key, command, opts)
+    opts.remap = false
+    vim.keymap.set("n", key, command, opts)
 end
 
 _G.vnoremap = function(key, command, opts)
     opts = opts or {}
-    opts.noremap = true
-    vim.api.nvim_set_keymap("v", key, command, opts)
+    opts.remap = false
+    vim.keymap.set("v", key, command, opts)
 end
 
 _G.snoremap = function(key, command, opts)
     opts = opts or {}
-    opts.noremap = true
-    vim.api.nvim_set_keymap("s", key, command, opts)
+    opts.remap = false
+    vim.keymap.set("s", key, command, opts)
 end
 
 _G.inoremap = function(key, command, opts)
     opts = opts or {}
-    opts.noremap = true
-    vim.api.nvim_set_keymap("i", key, command, opts)
+    opts.remap = false
+    vim.keymap.set("i", key, command, opts)
 end
 
 _G.tnoremap = function(key, command, opts)
     opts = opts or {}
-    opts.noremap = true
-    vim.api.nvim_set_keymap("t", key, command, opts)
+    opts.remap = false
+    vim.keymap.set("t", key, command, opts)
 end
 
 _G.noremap = function(key, command, opts)
     opts = opts or {}
-    opts.noremap = true
-    vim.api.nvim_set_keymap("n", key, command, opts)
-    vim.api.nvim_set_keymap("v", key, command, opts)
-    vim.api.nvim_set_keymap("s", key, command, opts)
-    vim.api.nvim_set_keymap("o", key, command, opts)
+    opts.remap = false
+    vim.keymap.set({ "n", "v", "s", "o" }, key, command, opts)
 end
 
 vim.opt.termguicolors = true

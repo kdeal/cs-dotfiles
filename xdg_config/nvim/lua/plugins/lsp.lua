@@ -6,14 +6,11 @@ return {
         event = "BufReadPre",
         config = function()
             local on_attach = function(client, bufnr)
-                local function buf_set_keymap(...)
-                    vim.api.nvim_buf_set_keymap(bufnr, ...)
-                end
-                local function buf_set_option(...)
-                    vim.api.nvim_buf_set_option(bufnr, ...)
+                local function buf_set_keymap(mode, lhs, rhs, opts)
+                    vim.keymap.set(mode, lhs, rhs, vim.tbl_extend("force", { buffer = bufnr }, opts or {}))
                 end
 
-                local opts = { noremap = true, silent = true }
+                local opts = { silent = true }
                 buf_set_keymap("n", "gd", "<C-]>", opts)
                 buf_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<CR>", opts)
                 buf_set_keymap("n", "grI", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
