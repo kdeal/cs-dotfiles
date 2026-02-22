@@ -9,7 +9,7 @@ local function get_window_args()
 
     return {
         relative = "cursor",
-        row = 2,
+        row = 1,
         col = col,
         width = 30,
         height = 1,
