@@ -16,13 +16,6 @@ return {
                 buf_set_keymap("n", "grn", function()
                     require("rename_popup").rename()
                 end, opts)
-                -- These are the default on nightly
-                buf_set_keymap("n", "grr", vim.lsp.buf.references, opts)
-                buf_set_keymap("n", "gra", vim.lsp.buf.code_action, opts)
-                buf_set_keymap("v", "gra", vim.lsp.buf.code_action, opts)
-                buf_set_keymap("n", "gri", vim.lsp.buf.implementation, opts)
-                buf_set_keymap("n", "gO", vim.lsp.buf.document_symbol, opts)
-                buf_set_keymap("i", "<C-s>", vim.lsp.buf.signature_help, opts)
             end
 
             -- Use a loop to conveniently both setup defined servers
