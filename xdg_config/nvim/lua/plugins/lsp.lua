@@ -3,7 +3,6 @@ return {
     {
         "neovim/nvim-lspconfig",
         dependencies = { "saghen/blink.cmp" },
-        event = "BufReadPre",
         config = function()
             local on_attach = function(client, bufnr)
                 local function buf_set_keymap(mode, lhs, rhs, opts)
