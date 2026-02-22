@@ -10,18 +10,6 @@ _G.vnoremap = function(key, command, opts)
     vim.keymap.set("v", key, command, opts)
 end
 
-_G.snoremap = function(key, command, opts)
-    opts = opts or {}
-    opts.remap = false
-    vim.keymap.set("s", key, command, opts)
-end
-
-_G.inoremap = function(key, command, opts)
-    opts = opts or {}
-    opts.remap = false
-    vim.keymap.set("i", key, command, opts)
-end
-
 _G.tnoremap = function(key, command, opts)
     opts = opts or {}
     opts.remap = false
@@ -142,7 +130,9 @@ nnoremap("gk", "k")
 
 -- Random maps
 nnoremap("<leader>nh", "<cmd>nohlsearch<CR>", { silent = true })
-nnoremap("<leader>ot", "<cmd>lua require('float_term').toggle()<CR>", { silent = true })
+nnoremap("<leader>ot", function()
+    require("float_term").toggle()
+end, { silent = true })
 nnoremap("<leader>oT", "<cmd>terminal<CR>", { silent = true })
 nnoremap("<leader>ol", "<cmd>lopen<CR>", { silent = true })
 nnoremap("<leader>oc", "<cmd>copen<CR>", { silent = true })
@@ -202,8 +192,12 @@ vim.cmd([[
 ]])
 
 -- Diagnostic config
-nnoremap("<leader>od", "<cmd>lua vim.diagnostic.setloclist({ open = true })<cr>", { silent = true })
-nnoremap("<leader>d", '<cmd>lua vim.diagnostic.open_float(nil, { scope = "cursor" })<cr>', { silent = true })
+nnoremap("<leader>od", function()
+    vim.diagnostic.setloclist({ open = true })
+end, { silent = true })
+nnoremap("<leader>d", function()
+    vim.diagnostic.open_float(nil, { scope = "cursor" })
+end, { silent = true })
 
 vim.diagnostic.config({ virtual_text = false })
 
