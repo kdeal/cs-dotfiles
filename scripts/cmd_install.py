@@ -11,7 +11,6 @@ Python port of `xdg_config/fish/functions/cmd_install.fish`.
 from __future__ import annotations
 
 import argparse
-import gzip
 import hashlib
 import platform
 import shutil
@@ -19,15 +18,16 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
 import urllib.request
-from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 HOME = Path.home()
 CACHE_DIR = HOME / ".cache"
 BIN_DIR = HOME / ".local" / "bin"
-LUA_LS_HOME = HOME / ".local" / "share" / "lua_ls"
+DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "cmd_install.toml"
 
 
 @dataclass(frozen=True)
@@ -38,9 +38,16 @@ class ArchiveInstallSpec:
 
 
 @dataclass(frozen=True)
-class ArchiveBinaryInstallSpec:
-    archive: ArchiveInstallSpec
-    file_copies: tuple[tuple[str, str], ...]
+class SelectedArchSpec:
+    context: str
+    spec: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class FileCopySpec:
+    source: str
+    destination: str
+    mode: str
 
 
 ARCH_ALIASES = {
@@ -50,6 +57,10 @@ ARCH_ALIASES = {
     "arm64": "arm64",
     "aarch64": "arm64",
 }
+
+
+class ConfigError(ValueError):
+    pass
 
 
 def normalize_arch(arch: str) -> str | None:
@@ -117,163 +128,278 @@ def copy_file(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
-def install_archive_binary(spec: ArchiveInstallSpec, file_copies: list[tuple[str, str]]) -> bool:
-    tmp_file = download_with_sha256(spec.url, spec.sha256)
+def parse_mapping(value: Any, context: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ConfigError(f"{context} must be a table")
+    return value
+
+
+def parse_string(value: Any, context: str) -> str:
+    if not isinstance(value, str):
+        raise ConfigError(f"{context} must be a string")
+    return value
+
+
+def parse_bool(value: Any, context: str) -> bool:
+    if not isinstance(value, bool):
+        raise ConfigError(f"{context} must be a boolean")
+    return value
+
+
+def parse_string_list(value: Any, context: str) -> list[str]:
+    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+        raise ConfigError(f"{context} must be a list of strings")
+    return value
+
+
+def parse_copy_mode(value: Any, context: str) -> str:
+    mode = parse_string(value, context)
+    allowed = {"file", "rsync-tree", "dircopy"}
+    if mode not in allowed:
+        allowed_values = ", ".join(sorted(allowed))
+        raise ConfigError(f"{context} must be one of: {allowed_values}")
+    return mode
+
+
+def require_string(mapping: dict[str, Any], key: str, context: str) -> str:
+    if key not in mapping:
+        raise ConfigError(f"{context}.{key} is required")
+    return parse_string(mapping[key], f"{context}.{key}")
+
+
+def require_mapping(mapping: dict[str, Any], key: str, context: str) -> dict[str, Any]:
+    if key not in mapping:
+        raise ConfigError(f"{context}.{key} is required")
+    return parse_mapping(mapping[key], f"{context}.{key}")
+
+
+def require_string_list(mapping: dict[str, Any], key: str, context: str) -> list[str]:
+    if key not in mapping:
+        raise ConfigError(f"{context}.{key} is required")
+    return parse_string_list(mapping[key], f"{context}.{key}")
+
+
+def get_optional_string(mapping: dict[str, Any], key: str, context: str) -> str | None:
+    value = mapping.get(key)
+    if value is None:
+        return None
+    return parse_string(value, f"{context}.{key}")
+
+
+def get_optional_bool(mapping: dict[str, Any], key: str, context: str, *, default: bool) -> bool:
+    value = mapping.get(key)
+    if value is None:
+        return default
+    return parse_bool(value, f"{context}.{key}")
+
+
+def render_template(value: str, variables: dict[str, Any], context: str) -> str:
+    try:
+        return value.format_map(variables)
+    except KeyError as exc:
+        missing = exc.args[0]
+        raise ConfigError(f"{context} references unknown placeholder '{missing}'") from exc
+    except ValueError as exc:
+        raise ConfigError(f"{context} has invalid template syntax: {exc}") from exc
+
+
+def parse_file_copies(
+    value: Any,
+    context: str,
+    variables: dict[str, Any],
+) -> list[FileCopySpec]:
+    if not isinstance(value, list):
+        raise ConfigError(f"{context} must be an array of tables")
+
+    copies: list[FileCopySpec] = []
+    for index, item in enumerate(value):
+        item_context = f"{context}[{index}]"
+        item_mapping = parse_mapping(item, item_context)
+        source = render_template(
+            require_string(item_mapping, "source", item_context),
+            variables,
+            f"{item_context}.source",
+        )
+        destination = render_template(
+            require_string(item_mapping, "destination", item_context),
+            variables,
+            f"{item_context}.destination",
+        )
+        mode = parse_copy_mode(item_mapping.get("mode", "file"), f"{item_context}.mode")
+        copies.append(FileCopySpec(source=source, destination=destination, mode=mode))
+    return copies
+
+
+def validate_file_copies_shape(value: Any, context: str) -> None:
+    if not isinstance(value, list):
+        raise ConfigError(f"{context} must be an array of tables")
+    for index, item in enumerate(value):
+        item_context = f"{context}[{index}]"
+        item_mapping = parse_mapping(item, item_context)
+        require_string(item_mapping, "source", item_context)
+        require_string(item_mapping, "destination", item_context)
+        if "mode" in item_mapping:
+            parse_copy_mode(item_mapping["mode"], f"{item_context}.mode")
+
+
+def select_arch_spec(
+    command: str, command_cfg: dict[str, Any], arch: str
+) -> SelectedArchSpec | None:
+    arch_context = f"commands.{command}.arch"
+    arch_cfg = command_cfg.get("arch")
+    if isinstance(arch_cfg, dict):
+        raw_spec = arch_cfg.get(arch)
+        if raw_spec is None:
+            return None
+        return SelectedArchSpec(
+            context=f"{arch_context}.{arch}",
+            spec=parse_mapping(raw_spec, f"{arch_context}.{arch}"),
+        )
+
+    if isinstance(arch_cfg, list):
+        for index, entry in enumerate(arch_cfg):
+            entry_context = f"{arch_context}[{index}]"
+            entry_mapping = parse_mapping(entry, entry_context)
+            entry_arch = require_string(entry_mapping, "arch", entry_context)
+            normalized = normalize_arch(entry_arch)
+            if normalized is None:
+                raise ConfigError(f"{entry_context}.arch has unsupported value '{entry_arch}'")
+            if normalized == arch:
+                return SelectedArchSpec(context=entry_context, spec=entry_mapping)
+        return None
+
+    raise ConfigError(f"{arch_context} must be a table or an array of tables")
+
+
+def collect_template_vars(
+    command_cfg: dict[str, Any],
+    selected_arch_spec: SelectedArchSpec,
+    target_arch: str,
+) -> dict[str, Any]:
+    variables: dict[str, Any] = {"target_arch": target_arch}
+    for key, value in command_cfg.items():
+        if isinstance(value, str | int | float | bool):
+            variables[key] = value
+    for key, value in selected_arch_spec.spec.items():
+        if isinstance(value, str | int | float | bool):
+            variables[key] = value
+    return variables
+
+
+def resolve_string_value(
+    command_cfg: dict[str, Any],
+    selected_arch_spec: SelectedArchSpec,
+    key: str,
+    command_context: str,
+    variables: dict[str, Any],
+) -> str:
+    if key in selected_arch_spec.spec:
+        value = parse_string(selected_arch_spec.spec[key], f"{selected_arch_spec.context}.{key}")
+        return render_template(value, variables, f"{selected_arch_spec.context}.{key}")
+    if key in command_cfg:
+        value = parse_string(command_cfg[key], f"{command_context}.{key}")
+        return render_template(value, variables, f"{command_context}.{key}")
+    raise ConfigError(f"{command_context}.{key} is required")
+
+
+def resolve_optional_string_value(
+    command_cfg: dict[str, Any],
+    selected_arch_spec: SelectedArchSpec,
+    key: str,
+    command_context: str,
+    variables: dict[str, Any],
+) -> str | None:
+    if key in selected_arch_spec.spec:
+        value = parse_string(selected_arch_spec.spec[key], f"{selected_arch_spec.context}.{key}")
+        return render_template(value, variables, f"{selected_arch_spec.context}.{key}")
+    if key in command_cfg:
+        value = parse_string(command_cfg[key], f"{command_context}.{key}")
+        return render_template(value, variables, f"{command_context}.{key}")
+    return None
+
+
+def resolve_file_copies(
+    command_cfg: dict[str, Any],
+    selected_arch_spec: SelectedArchSpec,
+    command_context: str,
+    variables: dict[str, Any],
+) -> list[FileCopySpec]:
+    if "file_copies" in selected_arch_spec.spec:
+        return parse_file_copies(
+            selected_arch_spec.spec["file_copies"],
+            f"{selected_arch_spec.context}.file_copies",
+            variables,
+        )
+    if "file_copies" in command_cfg:
+        return parse_file_copies(
+            command_cfg["file_copies"],
+            f"{command_context}.file_copies",
+            variables,
+        )
+    raise ConfigError(f"{command_context}.file_copies is required")
+
+
+def copy_any(source: Path, destination: Path) -> None:
+    if source.is_dir():
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, destination, dirs_exist_ok=True)
+        return
+    copy_file(source, destination)
+
+
+def apply_file_copies(extract_root: Path, file_copies: list[FileCopySpec]) -> None:
+    for file_copy in file_copies:
+        source_path = extract_root / file_copy.source
+        destination_path = HOME / file_copy.destination
+
+        if file_copy.mode == "file":
+            copy_file(source_path, destination_path)
+            continue
+
+        if file_copy.mode == "rsync-tree":
+            run(["rsync", "-a", str(source_path) + "/", str(destination_path) + "/"])
+            continue
+
+        if file_copy.mode == "dircopy":
+            for item in source_path.iterdir():
+                copy_any(item, destination_path / item.name)
+            continue
+
+        raise ConfigError(f"Unsupported file copy mode '{file_copy.mode}'")
+
+
+def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str) -> bool:
+    selected_spec = select_arch_spec(command, command_cfg, arch)
+    if selected_spec is None:
+        print(f"{arch} is not yet supported for {command}", file=sys.stderr)
+        return False
+
+    command_context = f"commands.{command}"
+    variables = collect_template_vars(command_cfg, selected_spec, arch)
+
+    url = resolve_string_value(command_cfg, selected_spec, "url", command_context, variables)
+    sha256 = resolve_string_value(command_cfg, selected_spec, "sha256", command_context, variables)
+    file_copies = resolve_file_copies(command_cfg, selected_spec, command_context, variables)
+
+    archive_spec = ArchiveInstallSpec(name=command, url=url, sha256=sha256)
+    tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
     if tmp_file is None:
-        print(f"Hashes don't match expected for {spec.name}", file=sys.stderr)
+        print(f"Hashes don't match expected for {archive_spec.name}", file=sys.stderr)
         return False
 
     try:
         with tempfile.TemporaryDirectory(dir=CACHE_DIR) as extract_dir:
             extract_root = Path(extract_dir)
             extract_tar_gz(tmp_file, extract_root)
-            for source_rel, dest_rel in file_copies:
-                copy_file(extract_root / source_rel, HOME / dest_rel)
-    except (FileNotFoundError, OSError, tarfile.TarError, ValueError) as exc:
-        print(f"Failed to install {spec.name}: {exc}", file=sys.stderr)
-        return False
-    finally:
-        tmp_file.unlink(missing_ok=True)
-
-    return True
-
-
-SIMPLE_ARCHIVE_BINARY_COMMANDS: dict[str, dict[str, ArchiveBinaryInstallSpec]] = {
-    "rg": {
-        "amd64": ArchiveBinaryInstallSpec(
-            archive=ArchiveInstallSpec(
-                name="rg",
-                url="https://github.com/BurntSushi/ripgrep/releases/download/14.1.0/ripgrep-14.1.0-x86_64-unknown-linux-musl.tar.gz",
-                sha256="f84757b07f425fe5cf11d87df6644691c644a5cd2348a2c670894272999d3ba7",
-            ),
-            file_copies=(
-                ("ripgrep-14.1.0-x86_64-unknown-linux-musl/rg", ".local/bin/rg"),
-                (
-                    "ripgrep-14.1.0-x86_64-unknown-linux-musl/complete/rg.fish",
-                    ".config/fish/completions/rg.fish",
-                ),
-            ),
-        )
-    },
-    "delta": {
-        "amd64": ArchiveBinaryInstallSpec(
-            archive=ArchiveInstallSpec(
-                name="delta",
-                url="https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-x86_64-unknown-linux-musl.tar.gz",
-                sha256="b7ea845004762358a00ef9127dd9fd723e333c7e4b9cb1da220c3909372310ee",
-            ),
-            file_copies=(("delta-0.18.2-x86_64-unknown-linux-musl/delta", ".local/bin/delta"),),
-        )
-    },
-    "bat": {
-        "amd64": ArchiveBinaryInstallSpec(
-            archive=ArchiveInstallSpec(
-                name="bat",
-                url="https://github.com/sharkdp/bat/releases/download/v0.24.0/bat-v0.24.0-x86_64-unknown-linux-musl.tar.gz",
-                sha256="d39a21e3da57fe6a3e07184b3c1dc245f8dba379af569d3668b6dcdfe75e3052",
-            ),
-            file_copies=(
-                ("bat-v0.24.0-x86_64-unknown-linux-musl/bat", ".local/bin/bat"),
-                (
-                    "bat-v0.24.0-x86_64-unknown-linux-musl/autocomplete/bat.fish",
-                    ".config/fish/completions/bat.fish",
-                ),
-            ),
-        )
-    },
-    "eza": {
-        "amd64": ArchiveBinaryInstallSpec(
-            archive=ArchiveInstallSpec(
-                name="eza",
-                url="https://github.com/eza-community/eza/releases/download/v0.20.14/eza_x86_64-unknown-linux-musl.tar.gz",
-                sha256="cb5953a866a5fb3ec8d4fb0f6b0275511c5caa4d6b3019e5378d970ea85d2ef0",
-            ),
-            file_copies=(("eza", ".local/bin/eza"),),
-        )
-    },
-    "fd": {
-        "amd64": ArchiveBinaryInstallSpec(
-            archive=ArchiveInstallSpec(
-                name="fd",
-                url="https://github.com/sharkdp/fd/releases/download/v10.2.0/fd-v10.2.0-x86_64-unknown-linux-musl.tar.gz",
-                sha256="d9bfa25ec28624545c222992e1b00673b7c9ca5eb15393c40369f10b28f9c932",
-            ),
-            file_copies=(
-                ("fd-v10.2.0-x86_64-unknown-linux-musl/fd", ".local/bin/fd"),
-                (
-                    "fd-v10.2.0-x86_64-unknown-linux-musl/autocomplete/fd.fish",
-                    ".config/fish/completions/fd.fish",
-                ),
-            ),
-        )
-    },
-    "just": {
-        "amd64": ArchiveBinaryInstallSpec(
-            archive=ArchiveInstallSpec(
-                name="just",
-                url="https://github.com/casey/just/releases/download/1.38.0/just-1.38.0-x86_64-unknown-linux-musl.tar.gz",
-                sha256="c803e67fd7b0af01667bd537197bc3df319938eacf9e8d51a441c71d03035bb5",
-            ),
-            file_copies=(
-                ("just", ".local/bin/just"),
-                ("just.1", ".local/share/man/man1/just.1"),
-                ("completions/just.fish", ".config/fish/completions/just.fish"),
-            ),
-        )
-    },
-}
-
-NPM_GLOBAL_COMMANDS: dict[str, list[str]] = {
-    "typescript-language-server": ["typescript", "typescript-language-server"],
-    "tailwindcss-language-server": ["@tailwindcss/language-server"],
-    "css-language-server": ["vscode-langservers-extracted"],
-    "html-language-server": ["vscode-langservers-extracted"],
-    "opencode": ["opencode-ai@latest"],
-    "copilot-language-server": ["@github/copilot-language-server"],
-}
-
-
-def install_nvim(arch: str) -> bool:
-    specs: dict[str, tuple[ArchiveInstallSpec, str]] = {
-        "amd64": (
-            ArchiveInstallSpec(
-                name="nvim",
-                url="https://github.com/neovim/neovim/releases/download/v0.11.2/nvim-linux-x86_64.tar.gz",
-                sha256="a9b24157672eb218ff3e33ef3f8c08db26f8931c5c04bdb0e471371dd1dfe63e",
-            ),
-            "nvim-linux-x86_64",
-        )
-    }
-    selected = specs.get(arch)
-    if selected is None:
-        print(f"{arch} is not yet supported for nvim", file=sys.stderr)
-        return False
-
-    spec, extract_dir_name = selected
-    tmp_file = download_with_sha256(spec.url, spec.sha256)
-    if tmp_file is None:
-        print("Hashes don't match expected for nvim", file=sys.stderr)
-        return False
-
-    try:
-        with tempfile.TemporaryDirectory(dir=CACHE_DIR) as extract_dir:
-            extract_root = Path(extract_dir)
-            extract_tar_gz(tmp_file, extract_root)
-            run(
-                [
-                    "rsync",
-                    "-a",
-                    str(extract_root / extract_dir_name) + "/",
-                    str(HOME / ".local") + "/",
-                ]
-            )
+            apply_file_copies(extract_root, file_copies)
     except (
+        FileNotFoundError,
         OSError,
         tarfile.TarError,
         ValueError,
         subprocess.CalledProcessError,
     ) as exc:
-        print(f"Failed to install nvim: {exc}", file=sys.stderr)
+        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
         return False
     finally:
         tmp_file.unlink(missing_ok=True)
@@ -281,37 +407,58 @@ def install_nvim(arch: str) -> bool:
     return True
 
 
-def install_uv(arch: str) -> bool:
-    specs: dict[str, tuple[ArchiveInstallSpec, str]] = {
-        "amd64": (
-            ArchiveInstallSpec(
-                name="uv",
-                url="https://github.com/astral-sh/uv/releases/download/0.9.24/uv-x86_64-unknown-linux-gnu.tar.gz",
-                sha256="fb13ad85106da6b21dd16613afca910994446fe94a78ee0b5bed9c75cd066078",
-            ),
-            "uv-x86_64-unknown-linux-gnu",
-        )
-    }
-    selected = specs.get(arch)
-    if selected is None:
-        print(f"{arch} is not yet supported for uv", file=sys.stderr)
+def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str) -> bool:
+    selected_spec = select_arch_spec(command, command_cfg, arch)
+    if selected_spec is None:
+        print(f"{arch} is not yet supported for {command}", file=sys.stderr)
         return False
 
-    spec, extract_dir_name = selected
-    tmp_file = download_with_sha256(spec.url, spec.sha256)
+    command_context = f"commands.{command}"
+    variables = collect_template_vars(command_cfg, selected_spec, arch)
+    url = resolve_string_value(command_cfg, selected_spec, "url", command_context, variables)
+    sha256 = resolve_string_value(command_cfg, selected_spec, "sha256", command_context, variables)
+    destination = resolve_string_value(
+        command_cfg,
+        selected_spec,
+        "destination",
+        command_context,
+        variables,
+    )
+    wrapper_path = resolve_optional_string_value(
+        command_cfg,
+        selected_spec,
+        "wrapper_path",
+        command_context,
+        variables,
+    )
+    wrapper_exec = resolve_optional_string_value(
+        command_cfg,
+        selected_spec,
+        "wrapper_exec",
+        command_context,
+        variables,
+    )
+
+    archive_spec = ArchiveInstallSpec(name=command, url=url, sha256=sha256)
+    tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
     if tmp_file is None:
-        print("Error: Hashes don't match expected for uv", file=sys.stderr)
+        print(f"Hashes don't match expected for {archive_spec.name}", file=sys.stderr)
         return False
 
     try:
-        with tempfile.TemporaryDirectory(dir=CACHE_DIR) as extract_dir:
-            extract_root = Path(extract_dir)
-            extract_tar_gz(tmp_file, extract_root)
-            uv_dir = extract_root / extract_dir_name
-            for uv_binary in uv_dir.iterdir():
-                copy_file(uv_binary, BIN_DIR / uv_binary.name)
-    except (FileNotFoundError, OSError, tarfile.TarError, ValueError) as exc:
-        print(f"Failed to install uv: {exc}", file=sys.stderr)
+        destination_path = HOME / destination
+        destination_path.mkdir(parents=True, exist_ok=True)
+        extract_tar_gz(tmp_file, destination_path)
+
+        if (wrapper_path is None) != (wrapper_exec is None):
+            raise ConfigError(f"{command_context} must set both wrapper_path and wrapper_exec")
+        if wrapper_path is not None and wrapper_exec is not None:
+            wrapper = HOME / wrapper_path
+            wrapper.parent.mkdir(parents=True, exist_ok=True)
+            wrapper.write_text(f'#!/bin/bash\nexec "$HOME/{wrapper_exec}" "$@"\n')
+            wrapper.chmod(0o755)
+    except (OSError, tarfile.TarError, ValueError, ConfigError) as exc:
+        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
         return False
     finally:
         tmp_file.unlink(missing_ok=True)
@@ -319,219 +466,204 @@ def install_uv(arch: str) -> bool:
     return True
 
 
-def install_lua_ls(arch: str) -> bool:
-    specs: dict[str, ArchiveInstallSpec] = {
-        "amd64": ArchiveInstallSpec(
-            name="lua_ls",
-            url="https://github.com/LuaLS/lua-language-server/releases/download/3.13.5/lua-language-server-3.13.5-linux-x64.tar.gz",
-            sha256="5d4316291b8c79b145002318fbb7cc294a327c314e2711e590609b178478eb59",
-        )
-    }
-    spec = specs.get(arch)
-    if spec is None:
-        print(f"{arch} is not yet supported for lua_ls", file=sys.stderr)
-        return False
-
-    tmp_file = download_with_sha256(spec.url, spec.sha256)
-    if tmp_file is None:
-        print("Hashes don't match expected", file=sys.stderr)
-        return False
-
-    try:
-        LUA_LS_HOME.mkdir(parents=True, exist_ok=True)
-        extract_tar_gz(tmp_file, LUA_LS_HOME)
-        wrapper = BIN_DIR / "lua-language-server"
-        wrapper.write_text(
-            '#!/bin/bash\nexec "$HOME/.local/share/lua_ls/bin/lua-language-server" "$@"\n'
-        )
-        wrapper.chmod(0o755)
-    except (OSError, tarfile.TarError, ValueError) as exc:
-        print(f"Failed to install lua_ls: {exc}", file=sys.stderr)
-        return False
-    finally:
-        tmp_file.unlink(missing_ok=True)
-
-    return True
-
-
-def install_rust_analyzer(arch: str) -> bool:
-    specs: dict[str, ArchiveInstallSpec] = {
-        "amd64": ArchiveInstallSpec(
-            name="rust-analyzer",
-            url="https://github.com/rust-lang/rust-analyzer/releases/download/2024-02-19/rust-analyzer-x86_64-unknown-linux-musl.gz",
-            sha256="80d1a59e87820b65d4a86e6994a5dfda14edfd9fb5133a2394f28634bbc19eb2",
-        )
-    }
-    spec = specs.get(arch)
-    if spec is None:
-        print(f"{arch} is not yet supported for rust-analyzer", file=sys.stderr)
-        return False
-
-    tmp_file = download_with_sha256(spec.url, spec.sha256)
-    if tmp_file is None:
-        print("Error: Hashes don't match expected for rust-analyzer", file=sys.stderr)
-        return False
-
-    try:
-        with (
-            gzip.open(tmp_file, "rb") as gz_handle,
-            (BIN_DIR / "rust-analyzer").open("wb") as out,
-        ):
-            shutil.copyfileobj(gz_handle, out)
-        (BIN_DIR / "rust-analyzer").chmod(0o755)
-    except OSError as exc:
-        print(f"Failed to install rust-analyzer: {exc}", file=sys.stderr)
-        return False
-    finally:
-        tmp_file.unlink(missing_ok=True)
-
-    return True
-
-
-CUSTOM_ARCHIVE_COMMANDS: dict[str, Callable[[str], bool]] = {
-    "uv": install_uv,
-    "lua_ls": install_lua_ls,
-    "rust-analyzer": install_rust_analyzer,
-}
-
-
-class CommandInstaller:
-    def install(self, arch: str) -> bool:
-        raise NotImplementedError
-
-
-@dataclass(frozen=True)
-class FunctionCommandInstaller(CommandInstaller):
-    installer: Callable[[str], bool]
-
-    def install(self, arch: str) -> bool:
-        return self.installer(arch)
-
-
-@dataclass(frozen=True)
-class ArchiveCommandInstaller(CommandInstaller):
-    command: str
-
-    def install(self, arch: str) -> bool:
-        return install_simple_archive_command(self.command, arch)
-
-
-@dataclass(frozen=True)
-class NpmCommandInstaller(CommandInstaller):
-    command: str
-
-    def install(self, arch: str) -> bool:
-        del arch
-        return install_npm_command(self.command)
-
-
-class GoplsInstaller(CommandInstaller):
-    def install(self, arch: str) -> bool:
-        del arch
-        if command_exists("go"):
-            run(["go", "install", "golang.org/x/tools/gopls@latest"])
-            return True
-        print("Go unavailable can't install gopls", file=sys.stderr)
-        return False
-
-
-@dataclass(frozen=True)
-class UvToolInstaller(CommandInstaller):
-    package: str
-    command_name: str
-
-    def install(self, arch: str) -> bool:
-        del arch
-        if not command_exists("uv"):
-            print(f"uv unavailable can't install {self.command_name}", file=sys.stderr)
-            return False
-        run(["uv", "tool", "install", self.package])
-        return True
-
-
-class PreCommitInstaller(UvToolInstaller):
-    def __init__(self) -> None:
-        super().__init__(package="pre-commit", command_name="pre-commit")
-
-    def install(self, arch: str) -> bool:
-        if not super().install(arch):
-            return False
-        if (run(["git", "rev-parse"], check=False).returncode == 0) and command_exists(
-            "pre-commit"
-        ):
-            run(["pre-commit", "install"], check=False)
-        return True
-
-
-class TyInstaller(UvToolInstaller):
-    def __init__(self) -> None:
-        super().__init__(package="ty@latest", command_name="ty")
-
-
-class RustfmtInstaller(CommandInstaller):
-    def install(self, arch: str) -> bool:
-        del arch
-        if command_exists("rustup"):
-            run(["rustup", "component", "add", "rustfmt"])
-            return True
-        print("ERROR: rustup unavailable can't install rustfmt", file=sys.stderr)
-        return False
-
-
-def install_simple_archive_command(command: str, arch: str) -> bool:
-    if command in SIMPLE_ARCHIVE_BINARY_COMMANDS:
-        binary_spec = SIMPLE_ARCHIVE_BINARY_COMMANDS[command].get(arch)
-        if binary_spec is None:
-            print(f"{arch} is not yet supported for {command}", file=sys.stderr)
-            return False
-        return install_archive_binary(binary_spec.archive, list(binary_spec.file_copies))
-    installer = CUSTOM_ARCHIVE_COMMANDS.get(command)
-    if installer is None:
-        print(f"Unsupported archive command: {command}", file=sys.stderr)
-        return False
-    return installer(arch)
-
-
-def install_npm_command(command: str) -> bool:
+def install_npm_global(command: str, command_cfg: dict[str, Any]) -> bool:
     if not command_exists("npm"):
         print(f"npm unavailable can't install {command}", file=sys.stderr)
         return False
 
-    packages = NPM_GLOBAL_COMMANDS[command]
+    packages = require_string_list(command_cfg, "packages", f"commands.{command}")
     run(["npm", "install", "-g", *packages])
     return True
 
 
-COMMAND_INSTALLERS: dict[str, CommandInstaller] = {
-    "nvim": FunctionCommandInstaller(install_nvim),
-    "rg": ArchiveCommandInstaller("rg"),
-    "delta": ArchiveCommandInstaller("delta"),
-    "bat": ArchiveCommandInstaller("bat"),
-    "eza": ArchiveCommandInstaller("eza"),
-    "fd": ArchiveCommandInstaller("fd"),
-    "lua_ls": ArchiveCommandInstaller("lua_ls"),
-    "rust-analyzer": ArchiveCommandInstaller("rust-analyzer"),
-    "just": ArchiveCommandInstaller("just"),
-    "uv": ArchiveCommandInstaller("uv"),
-    "typescript-language-server": NpmCommandInstaller("typescript-language-server"),
-    "tailwindcss-language-server": NpmCommandInstaller("tailwindcss-language-server"),
-    "css-language-server": NpmCommandInstaller("css-language-server"),
-    "html-language-server": NpmCommandInstaller("html-language-server"),
-    "opencode": NpmCommandInstaller("opencode"),
-    "copilot-language-server": NpmCommandInstaller("copilot-language-server"),
-    "gopls": GoplsInstaller(),
-    "pre-commit": PreCommitInstaller(),
-    "ty": TyInstaller(),
-    "rustfmt": RustfmtInstaller(),
-}
-
-
-def install_command(command: str, arch: str) -> bool:
-    installer = COMMAND_INSTALLERS.get(command)
-    if installer is None:
-        print(f'Command not recognized: "{command}"', file=sys.stderr)
+def install_uv_tool(command: str, command_cfg: dict[str, Any]) -> bool:
+    if not command_exists("uv"):
+        print(f"uv unavailable can't install {command}", file=sys.stderr)
         return False
-    return installer.install(arch)
+
+    package = require_string(command_cfg, "package", f"commands.{command}")
+    run(["uv", "tool", "install", package])
+
+    install_hook = get_optional_bool(
+        command_cfg,
+        "post_install_pre_commit_hook",
+        f"commands.{command}",
+        default=False,
+    )
+    if (
+        install_hook
+        and (run(["git", "rev-parse"], check=False).returncode == 0)
+        and command_exists("pre-commit")
+    ):
+        run(["pre-commit", "install"], check=False)
+    return True
+
+
+def install_go_package(command: str, command_cfg: dict[str, Any]) -> bool:
+    if not command_exists("go"):
+        print(f"Go unavailable can't install {command}", file=sys.stderr)
+        return False
+
+    package = require_string(command_cfg, "package", f"commands.{command}")
+    run(["go", "install", package])
+    return True
+
+
+def install_rustup_component(command: str, command_cfg: dict[str, Any]) -> bool:
+    if not command_exists("rustup"):
+        print(f"ERROR: rustup unavailable can't install {command}", file=sys.stderr)
+        return False
+
+    component = require_string(command_cfg, "component", f"commands.{command}")
+    run(["rustup", "component", "add", component])
+    return True
+
+
+def enumerate_arch_specs(command: str, command_cfg: dict[str, Any]) -> list[SelectedArchSpec]:
+    arch_context = f"commands.{command}.arch"
+    arch_cfg = command_cfg.get("arch")
+
+    if isinstance(arch_cfg, dict):
+        entries: list[SelectedArchSpec] = []
+        for arch_name, arch_spec in arch_cfg.items():
+            normalized = normalize_arch(arch_name)
+            if normalized is None:
+                raise ConfigError(f"{arch_context}.{arch_name} uses unsupported architecture name")
+            spec_context = f"{arch_context}.{normalized}"
+            entries.append(
+                SelectedArchSpec(
+                    context=spec_context,
+                    spec=parse_mapping(arch_spec, spec_context),
+                )
+            )
+        return entries
+
+    if isinstance(arch_cfg, list):
+        entries = []
+        for index, raw_entry in enumerate(arch_cfg):
+            entry_context = f"{arch_context}[{index}]"
+            entry = parse_mapping(raw_entry, entry_context)
+            entry_arch = require_string(entry, "arch", entry_context)
+            if normalize_arch(entry_arch) is None:
+                raise ConfigError(f"{entry_context}.arch has unsupported value '{entry_arch}'")
+            entries.append(SelectedArchSpec(context=entry_context, spec=entry))
+        return entries
+
+    raise ConfigError(f"{arch_context} must be a table or an array of tables")
+
+
+def validate_required_field_for_arch_type(
+    command: str,
+    command_cfg: dict[str, Any],
+    key: str,
+    arch_specs: list[SelectedArchSpec],
+) -> None:
+    command_context = f"commands.{command}"
+    if key in command_cfg:
+        parse_string(command_cfg[key], f"{command_context}.{key}")
+        return
+    if not arch_specs:
+        raise ConfigError(f"{command_context}.arch must define at least one architecture")
+
+    for entry in arch_specs:
+        if key not in entry.spec:
+            raise ConfigError(f"{entry.context}.{key} is required")
+        parse_string(entry.spec[key], f"{entry.context}.{key}")
+
+
+def validate_type_specific(command: str, command_cfg: dict[str, Any]) -> None:
+    command_type = require_string(command_cfg, "type", f"commands.{command}")
+
+    if command_type in {
+        "archive_binary",
+        "archive_extract",
+    }:
+        arch_specs = enumerate_arch_specs(command, command_cfg)
+        validate_required_field_for_arch_type(command, command_cfg, "url", arch_specs)
+        validate_required_field_for_arch_type(command, command_cfg, "sha256", arch_specs)
+    else:
+        arch_specs = []
+
+    if command_type == "archive_binary":
+        has_copies = "file_copies" in command_cfg or any(
+            "file_copies" in e.spec for e in arch_specs
+        )
+        if not has_copies:
+            raise ConfigError(f"commands.{command}.file_copies is required")
+        if "file_copies" in command_cfg:
+            validate_file_copies_shape(
+                command_cfg["file_copies"], f"commands.{command}.file_copies"
+            )
+        for entry in arch_specs:
+            if "file_copies" in entry.spec:
+                validate_file_copies_shape(
+                    entry.spec["file_copies"], f"{entry.context}.file_copies"
+                )
+    elif command_type == "archive_extract":
+        validate_required_field_for_arch_type(command, command_cfg, "destination", arch_specs)
+        for entry in arch_specs:
+            wrapper_path = get_optional_string(entry.spec, "wrapper_path", entry.context)
+            wrapper_exec = get_optional_string(entry.spec, "wrapper_exec", entry.context)
+            if (wrapper_path is None) != (wrapper_exec is None):
+                raise ConfigError(f"{entry.context} must set both wrapper_path and wrapper_exec")
+    elif command_type == "npm_global":
+        require_string_list(command_cfg, "packages", f"commands.{command}")
+    elif command_type == "uv_tool":
+        require_string(command_cfg, "package", f"commands.{command}")
+        if "post_install_pre_commit_hook" in command_cfg:
+            parse_bool(command_cfg["post_install_pre_commit_hook"], f"commands.{command}")
+    elif command_type == "go_install":
+        require_string(command_cfg, "package", f"commands.{command}")
+    elif command_type == "rustup_component":
+        require_string(command_cfg, "component", f"commands.{command}")
+    else:
+        raise ConfigError(f"Unsupported command type '{command_type}' for commands.{command}")
+
+
+def load_config(path: Path) -> dict[str, dict[str, Any]]:
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise ConfigError(f"Unable to read config at {path}: {exc}") from exc
+
+    try:
+        parsed = tomllib.loads(raw.decode("utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as exc:
+        raise ConfigError(f"Unable to parse TOML config at {path}: {exc}") from exc
+
+    root = parse_mapping(parsed, "root")
+    commands_raw = require_mapping(root, "commands", "root")
+
+    commands: dict[str, dict[str, Any]] = {}
+    for name, cfg in commands_raw.items():
+        command_name = parse_string(name, "command name")
+        command_cfg = parse_mapping(cfg, f"commands.{command_name}")
+        validate_type_specific(command_name, command_cfg)
+        commands[command_name] = command_cfg
+
+    if not commands:
+        raise ConfigError("root.commands must define at least one command")
+    return commands
+
+
+def install_command(command: str, command_cfg: dict[str, Any], arch: str) -> bool:
+    command_type = require_string(command_cfg, "type", f"commands.{command}")
+
+    if command_type == "archive_binary":
+        return install_archive_binary(command, command_cfg, arch)
+    if command_type == "archive_extract":
+        return install_archive_extract(command, command_cfg, arch)
+    if command_type == "npm_global":
+        return install_npm_global(command, command_cfg)
+    if command_type == "uv_tool":
+        return install_uv_tool(command, command_cfg)
+    if command_type == "go_install":
+        return install_go_package(command, command_cfg)
+    if command_type == "rustup_component":
+        return install_rustup_component(command, command_cfg)
+
+    print(f"Unsupported command type '{command_type}' for {command}", file=sys.stderr)
+    return False
 
 
 def parse_args() -> argparse.Namespace:
@@ -543,25 +675,40 @@ def parse_args() -> argparse.Namespace:
         default=detect_default_arch(),
         help="Target architecture (amd64/x86_64/x64 or arm64/aarch64)",
     )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=DEFAULT_CONFIG_PATH,
+        help=f"TOML config path (default: {DEFAULT_CONFIG_PATH})",
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+
+    try:
+        commands_cfg = load_config(args.config)
+    except ConfigError as exc:
+        print(f"Config error: {exc}", file=sys.stderr)
+        return 1
+
     ensure_dirs()
     had_errors = False
     for cmd in args.commands:
+        cfg = commands_cfg.get(cmd)
+        if cfg is None:
+            had_errors = True
+            print(f'Command not recognized: "{cmd}"', file=sys.stderr)
+            continue
+
         try:
-            if not install_command(cmd, args.arch):
+            if not install_command(cmd, cfg, args.arch):
                 had_errors = True
-        except (
-            subprocess.CalledProcessError,
-            OSError,
-            tarfile.TarError,
-            ValueError,
-        ) as exc:
+        except (subprocess.CalledProcessError, OSError, tarfile.TarError, ValueError) as exc:
             had_errors = True
             print(f"Failed to install {cmd}: {exc}", file=sys.stderr)
+
     return 1 if had_errors else 0
 
 
