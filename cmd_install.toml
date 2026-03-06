@@ -1,0 +1,169 @@
+[commands.nvim]
+type = "archive_binary"
+version = "0.11.2"
+url = "https://github.com/neovim/neovim/releases/download/v{version}/nvim-linux-{arch}.tar.gz"
+file_copies = [
+  { source = "nvim-linux-{arch}", destination = ".local", mode = "rsync-tree" },
+]
+
+[[commands.nvim.arch]]
+arch = "x86_64"
+sha256 = "a9b24157672eb218ff3e33ef3f8c08db26f8931c5c04bdb0e471371dd1dfe63e"
+
+[commands.rg]
+type = "archive_binary"
+version = "14.1.0"
+url = "https://github.com/BurntSushi/ripgrep/releases/download/{version}/ripgrep-{version}-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "ripgrep-{version}-{arch}-{variant}/rg", destination = ".local/bin/rg" },
+  { source = "ripgrep-{version}-{arch}-{variant}/complete/rg.fish", destination = ".config/fish/completions/rg.fish" },
+]
+
+[[commands.rg.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "f84757b07f425fe5cf11d87df6644691c644a5cd2348a2c670894272999d3ba7"
+
+[[commands.rg.arch]]
+arch = "aarch64"
+variant = "unknown-linux-gnu"
+sha256 = "c8c210b99844fbf16b7a36d1c963e8351bca5ff2dd7c788f5fba4ac18ba8c60d"
+
+[commands.delta]
+type = "archive_binary"
+version = "0.18.2"
+url = "https://github.com/dandavison/delta/releases/download/{version}/delta-{version}-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "delta-{version}-{arch}-{variant}/delta", destination = ".local/bin/delta" },
+]
+
+[[commands.delta.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "b7ea845004762358a00ef9127dd9fd723e333c7e4b9cb1da220c3909372310ee"
+
+[commands.bat]
+type = "archive_binary"
+version = "0.24.0"
+url = "https://github.com/sharkdp/bat/releases/download/v{version}/bat-v{version}-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "bat-v{version}-{arch}-{variant}/bat", destination = ".local/bin/bat" },
+  { source = "bat-v{version}-{arch}-{variant}/autocomplete/bat.fish", destination = ".config/fish/completions/bat.fish" },
+]
+
+[[commands.bat.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "d39a21e3da57fe6a3e07184b3c1dc245f8dba379af569d3668b6dcdfe75e3052"
+
+[commands.eza]
+type = "archive_binary"
+version = "0.20.14"
+url = "https://github.com/eza-community/eza/releases/download/v{version}/eza_{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "eza", destination = ".local/bin/eza" },
+]
+
+[[commands.eza.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "cb5953a866a5fb3ec8d4fb0f6b0275511c5caa4d6b3019e5378d970ea85d2ef0"
+
+[commands.fd]
+type = "archive_binary"
+version = "10.2.0"
+url = "https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "fd-v{version}-{arch}-{variant}/fd", destination = ".local/bin/fd" },
+  { source = "fd-v{version}-{arch}-{variant}/autocomplete/fd.fish", destination = ".config/fish/completions/fd.fish" },
+]
+
+[[commands.fd.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "d9bfa25ec28624545c222992e1b00673b7c9ca5eb15393c40369f10b28f9c932"
+
+[commands.lua_ls]
+type = "archive_extract"
+version = "3.13.5"
+url = "https://github.com/LuaLS/lua-language-server/releases/download/{version}/lua-language-server-{version}-linux-{arch}.tar.gz"
+destination = ".local/share/lua_ls"
+wrapper_path = ".local/bin/lua-language-server"
+wrapper_exec = ".local/share/lua_ls/bin/lua-language-server"
+
+[[commands.lua_ls.arch]]
+arch = "x64"
+sha256 = "5d4316291b8c79b145002318fbb7cc294a327c314e2711e590609b178478eb59"
+
+[commands.rust-analyzer]
+type = "rustup_component"
+component = "rust-analyzer"
+
+[commands.just]
+type = "archive_binary"
+version = "1.38.0"
+url = "https://github.com/casey/just/releases/download/{version}/just-{version}-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "just", destination = ".local/bin/just" },
+  { source = "just.1", destination = ".local/share/man/man1/just.1" },
+  { source = "completions/just.fish", destination = ".config/fish/completions/just.fish" },
+]
+
+[[commands.just.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "c803e67fd7b0af01667bd537197bc3df319938eacf9e8d51a441c71d03035bb5"
+
+[commands.uv]
+type = "archive_binary"
+version = "0.9.24"
+url = "https://github.com/astral-sh/uv/releases/download/{version}/uv-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "uv-{arch}-{variant}", destination = ".local/bin", mode = "dircopy" },
+]
+
+[[commands.uv.arch]]
+arch = "x86_64"
+variant = "unknown-linux-gnu"
+sha256 = "fb13ad85106da6b21dd16613afca910994446fe94a78ee0b5bed9c75cd066078"
+
+[commands.typescript-language-server]
+type = "npm_global"
+packages = ["typescript", "typescript-language-server"]
+
+[commands.tailwindcss-language-server]
+type = "npm_global"
+packages = ["@tailwindcss/language-server"]
+
+[commands.css-language-server]
+type = "npm_global"
+packages = ["vscode-langservers-extracted"]
+
+[commands.html-language-server]
+type = "npm_global"
+packages = ["vscode-langservers-extracted"]
+
+[commands.opencode]
+type = "npm_global"
+packages = ["opencode-ai@latest"]
+
+[commands.copilot-language-server]
+type = "npm_global"
+packages = ["@github/copilot-language-server"]
+
+[commands.gopls]
+type = "go_install"
+package = "golang.org/x/tools/gopls@latest"
+
+[commands.pre-commit]
+type = "uv_tool"
+package = "pre-commit"
+post_install_pre_commit_hook = true
+
+[commands.ty]
+type = "uv_tool"
+package = "ty@latest"
+
+[commands.rustfmt]
+type = "rustup_component"
+component = "rustfmt"
