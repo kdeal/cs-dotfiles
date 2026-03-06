@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # /// script
-# requires-python = ">=3.14"
+# requires-python = ">=3.13"
 # dependencies = []
 # ///
 """Install extra commands that I might want.
@@ -19,13 +19,13 @@ import sys
 import tarfile
 import tempfile
 import tomllib
+import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 HOME = Path.home()
-CACHE_DIR = HOME / ".cache"
 BIN_DIR = HOME / ".local" / "bin"
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "cmd_install.toml"
 
@@ -58,8 +58,38 @@ ARCH_ALIASES = {
     "aarch64": "arm64",
 }
 
+ALLOWED_SELECTED_ARCH_KEYS = {"arch", "variant", "sha256"}
+ALLOWED_FILE_COPY_KEYS = {"source", "destination", "mode"}
+COPY_MODES = {"file", "rsync-tree", "dircopy"}
+unset = object()
+
+DOWNLOAD_TIMEOUT_SECONDS = 30
+
+ALLOWED_COMMAND_KEYS_BY_TYPE = {
+    "archive_binary": {"type", "version", "url", "file_copies", "arch"},
+    "archive_extract": {
+        "type",
+        "version",
+        "url",
+        "destination",
+        "wrapper_path",
+        "wrapper_exec",
+        "arch",
+    },
+    "npm_global": {"type", "packages"},
+    "uv_tool": {"type", "package", "post_install_pre_commit_hook"},
+    "go_install": {"type", "package"},
+    "rustup_component": {"type", "component"},
+}
+
+ValueType = Literal["table", "string", "boolean", "string_list", "copy_mode"]
+
 
 class ConfigError(ValueError):
+    pass
+
+
+class InstallError(RuntimeError):
     pass
 
 
@@ -84,7 +114,6 @@ def detect_default_arch() -> str:
 
 def ensure_dirs() -> None:
     for path in (
-        CACHE_DIR,
         BIN_DIR,
         HOME / ".config" / "fish" / "completions",
         HOME / ".local" / "share" / "man" / "man1",
@@ -100,21 +129,30 @@ def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[st
     return subprocess.run(cmd, check=check, text=True)
 
 
-def download_with_sha256(url: str, expected_sha256: str) -> Path | None:
+def download_with_sha256(url: str, expected_sha256: str) -> Path:
     with tempfile.NamedTemporaryFile(delete=False) as handle:
         tmp_path = Path(handle.name)
 
-    with urllib.request.urlopen(url) as response, tmp_path.open("wb") as out:
-        shutil.copyfileobj(response, out)
+    try:
+        with (
+            urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT_SECONDS) as response,
+            tmp_path.open("wb") as out,
+        ):
+            shutil.copyfileobj(response, out)
 
-    sha256 = hashlib.sha256()
-    with tmp_path.open("rb") as downloaded:
-        for chunk in iter(lambda: downloaded.read(1024 * 1024), b""):
-            sha256.update(chunk)
-    digest = sha256.hexdigest()
+        sha256 = hashlib.sha256()
+        with tmp_path.open("rb") as downloaded:
+            for chunk in iter(lambda: downloaded.read(1024 * 1024), b""):
+                sha256.update(chunk)
+        digest = sha256.hexdigest()
+    except (OSError, urllib.error.URLError, ValueError) as exc:
+        tmp_path.unlink(missing_ok=True)
+        raise InstallError(f"Failed to download {url}: {exc}") from exc
+
     if digest != expected_sha256:
         tmp_path.unlink(missing_ok=True)
-        return None
+        raise InstallError(f"SHA256 mismatch for {url}: expected {expected_sha256}, got {digest}")
+
     return tmp_path
 
 
@@ -128,69 +166,77 @@ def copy_file(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
-def parse_mapping(value: Any, context: str) -> dict[str, Any]:
-    if not isinstance(value, dict):
-        raise ConfigError(f"{context} must be a table")
-    return value
+def remove_path(path: Path) -> None:
+    if path.is_dir() and not path.is_symlink():
+        shutil.rmtree(path)
+        return
+    path.unlink()
 
 
-def parse_string(value: Any, context: str) -> str:
-    if not isinstance(value, str):
-        raise ConfigError(f"{context} must be a string")
-    return value
+def replace_directory_contents(source: Path, destination: Path) -> None:
+    destination.mkdir(parents=True, exist_ok=True)
+    for existing in destination.iterdir():
+        remove_path(existing)
+    for item in source.iterdir():
+        copy_any(item, destination / item.name)
 
 
-def parse_bool(value: Any, context: str) -> bool:
-    if not isinstance(value, bool):
-        raise ConfigError(f"{context} must be a boolean")
-    return value
+def validate_allowed_keys(mapping: dict[str, Any], allowed_keys: set[str], context: str) -> None:
+    unexpected = sorted(set(mapping) - allowed_keys)
+    if unexpected:
+        keys = ", ".join(unexpected)
+        raise ConfigError(f"{context} has unsupported keys: {keys}")
 
 
-def parse_string_list(value: Any, context: str) -> list[str]:
-    if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
-        raise ConfigError(f"{context} must be a list of strings")
-    return value
+def parse(
+    mapping: Any,
+    key: str,
+    context: str,
+    value_type: ValueType,
+    *,
+    default: Any = unset,
+) -> Any:
+    required = default is unset
 
+    if key == "":
+        value = mapping
+        value_context = context
+    else:
+        mapping_context = context or "value"
+        if not isinstance(mapping, dict):
+            raise ConfigError(f"{mapping_context} must be a table")
+        value_context = f"{context}.{key}" if context else key
+        if key not in mapping:
+            if required:
+                raise ConfigError(f"{value_context} is required")
+            return default
+        value = mapping[key]
 
-def parse_copy_mode(value: Any, context: str) -> str:
-    mode = parse_string(value, context)
-    allowed = {"file", "rsync-tree", "dircopy"}
-    if mode not in allowed:
-        allowed_values = ", ".join(sorted(allowed))
-        raise ConfigError(f"{context} must be one of: {allowed_values}")
-    return mode
+    if value_type == "table":
+        if not isinstance(value, dict):
+            raise ConfigError(f"{value_context} must be a table")
+        return value
+    if value_type == "string":
+        if not isinstance(value, str):
+            raise ConfigError(f"{value_context} must be a string")
+        return value
+    if value_type == "boolean":
+        if not isinstance(value, bool):
+            raise ConfigError(f"{value_context} must be a boolean")
+        return value
+    if value_type == "string_list":
+        if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
+            raise ConfigError(f"{value_context} must be a list of strings")
+        return value
+    if value_type == "copy_mode":
+        if not isinstance(value, str):
+            raise ConfigError(f"{value_context} must be a string")
+        if value not in COPY_MODES:
+            allowed_values = ", ".join(sorted(COPY_MODES))
+            raise ConfigError(f"{value_context} must be one of: {allowed_values}")
+        return value
 
-
-def require_string(mapping: dict[str, Any], key: str, context: str) -> str:
-    if key not in mapping:
-        raise ConfigError(f"{context}.{key} is required")
-    return parse_string(mapping[key], f"{context}.{key}")
-
-
-def require_mapping(mapping: dict[str, Any], key: str, context: str) -> dict[str, Any]:
-    if key not in mapping:
-        raise ConfigError(f"{context}.{key} is required")
-    return parse_mapping(mapping[key], f"{context}.{key}")
-
-
-def require_string_list(mapping: dict[str, Any], key: str, context: str) -> list[str]:
-    if key not in mapping:
-        raise ConfigError(f"{context}.{key} is required")
-    return parse_string_list(mapping[key], f"{context}.{key}")
-
-
-def get_optional_string(mapping: dict[str, Any], key: str, context: str) -> str | None:
-    value = mapping.get(key)
-    if value is None:
-        return None
-    return parse_string(value, f"{context}.{key}")
-
-
-def get_optional_bool(mapping: dict[str, Any], key: str, context: str, *, default: bool) -> bool:
-    value = mapping.get(key)
-    if value is None:
-        return default
-    return parse_bool(value, f"{context}.{key}")
+    raise ConfigError(f"Unsupported value type '{value_type}'")
 
 
 def render_template(value: str, variables: dict[str, Any], context: str) -> str:
@@ -214,18 +260,18 @@ def parse_file_copies(
     copies: list[FileCopySpec] = []
     for index, item in enumerate(value):
         item_context = f"{context}[{index}]"
-        item_mapping = parse_mapping(item, item_context)
+        item_mapping = parse(item, "", item_context, "table")
         source = render_template(
-            require_string(item_mapping, "source", item_context),
+            parse(item_mapping, "source", item_context, "string"),
             variables,
             f"{item_context}.source",
         )
         destination = render_template(
-            require_string(item_mapping, "destination", item_context),
+            parse(item_mapping, "destination", item_context, "string"),
             variables,
             f"{item_context}.destination",
         )
-        mode = parse_copy_mode(item_mapping.get("mode", "file"), f"{item_context}.mode")
+        mode = parse(item_mapping, "mode", item_context, "copy_mode", default="file")
         copies.append(FileCopySpec(source=source, destination=destination, mode=mode))
     return copies
 
@@ -235,11 +281,30 @@ def validate_file_copies_shape(value: Any, context: str) -> None:
         raise ConfigError(f"{context} must be an array of tables")
     for index, item in enumerate(value):
         item_context = f"{context}[{index}]"
-        item_mapping = parse_mapping(item, item_context)
-        require_string(item_mapping, "source", item_context)
-        require_string(item_mapping, "destination", item_context)
+        item_mapping = parse(item, "", item_context, "table")
+        validate_allowed_keys(item_mapping, ALLOWED_FILE_COPY_KEYS, item_context)
+        parse(item_mapping, "source", item_context, "string")
+        parse(item_mapping, "destination", item_context, "string")
         if "mode" in item_mapping:
-            parse_copy_mode(item_mapping["mode"], f"{item_context}.mode")
+            parse(item_mapping, "mode", item_context, "copy_mode")
+
+
+def parse_selected_arch_spec(
+    value: Any,
+    context: str,
+) -> dict[str, Any]:
+    spec = parse(value, "", context, "table")
+    validate_allowed_keys(spec, ALLOWED_SELECTED_ARCH_KEYS, context)
+
+    entry_arch = parse(spec, "arch", context, "string")
+    if normalize_arch(entry_arch) is None:
+        raise ConfigError(f"{context}.arch has unsupported value '{entry_arch}'")
+
+    parse(spec, "sha256", context, "string")
+    if "variant" in spec:
+        parse(spec, "variant", context, "string")
+
+    return spec
 
 
 def select_arch_spec(
@@ -247,28 +312,22 @@ def select_arch_spec(
 ) -> SelectedArchSpec | None:
     arch_context = f"commands.{command}.arch"
     arch_cfg = command_cfg.get("arch")
-    if isinstance(arch_cfg, dict):
-        raw_spec = arch_cfg.get(arch)
-        if raw_spec is None:
-            return None
-        return SelectedArchSpec(
-            context=f"{arch_context}.{arch}",
-            spec=parse_mapping(raw_spec, f"{arch_context}.{arch}"),
-        )
-
     if isinstance(arch_cfg, list):
         for index, entry in enumerate(arch_cfg):
             entry_context = f"{arch_context}[{index}]"
-            entry_mapping = parse_mapping(entry, entry_context)
-            entry_arch = require_string(entry_mapping, "arch", entry_context)
+            entry_mapping = parse(entry, "", entry_context, "table")
+            entry_arch = parse(entry_mapping, "arch", entry_context, "string")
             normalized = normalize_arch(entry_arch)
             if normalized is None:
                 raise ConfigError(f"{entry_context}.arch has unsupported value '{entry_arch}'")
             if normalized == arch:
-                return SelectedArchSpec(context=entry_context, spec=entry_mapping)
+                return SelectedArchSpec(
+                    context=entry_context,
+                    spec=parse_selected_arch_spec(entry_mapping, entry_context),
+                )
         return None
 
-    raise ConfigError(f"{arch_context} must be a table or an array of tables")
+    raise ConfigError(f"{arch_context} must be an array of tables")
 
 
 def collect_template_vars(
@@ -276,11 +335,12 @@ def collect_template_vars(
     selected_arch_spec: SelectedArchSpec,
     target_arch: str,
 ) -> dict[str, Any]:
-    variables: dict[str, Any] = {"target_arch": target_arch}
+    variables: dict[str, Any] = {"target_arch": target_arch, "arch": target_arch}
     for key, value in command_cfg.items():
         if isinstance(value, str | int | float | bool):
             variables[key] = value
-    for key, value in selected_arch_spec.spec.items():
+    for key in ("arch", "variant", "sha256"):
+        value = selected_arch_spec.spec.get(key)
         if isinstance(value, str | int | float | bool):
             variables[key] = value
     return variables
@@ -288,55 +348,35 @@ def collect_template_vars(
 
 def resolve_string_value(
     command_cfg: dict[str, Any],
-    selected_arch_spec: SelectedArchSpec,
     key: str,
     command_context: str,
     variables: dict[str, Any],
 ) -> str:
-    if key in selected_arch_spec.spec:
-        value = parse_string(selected_arch_spec.spec[key], f"{selected_arch_spec.context}.{key}")
-        return render_template(value, variables, f"{selected_arch_spec.context}.{key}")
     if key in command_cfg:
-        value = parse_string(command_cfg[key], f"{command_context}.{key}")
+        value = parse(command_cfg, key, command_context, "string")
         return render_template(value, variables, f"{command_context}.{key}")
     raise ConfigError(f"{command_context}.{key} is required")
 
 
 def resolve_optional_string_value(
     command_cfg: dict[str, Any],
-    selected_arch_spec: SelectedArchSpec,
     key: str,
     command_context: str,
     variables: dict[str, Any],
 ) -> str | None:
-    if key in selected_arch_spec.spec:
-        value = parse_string(selected_arch_spec.spec[key], f"{selected_arch_spec.context}.{key}")
-        return render_template(value, variables, f"{selected_arch_spec.context}.{key}")
     if key in command_cfg:
-        value = parse_string(command_cfg[key], f"{command_context}.{key}")
+        value = parse(command_cfg, key, command_context, "string")
         return render_template(value, variables, f"{command_context}.{key}")
     return None
 
 
-def resolve_file_copies(
-    command_cfg: dict[str, Any],
+def resolve_selected_arch_string_value(
     selected_arch_spec: SelectedArchSpec,
-    command_context: str,
+    key: str,
     variables: dict[str, Any],
-) -> list[FileCopySpec]:
-    if "file_copies" in selected_arch_spec.spec:
-        return parse_file_copies(
-            selected_arch_spec.spec["file_copies"],
-            f"{selected_arch_spec.context}.file_copies",
-            variables,
-        )
-    if "file_copies" in command_cfg:
-        return parse_file_copies(
-            command_cfg["file_copies"],
-            f"{command_context}.file_copies",
-            variables,
-        )
-    raise ConfigError(f"{command_context}.file_copies is required")
+) -> str:
+    value = parse(selected_arch_spec.spec, key, selected_arch_spec.context, "string")
+    return render_template(value, variables, f"{selected_arch_spec.context}.{key}")
 
 
 def copy_any(source: Path, destination: Path) -> None:
@@ -377,18 +417,21 @@ def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str)
     command_context = f"commands.{command}"
     variables = collect_template_vars(command_cfg, selected_spec, arch)
 
-    url = resolve_string_value(command_cfg, selected_spec, "url", command_context, variables)
-    sha256 = resolve_string_value(command_cfg, selected_spec, "sha256", command_context, variables)
-    file_copies = resolve_file_copies(command_cfg, selected_spec, command_context, variables)
+    url = resolve_string_value(command_cfg, "url", command_context, variables)
+    sha256 = resolve_selected_arch_string_value(selected_spec, "sha256", variables)
+    file_copies = parse_file_copies(
+        command_cfg["file_copies"], f"{command_context}.file_copies", variables
+    )
 
     archive_spec = ArchiveInstallSpec(name=command, url=url, sha256=sha256)
-    tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
-    if tmp_file is None:
-        print(f"Hashes don't match expected for {archive_spec.name}", file=sys.stderr)
+    try:
+        tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
+    except InstallError as exc:
+        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
         return False
 
     try:
-        with tempfile.TemporaryDirectory(dir=CACHE_DIR) as extract_dir:
+        with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
             extract_tar_gz(tmp_file, extract_root)
             apply_file_copies(extract_root, file_copies)
@@ -415,47 +458,51 @@ def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str
 
     command_context = f"commands.{command}"
     variables = collect_template_vars(command_cfg, selected_spec, arch)
-    url = resolve_string_value(command_cfg, selected_spec, "url", command_context, variables)
-    sha256 = resolve_string_value(command_cfg, selected_spec, "sha256", command_context, variables)
+    url = resolve_string_value(command_cfg, "url", command_context, variables)
+    sha256 = resolve_selected_arch_string_value(selected_spec, "sha256", variables)
     destination = resolve_string_value(
         command_cfg,
-        selected_spec,
         "destination",
         command_context,
         variables,
     )
     wrapper_path = resolve_optional_string_value(
         command_cfg,
-        selected_spec,
         "wrapper_path",
         command_context,
         variables,
     )
     wrapper_exec = resolve_optional_string_value(
         command_cfg,
-        selected_spec,
         "wrapper_exec",
         command_context,
         variables,
     )
 
     archive_spec = ArchiveInstallSpec(name=command, url=url, sha256=sha256)
-    tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
-    if tmp_file is None:
-        print(f"Hashes don't match expected for {archive_spec.name}", file=sys.stderr)
+    try:
+        tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
+    except InstallError as exc:
+        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
         return False
 
     try:
-        destination_path = HOME / destination
-        destination_path.mkdir(parents=True, exist_ok=True)
-        extract_tar_gz(tmp_file, destination_path)
+        with tempfile.TemporaryDirectory() as extract_dir:
+            extract_root = Path(extract_dir)
+            extract_tar_gz(tmp_file, extract_root)
+
+            destination_path = HOME / destination
+            replace_directory_contents(extract_root, destination_path)
 
         if (wrapper_path is None) != (wrapper_exec is None):
             raise ConfigError(f"{command_context} must set both wrapper_path and wrapper_exec")
         if wrapper_path is not None and wrapper_exec is not None:
             wrapper = HOME / wrapper_path
             wrapper.parent.mkdir(parents=True, exist_ok=True)
-            wrapper.write_text(f'#!/bin/bash\nexec "$HOME/{wrapper_exec}" "$@"\n')
+            wrapper.write_text(
+                f'#!/usr/bin/env sh\nexec "$HOME/{wrapper_exec}" "$@"\n',
+                encoding="utf-8",
+            )
             wrapper.chmod(0o755)
     except (OSError, tarfile.TarError, ValueError, ConfigError) as exc:
         print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
@@ -471,7 +518,7 @@ def install_npm_global(command: str, command_cfg: dict[str, Any]) -> bool:
         print(f"npm unavailable can't install {command}", file=sys.stderr)
         return False
 
-    packages = require_string_list(command_cfg, "packages", f"commands.{command}")
+    packages = parse(command_cfg, "packages", f"commands.{command}", "string_list")
     run(["npm", "install", "-g", *packages])
     return True
 
@@ -481,13 +528,14 @@ def install_uv_tool(command: str, command_cfg: dict[str, Any]) -> bool:
         print(f"uv unavailable can't install {command}", file=sys.stderr)
         return False
 
-    package = require_string(command_cfg, "package", f"commands.{command}")
+    package = parse(command_cfg, "package", f"commands.{command}", "string")
     run(["uv", "tool", "install", package])
 
-    install_hook = get_optional_bool(
+    install_hook = parse(
         command_cfg,
         "post_install_pre_commit_hook",
         f"commands.{command}",
+        "boolean",
         default=False,
     )
     if (
@@ -504,7 +552,7 @@ def install_go_package(command: str, command_cfg: dict[str, Any]) -> bool:
         print(f"Go unavailable can't install {command}", file=sys.stderr)
         return False
 
-    package = require_string(command_cfg, "package", f"commands.{command}")
+    package = parse(command_cfg, "package", f"commands.{command}", "string")
     run(["go", "install", package])
     return True
 
@@ -514,7 +562,7 @@ def install_rustup_component(command: str, command_cfg: dict[str, Any]) -> bool:
         print(f"ERROR: rustup unavailable can't install {command}", file=sys.stderr)
         return False
 
-    component = require_string(command_cfg, "component", f"commands.{command}")
+    component = parse(command_cfg, "component", f"commands.{command}", "string")
     run(["rustup", "component", "add", component])
     return True
 
@@ -523,101 +571,69 @@ def enumerate_arch_specs(command: str, command_cfg: dict[str, Any]) -> list[Sele
     arch_context = f"commands.{command}.arch"
     arch_cfg = command_cfg.get("arch")
 
-    if isinstance(arch_cfg, dict):
-        entries: list[SelectedArchSpec] = []
-        for arch_name, arch_spec in arch_cfg.items():
-            normalized = normalize_arch(arch_name)
-            if normalized is None:
-                raise ConfigError(f"{arch_context}.{arch_name} uses unsupported architecture name")
-            spec_context = f"{arch_context}.{normalized}"
-            entries.append(
-                SelectedArchSpec(
-                    context=spec_context,
-                    spec=parse_mapping(arch_spec, spec_context),
-                )
-            )
-        return entries
-
     if isinstance(arch_cfg, list):
         entries = []
+        seen_arches: set[str] = set()
         for index, raw_entry in enumerate(arch_cfg):
             entry_context = f"{arch_context}[{index}]"
-            entry = parse_mapping(raw_entry, entry_context)
-            entry_arch = require_string(entry, "arch", entry_context)
-            if normalize_arch(entry_arch) is None:
-                raise ConfigError(f"{entry_context}.arch has unsupported value '{entry_arch}'")
+            entry = parse_selected_arch_spec(raw_entry, entry_context)
+            normalized_arch = normalize_arch(entry["arch"])
+            assert normalized_arch is not None
+            if normalized_arch in seen_arches:
+                raise ConfigError(f"{entry_context}.arch duplicates architecture '{entry['arch']}'")
+            seen_arches.add(normalized_arch)
             entries.append(SelectedArchSpec(context=entry_context, spec=entry))
         return entries
 
-    raise ConfigError(f"{arch_context} must be a table or an array of tables")
-
-
-def validate_required_field_for_arch_type(
-    command: str,
-    command_cfg: dict[str, Any],
-    key: str,
-    arch_specs: list[SelectedArchSpec],
-) -> None:
-    command_context = f"commands.{command}"
-    if key in command_cfg:
-        parse_string(command_cfg[key], f"{command_context}.{key}")
-        return
-    if not arch_specs:
-        raise ConfigError(f"{command_context}.arch must define at least one architecture")
-
-    for entry in arch_specs:
-        if key not in entry.spec:
-            raise ConfigError(f"{entry.context}.{key} is required")
-        parse_string(entry.spec[key], f"{entry.context}.{key}")
+    raise ConfigError(f"{arch_context} must be an array of tables")
 
 
 def validate_type_specific(command: str, command_cfg: dict[str, Any]) -> None:
-    command_type = require_string(command_cfg, "type", f"commands.{command}")
+    command_type = parse(command_cfg, "type", f"commands.{command}", "string")
+    allowed_keys = ALLOWED_COMMAND_KEYS_BY_TYPE.get(command_type)
+    if allowed_keys is None:
+        raise ConfigError(f"Unsupported command type '{command_type}' for commands.{command}")
+    validate_allowed_keys(command_cfg, allowed_keys, f"commands.{command}")
 
     if command_type in {
         "archive_binary",
         "archive_extract",
     }:
-        arch_specs = enumerate_arch_specs(command, command_cfg)
-        validate_required_field_for_arch_type(command, command_cfg, "url", arch_specs)
-        validate_required_field_for_arch_type(command, command_cfg, "sha256", arch_specs)
-    else:
-        arch_specs = []
+        enumerate_arch_specs(command, command_cfg)
+        parse(command_cfg, "url", f"commands.{command}", "string")
 
     if command_type == "archive_binary":
-        has_copies = "file_copies" in command_cfg or any(
-            "file_copies" in e.spec for e in arch_specs
-        )
-        if not has_copies:
+        if "file_copies" not in command_cfg:
             raise ConfigError(f"commands.{command}.file_copies is required")
-        if "file_copies" in command_cfg:
-            validate_file_copies_shape(
-                command_cfg["file_copies"], f"commands.{command}.file_copies"
-            )
-        for entry in arch_specs:
-            if "file_copies" in entry.spec:
-                validate_file_copies_shape(
-                    entry.spec["file_copies"], f"{entry.context}.file_copies"
-                )
+        validate_file_copies_shape(command_cfg["file_copies"], f"commands.{command}.file_copies")
     elif command_type == "archive_extract":
-        validate_required_field_for_arch_type(command, command_cfg, "destination", arch_specs)
-        for entry in arch_specs:
-            wrapper_path = get_optional_string(entry.spec, "wrapper_path", entry.context)
-            wrapper_exec = get_optional_string(entry.spec, "wrapper_exec", entry.context)
-            if (wrapper_path is None) != (wrapper_exec is None):
-                raise ConfigError(f"{entry.context} must set both wrapper_path and wrapper_exec")
+        parse(command_cfg, "destination", f"commands.{command}", "string")
+        wrapper_path = parse(
+            command_cfg,
+            "wrapper_path",
+            f"commands.{command}",
+            "string",
+            default=None,
+        )
+        wrapper_exec = parse(
+            command_cfg,
+            "wrapper_exec",
+            f"commands.{command}",
+            "string",
+            default=None,
+        )
+        if (wrapper_path is None) != (wrapper_exec is None):
+            raise ConfigError(f"commands.{command} must set both wrapper_path and wrapper_exec")
     elif command_type == "npm_global":
-        require_string_list(command_cfg, "packages", f"commands.{command}")
+        parse(command_cfg, "packages", f"commands.{command}", "string_list")
     elif command_type == "uv_tool":
-        require_string(command_cfg, "package", f"commands.{command}")
+        parse(command_cfg, "package", f"commands.{command}", "string")
         if "post_install_pre_commit_hook" in command_cfg:
-            parse_bool(command_cfg["post_install_pre_commit_hook"], f"commands.{command}")
+            parse(command_cfg, "post_install_pre_commit_hook", f"commands.{command}", "boolean")
     elif command_type == "go_install":
-        require_string(command_cfg, "package", f"commands.{command}")
+        parse(command_cfg, "package", f"commands.{command}", "string")
     elif command_type == "rustup_component":
-        require_string(command_cfg, "component", f"commands.{command}")
-    else:
-        raise ConfigError(f"Unsupported command type '{command_type}' for commands.{command}")
+        parse(command_cfg, "component", f"commands.{command}", "string")
 
 
 def load_config(path: Path) -> dict[str, dict[str, Any]]:
@@ -631,13 +647,13 @@ def load_config(path: Path) -> dict[str, dict[str, Any]]:
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as exc:
         raise ConfigError(f"Unable to parse TOML config at {path}: {exc}") from exc
 
-    root = parse_mapping(parsed, "root")
-    commands_raw = require_mapping(root, "commands", "root")
+    root = parse(parsed, "", "root", "table")
+    commands_raw = parse(root, "commands", "root", "table")
 
     commands: dict[str, dict[str, Any]] = {}
     for name, cfg in commands_raw.items():
-        command_name = parse_string(name, "command name")
-        command_cfg = parse_mapping(cfg, f"commands.{command_name}")
+        command_name = parse(name, "", "command name", "string")
+        command_cfg = parse(cfg, "", f"commands.{command_name}", "table")
         validate_type_specific(command_name, command_cfg)
         commands[command_name] = command_cfg
 
@@ -647,7 +663,7 @@ def load_config(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def install_command(command: str, command_cfg: dict[str, Any], arch: str) -> bool:
-    command_type = require_string(command_cfg, "type", f"commands.{command}")
+    command_type = parse(command_cfg, "type", f"commands.{command}", "string")
 
     if command_type == "archive_binary":
         return install_archive_binary(command, command_cfg, arch)
