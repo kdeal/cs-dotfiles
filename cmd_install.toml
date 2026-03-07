@@ -2,9 +2,7 @@
 type = "archive_binary"
 version = "0.11.6"
 url = "https://github.com/neovim/neovim/releases/download/v{version}/nvim-linux-{arch}.tar.gz"
-file_copies = [
-  { source = "nvim-linux-{arch}", destination = ".local", mode = "rsync-tree" },
-]
+file_copies = [{ source = "nvim-linux-{arch}", destination = ".local", mode = "rsync-tree" }]
 
 [[commands.nvim.arch]]
 arch = "x86_64"
@@ -74,9 +72,7 @@ sha256 = "6369242c584065f195fb20cb36fbd7cb63ae690605bbe89868a7596b596c2c23"
 type = "archive_binary"
 version = "0.23.4"
 url = "https://github.com/eza-community/eza/releases/download/v{version}/eza_{arch}-{variant}.tar.gz"
-file_copies = [
-  { source = "eza", destination = ".local/bin/eza" },
-]
+file_copies = [{ source = "eza", destination = ".local/bin/eza" }]
 
 [[commands.eza.arch]]
 arch = "x86_64"
@@ -151,9 +147,7 @@ sha256 = "b81970c8247fa64cfb30d2a3da0e487e4253f9f2d01865ed5e7d53cdc7b02188"
 type = "archive_binary"
 version = "0.10.9"
 url = "https://github.com/astral-sh/uv/releases/download/{version}/uv-{arch}-{variant}.tar.gz"
-file_copies = [
-  { source = "uv-{arch}-{variant}", destination = ".local/bin", mode = "dircopy" },
-]
+file_copies = [{ source = "uv-{arch}-{variant}", destination = ".local/bin", mode = "dircopy" }]
 
 [[commands.uv.arch]]
 arch = "x86_64"
@@ -169,9 +163,7 @@ sha256 = "05b0d3087e913ebe11756365a90dd47c05d6728752fdbe129ad4c3ccd769826d"
 type = "archive_binary"
 version = "0.39.0"
 url = "https://github.com/jj-vcs/jj/releases/download/v{version}/jj-v{version}-{arch}-{variant}.tar.gz"
-file_copies = [
-  { source = "jj", destination = ".local/bin/jj"},
-]
+file_copies = [{ source = "jj", destination = ".local/bin/jj" }]
 
 [[commands.jj.arch]]
 arch = "x86_64"
@@ -187,9 +179,7 @@ sha256 = "15bbb0199adf57929d1e3cd90ae0b47356858cbe374814769815a1fb87d5ad1d"
 type = "archive_binary"
 version = "4.5.0"
 url = "https://github.com/fish-shell/fish-shell/releases/download/{version}/fish-{version}-linux-{arch}.tar.xz"
-file_copies = [
-  { source = "fish", destination = ".local/bin/fish"},
-]
+file_copies = [{ source = "fish", destination = ".local/bin/fish" }]
 
 [[commands.fish.arch]]
 arch = "x86_64"
@@ -203,9 +193,7 @@ sha256 = "e99e3dd09ee31f40e3a12ea4410ebaf50006f26277ce5153189648baae5e141d"
 type = "archive_binary"
 version = "2.3.1"
 url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v{version}/stylua-linux-{arch}-musl.zip"
-file_copies = [
-  { source = "stylua", destination = ".local/bin/stylua"},
-]
+file_copies = [{ source = "stylua", destination = ".local/bin/stylua" }]
 
 [[commands.stylua.arch]]
 arch = "x86_64"
@@ -214,6 +202,38 @@ sha256 = "1b3ca3f577e584e19a0ad2264a0ab87f4133818e35700a094416ca98251ffb4a"
 [[commands.stylua.arch]]
 arch = "aarch64"
 sha256 = "3a5fef8220f3d482fd9f4c1d2655827c90e42197a11a28da6c7b42e7ddde8be6"
+
+[commands.oxfmt]
+type = "archive_binary"
+version = "1.51.0"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v{version}/oxfmt-{arch}-{variant}.tar.gz"
+file_copies = [{ source = "oxfmt-{arch}-{variant}", destination = ".local/bin/oxfmt" }]
+
+[[commands.oxfmt.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "1ec7b38d64e13872591106fb9e38b1d153d3a51e9a2020d924b477ff9122bc54"
+
+[[commands.oxfmt.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "fa3f6fc5dabf7bb02fd808a3cfffc6bf81388bcf8226fb4a3afca7c428a77f75"
+
+[commands.oxlint]
+type = "archive_binary"
+version = "1.51.0"
+url = "https://github.com/oxc-project/oxc/releases/download/apps_v{version}/oxlint-{arch}-{variant}.tar.gz"
+file_copies = [{ source = "oxlint-{arch}-{variant}", destination = ".local/bin/oxlint" }]
+
+[[commands.oxlint.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "77a39edb86f068832be60d73d400c848dc837e561977a458c27ca39d5b01ed43"
+
+[[commands.oxlint.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "b2693264a9428c3179c0952a9452028015819ebb5da50ca58276bbe4507b46a0"
 
 [commands.typescript-language-server]
 type = "npm_global"
