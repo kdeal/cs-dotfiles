@@ -21,4 +21,4 @@ jobs:
       - name: Check code
         run: |
           just check
-          git diff --exit-code
+          git diff --exit-code && printf "No diff"
