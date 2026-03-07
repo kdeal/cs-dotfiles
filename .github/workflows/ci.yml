@@ -12,7 +12,7 @@ jobs:
 
       - name: Install tools
         run: |
-          python scripts/cmd_install.py uv stylua ty ruff fish just
+          python scripts/cmd_install.py uv stylua ty ruff fish just oxfmt
           ln -s ~/.local/bin/fish ~/.local/bin/fish_indent
 
       - name: Add local bin to PATH

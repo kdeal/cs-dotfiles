@@ -33,6 +33,8 @@ return {
                 },
                 html = {},
                 lua_ls = {},
+                oxfmt = {},
+                oxlint = {},
                 ty = {},
                 ruff = {},
                 rust_analyzer = {},

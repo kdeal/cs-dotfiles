@@ -5,12 +5,13 @@ return {
         init = function()
             require("lint").linters_by_ft = {
                 fish = { "fish", "cspell" },
-                javascript = { "eslint", "cspell" },
+                javascript = { "oxlint", "cspell" },
                 lua = { "cspell" },
                 markdown = { "vale", "cspell" },
                 python = { "ruff", "mypy", "cspell" },
                 rust = { "cspell" },
                 yaml = { "yamllint" },
+                typescript = { "oxlint", "cspell" },
             }
             vim.api.nvim_create_autocmd({ "BufWritePost" }, {
                 callback = function(ev)

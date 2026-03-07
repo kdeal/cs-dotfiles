@@ -11,6 +11,7 @@ format:
 	ruff format scripts tests
 	stylua .
 	find . -name '*.fish' -exec fish_indent --write {} +
+	oxfmt
 
 typecheck:
 	ty check scripts tests
