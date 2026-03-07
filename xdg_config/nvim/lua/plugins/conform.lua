@@ -31,7 +31,7 @@ return {
                 css = { "oxfmt" },
                 fish = { "fish_indent" },
                 graphql = { "oxfmt" },
-                hmtl = { "oxfmt" },
+                html = { "oxfmt" },
                 javascript = { "oxfmt" },
                 javascriptreact = { "oxfmt" },
                 json = { "oxfmt" },
