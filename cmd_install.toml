@@ -46,9 +46,14 @@ arch = "x86_64"
 variant = "unknown-linux-musl"
 sha256 = "b7ea845004762358a00ef9127dd9fd723e333c7e4b9cb1da220c3909372310ee"
 
+[[commands.delta.arch]]
+arch = "aarch64"
+variant = "unknown-linux-gnu"
+sha256 = "adf7674086daa4582f598f74ce9caa6b70c1ba8f4a57d2911499b37826b014f9"
+
 [commands.bat]
 type = "archive_binary"
-version = "0.24.0"
+version = "0.26.1"
 url = "https://github.com/sharkdp/bat/releases/download/v{version}/bat-v{version}-{arch}-{variant}.tar.gz"
 file_copies = [
   { source = "bat-v{version}-{arch}-{variant}/bat", destination = ".local/bin/bat" },
@@ -58,11 +63,16 @@ file_copies = [
 [[commands.bat.arch]]
 arch = "x86_64"
 variant = "unknown-linux-musl"
-sha256 = "d39a21e3da57fe6a3e07184b3c1dc245f8dba379af569d3668b6dcdfe75e3052"
+sha256 = "0dcd8ac79732c0d5b136f11f4ee00e581440e16a44eab5b3105b611bbf2cf191"
+
+[[commands.bat.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "6369242c584065f195fb20cb36fbd7cb63ae690605bbe89868a7596b596c2c23"
 
 [commands.eza]
 type = "archive_binary"
-version = "0.20.14"
+version = "0.23.4"
 url = "https://github.com/eza-community/eza/releases/download/v{version}/eza_{arch}-{variant}.tar.gz"
 file_copies = [
   { source = "eza", destination = ".local/bin/eza" },
@@ -71,11 +81,16 @@ file_copies = [
 [[commands.eza.arch]]
 arch = "x86_64"
 variant = "unknown-linux-musl"
-sha256 = "cb5953a866a5fb3ec8d4fb0f6b0275511c5caa4d6b3019e5378d970ea85d2ef0"
+sha256 = "d231bb3ee33b08c76279b5888845dceb7034d055c42bb9be46dbe0dae39394df"
+
+[[commands.eza.arch]]
+arch = "aarch64"
+variant = "unknown-linux-gnu"
+sha256 = "366e8430225f9955c3dc659b452150c169894833ccfef455e01765e265a3edda"
 
 [commands.fd]
 type = "archive_binary"
-version = "10.2.0"
+version = "10.3.0"
 url = "https://github.com/sharkdp/fd/releases/download/v{version}/fd-v{version}-{arch}-{variant}.tar.gz"
 file_copies = [
   { source = "fd-v{version}-{arch}-{variant}/fd", destination = ".local/bin/fd" },
@@ -85,11 +100,16 @@ file_copies = [
 [[commands.fd.arch]]
 arch = "x86_64"
 variant = "unknown-linux-musl"
-sha256 = "d9bfa25ec28624545c222992e1b00673b7c9ca5eb15393c40369f10b28f9c932"
+sha256 = "2b6bfaae8c48f12050813c2ffe1884c61ea26e750d803df9c9114550a314cd14"
+
+[[commands.fd.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "996b9b1366433b211cb3bbedba91c9dbce2431842144d925428ead0adf32020b"
 
 [commands.lua_ls]
 type = "archive_extract"
-version = "3.13.5"
+version = "3.17.1"
 url = "https://github.com/LuaLS/lua-language-server/releases/download/{version}/lua-language-server-{version}-linux-{arch}.tar.gz"
 destination = ".local/share/lua_ls"
 wrapper_path = ".local/bin/lua-language-server"
@@ -97,7 +117,11 @@ wrapper_exec = ".local/share/lua_ls/bin/lua-language-server"
 
 [[commands.lua_ls.arch]]
 arch = "x64"
-sha256 = "5d4316291b8c79b145002318fbb7cc294a327c314e2711e590609b178478eb59"
+sha256 = "248b0858a0afc8233f2535e89b648398b2202cb96cf51ce187e3263923dd0223"
+
+[[commands.lua_ls.arch]]
+arch = "arm64"
+sha256 = "680285a36d8cf7b17ca4be7a2f9c93643ebd8daec0b7425a6b7a02d003f3da81"
 
 [commands.rust-analyzer]
 type = "rustup_component"
@@ -105,7 +129,7 @@ component = "rust-analyzer"
 
 [commands.just]
 type = "archive_binary"
-version = "1.38.0"
+version = "1.46.0"
 url = "https://github.com/casey/just/releases/download/{version}/just-{version}-{arch}-{variant}.tar.gz"
 file_copies = [
   { source = "just", destination = ".local/bin/just" },
@@ -116,11 +140,16 @@ file_copies = [
 [[commands.just.arch]]
 arch = "x86_64"
 variant = "unknown-linux-musl"
-sha256 = "c803e67fd7b0af01667bd537197bc3df319938eacf9e8d51a441c71d03035bb5"
+sha256 = "79966e6e353f535ee7d1c6221641bcc8e3381c55b0d0a6dc6e54b34f9db36eaa"
+
+[[commands.just.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "b81970c8247fa64cfb30d2a3da0e487e4253f9f2d01865ed5e7d53cdc7b02188"
 
 [commands.uv]
 type = "archive_binary"
-version = "0.9.24"
+version = "0.10.9"
 url = "https://github.com/astral-sh/uv/releases/download/{version}/uv-{arch}-{variant}.tar.gz"
 file_copies = [
   { source = "uv-{arch}-{variant}", destination = ".local/bin", mode = "dircopy" },
@@ -128,8 +157,31 @@ file_copies = [
 
 [[commands.uv.arch]]
 arch = "x86_64"
-variant = "unknown-linux-gnu"
-sha256 = "fb13ad85106da6b21dd16613afca910994446fe94a78ee0b5bed9c75cd066078"
+variant = "unknown-linux-musl"
+sha256 = "433e56874739e92c7cfd661ba9e5f287b376ca612c08c8194a41a98a13158aea"
+
+[[commands.uv.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "05b0d3087e913ebe11756365a90dd47c05d6728752fdbe129ad4c3ccd769826d"
+
+[commands.jj]
+type = "archive_binary"
+version = "0.39.0"
+url = "https://github.com/jj-vcs/jj/releases/download/v{version}/jj-v{version}-{arch}-{variant}.tar.gz"
+file_copies = [
+  { source = "jj", destination = ".local/bin/jj"},
+]
+
+[[commands.jj.arch]]
+arch = "x86_64"
+variant = "unknown-linux-musl"
+sha256 = "8da8d96e9c8696c21ad47847a63d533e249acb0449d9af0f0562b5ea7b024f04"
+
+[[commands.jj.arch]]
+arch = "aarch64"
+variant = "unknown-linux-musl"
+sha256 = "15bbb0199adf57929d1e3cd90ae0b47356858cbe374814769815a1fb87d5ad1d"
 
 [commands.typescript-language-server]
 type = "npm_global"
