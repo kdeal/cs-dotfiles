@@ -1,6 +1,6 @@
 [commands.nvim]
 type = "archive_binary"
-version = "0.11.2"
+version = "0.11.6"
 url = "https://github.com/neovim/neovim/releases/download/v{version}/nvim-linux-{arch}.tar.gz"
 file_copies = [
   { source = "nvim-linux-{arch}", destination = ".local", mode = "rsync-tree" },
@@ -8,7 +8,11 @@ file_copies = [
 
 [[commands.nvim.arch]]
 arch = "x86_64"
-sha256 = "a9b24157672eb218ff3e33ef3f8c08db26f8931c5c04bdb0e471371dd1dfe63e"
+sha256 = "2fc90b962327f73a78afbfb8203fd19db8db9cdf4ee5e2bef84704339add89cc"
+
+[[commands.nvim.arch]]
+arch = "arm64"
+sha256 = "8ddc0c101846145e830b17bbca50782ca9307eee4fab539d9e2ddaf8793c06f1"
 
 [commands.rg]
 type = "archive_binary"
