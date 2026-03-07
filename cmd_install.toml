@@ -183,6 +183,22 @@ arch = "aarch64"
 variant = "unknown-linux-musl"
 sha256 = "15bbb0199adf57929d1e3cd90ae0b47356858cbe374814769815a1fb87d5ad1d"
 
+[commands.fish]
+type = "archive_binary"
+version = "4.5.0"
+url = "https://github.com/fish-shell/fish-shell/releases/download/{version}/fish-{version}-linux-{arch}.tar.xz"
+file_copies = [
+  { source = "fish", destination = ".local/bin/fish"},
+]
+
+[[commands.fish.arch]]
+arch = "x86_64"
+sha256 = "a78d17517a6772a616d214a63f163ba8281c70834b71eeae9d1a37267e9e46d3"
+
+[[commands.fish.arch]]
+arch = "aarch64"
+sha256 = "e99e3dd09ee31f40e3a12ea4410ebaf50006f26277ce5153189648baae5e141d"
+
 [commands.typescript-language-server]
 type = "npm_global"
 packages = ["typescript", "typescript-language-server"]

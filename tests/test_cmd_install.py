@@ -168,5 +168,35 @@ class InstallArchiveExtractTests(unittest.TestCase):
         )
 
 
+class ExtractTarTests(unittest.TestCase):
+    def test_extract_tar_uses_mode_for_archive_extension(self) -> None:
+        cases = [
+            ("demo.tar", "r:"),
+            ("demo.tar.gz", "r:gz"),
+            ("demo.tgz", "r:gz"),
+            ("demo.tar.bz2", "r:bz2"),
+            ("demo.tbz2", "r:bz2"),
+            ("demo.tar.xz", "r:xz"),
+            ("demo.txz", "r:xz"),
+        ]
+
+        for archive_name, expected_mode in cases:
+            with self.subTest(archive_name=archive_name):
+                archive = Path(archive_name)
+                destination = Path("/tmp/extract")
+                tar_handle = mock.MagicMock()
+                tar_context = mock.MagicMock()
+                tar_context.__enter__.return_value = tar_handle
+                tar_context.__exit__.return_value = False
+
+                with mock.patch.object(
+                    cmd_install.tarfile, "open", return_value=tar_context
+                ) as open_mock:
+                    cmd_install.extract_tar(archive, destination)
+
+                open_mock.assert_called_once_with(archive, mode=expected_mode)
+                tar_handle.extractall.assert_called_once_with(destination, filter="data")
+
+
 if __name__ == "__main__":
     unittest.main()

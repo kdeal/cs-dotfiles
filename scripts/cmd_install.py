@@ -20,6 +20,7 @@ import tarfile
 import tempfile
 import tomllib
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -130,7 +131,10 @@ def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[st
 
 
 def download_with_sha256(url: str, expected_sha256: str) -> Path:
-    with tempfile.NamedTemporaryFile(delete=False) as handle:
+    archive_name = Path(urllib.parse.urlparse(url).path).name
+    suffix = "".join(Path(archive_name).suffixes)
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
         tmp_path = Path(handle.name)
 
     try:
@@ -156,8 +160,22 @@ def download_with_sha256(url: str, expected_sha256: str) -> Path:
     return tmp_path
 
 
-def extract_tar_gz(archive: Path, destination: Path) -> None:
-    with tarfile.open(archive, mode="r:gz") as tar:
+def extract_tar(archive: Path, destination: Path) -> None:
+    suffixes = tuple(archive.suffixes)
+
+    match suffixes:
+        case (*_, ".tar", ".gz") | (*_, ".tgz"):
+            mode = "r:gz"
+        case (*_, ".tar", ".bz2") | (*_, ".tbz2"):
+            mode = "r:bz2"
+        case (*_, ".tar", ".xz") | (*_, ".txz"):
+            mode = "r:xz"
+        case (*_, ".tar"):
+            mode = "r:"
+        case _:
+            raise ValueError(f"Unsupported tar archive extension for {archive.name}")
+
+    with tarfile.open(archive, mode=mode) as tar:
         tar.extractall(destination, filter="data")
 
 
@@ -433,7 +451,7 @@ def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str)
     try:
         with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
-            extract_tar_gz(tmp_file, extract_root)
+            extract_tar(tmp_file, extract_root)
             apply_file_copies(extract_root, file_copies)
     except (
         FileNotFoundError,
@@ -489,7 +507,7 @@ def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str
     try:
         with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
-            extract_tar_gz(tmp_file, extract_root)
+            extract_tar(tmp_file, extract_root)
 
             destination_path = HOME / destination
             replace_directory_contents(extract_root, destination_path)
