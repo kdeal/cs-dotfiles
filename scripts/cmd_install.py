@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
 import platform
 import shutil
 import subprocess
@@ -92,6 +93,57 @@ class ConfigError(ValueError):
 
 class InstallError(RuntimeError):
     pass
+
+
+ANSI_RESET = "\033[0m"
+ANSI_BOLD = "\033[1m"
+ANSI_BLUE = "\033[34m"
+ANSI_GREEN = "\033[32m"
+ANSI_MAGENTA = "\033[35m"
+ANSI_RED = "\033[31m"
+ANSI_YELLOW = "\033[33m"
+
+
+def supports_color(stream: Any) -> bool:
+    if os.environ.get("NO_COLOR") is not None:
+        return False
+    if os.environ.get("TERM") == "dumb":
+        return False
+    return bool(getattr(stream, "isatty", lambda: False)())
+
+
+def colorize(message: str, *styles: str, stream: Any) -> str:
+    if not styles or not supports_color(stream):
+        return message
+    return f"{''.join(styles)}{message}{ANSI_RESET}"
+
+
+def format_command_label(command: str, *, stream: Any) -> str:
+    colored_command = colorize(command, ANSI_BOLD, ANSI_MAGENTA, stream=stream)
+    return f"[{colored_command}]"
+
+
+def format_arch(arch: str, *, stream: Any) -> str:
+    return colorize(arch, ANSI_BOLD, ANSI_YELLOW, stream=stream)
+
+
+def log_info(message: str) -> None:
+    prefix = colorize("==>", ANSI_BOLD, ANSI_BLUE, stream=sys.stdout)
+    print(f"{prefix} {message}", flush=True)
+
+
+def log_success(message: str) -> None:
+    prefix = colorize("OK:", ANSI_BOLD, ANSI_GREEN, stream=sys.stdout)
+    print(f"{prefix} {message}", flush=True)
+
+
+def log_error(message: str) -> None:
+    prefix = colorize("ERROR:", ANSI_BOLD, ANSI_RED, stream=sys.stderr)
+    print(f"{prefix} {message}", file=sys.stderr, flush=True)
+
+
+def log_command(command: str, message: str) -> None:
+    log_info(f"{format_command_label(command, stream=sys.stdout)} {message}")
 
 
 def normalize_arch(arch: str) -> str | None:
@@ -429,7 +481,10 @@ def apply_file_copies(extract_root: Path, file_copies: list[FileCopySpec]) -> No
 def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str) -> bool:
     selected_spec = select_arch_spec(command, command_cfg, arch)
     if selected_spec is None:
-        print(f"{arch} is not yet supported for {command}", file=sys.stderr)
+        arch_label = format_arch(arch, stream=sys.stderr)
+        log_error(
+            f"{format_command_label(command, stream=sys.stderr)} {arch_label} is not yet supported"
+        )
         return False
 
     command_context = f"commands.{command}"
@@ -442,16 +497,22 @@ def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str)
     )
 
     archive_spec = ArchiveInstallSpec(name=command, url=url, sha256=sha256)
+    log_command(command, f"Downloading {archive_spec.url}")
     try:
         tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
     except InstallError as exc:
-        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(archive_spec.name, stream=sys.stderr)} "
+            f"Failed to download archive: {exc}"
+        )
         return False
 
     try:
         with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
+            log_command(command, "Extracting archive")
             extract_tar(tmp_file, extract_root)
+            log_command(command, "Copying installed files into place")
             apply_file_copies(extract_root, file_copies)
     except (
         FileNotFoundError,
@@ -460,18 +521,24 @@ def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str)
         ValueError,
         subprocess.CalledProcessError,
     ) as exc:
-        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(archive_spec.name, stream=sys.stderr)} Install failed: {exc}"
+        )
         return False
     finally:
         tmp_file.unlink(missing_ok=True)
 
+    log_success(f"{format_command_label(command, stream=sys.stdout)} Install completed")
     return True
 
 
 def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str) -> bool:
     selected_spec = select_arch_spec(command, command_cfg, arch)
     if selected_spec is None:
-        print(f"{arch} is not yet supported for {command}", file=sys.stderr)
+        arch_label = format_arch(arch, stream=sys.stderr)
+        log_error(
+            f"{format_command_label(command, stream=sys.stderr)} {arch_label} is not yet supported"
+        )
         return False
 
     command_context = f"commands.{command}"
@@ -498,18 +565,24 @@ def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str
     )
 
     archive_spec = ArchiveInstallSpec(name=command, url=url, sha256=sha256)
+    log_command(command, f"Downloading {archive_spec.url}")
     try:
         tmp_file = download_with_sha256(archive_spec.url, archive_spec.sha256)
     except InstallError as exc:
-        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(archive_spec.name, stream=sys.stderr)} "
+            f"Failed to download archive: {exc}"
+        )
         return False
 
     try:
         with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
+            log_command(command, "Extracting archive")
             extract_tar(tmp_file, extract_root)
 
             destination_path = HOME / destination
+            log_command(command, f"Replacing contents of {destination_path}")
             replace_directory_contents(extract_root, destination_path)
 
         if (wrapper_path is None) != (wrapper_exec is None):
@@ -517,36 +590,47 @@ def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str
         if wrapper_path is not None and wrapper_exec is not None:
             wrapper = HOME / wrapper_path
             wrapper.parent.mkdir(parents=True, exist_ok=True)
+            log_command(command, f"Writing wrapper script to {wrapper}")
             wrapper.write_text(
                 f'#!/usr/bin/env sh\nexec "$HOME/{wrapper_exec}" "$@"\n',
                 encoding="utf-8",
             )
             wrapper.chmod(0o755)
     except (OSError, tarfile.TarError, ValueError, ConfigError) as exc:
-        print(f"Failed to install {archive_spec.name}: {exc}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(archive_spec.name, stream=sys.stderr)} Install failed: {exc}"
+        )
         return False
     finally:
         tmp_file.unlink(missing_ok=True)
 
+    log_success(f"{format_command_label(command, stream=sys.stdout)} Install completed")
     return True
 
 
 def install_npm_global(command: str, command_cfg: dict[str, Any]) -> bool:
     if not command_exists("npm"):
-        print(f"npm unavailable can't install {command}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(command, stream=sys.stderr)} npm unavailable; cannot install"
+        )
         return False
 
     packages = parse(command_cfg, "packages", f"commands.{command}", "string_list")
+    log_command(command, f"Installing npm packages: {', '.join(packages)}")
     run(["npm", "install", "-g", *packages])
+    log_success(f"{format_command_label(command, stream=sys.stdout)} Install completed")
     return True
 
 
 def install_uv_tool(command: str, command_cfg: dict[str, Any]) -> bool:
     if not command_exists("uv"):
-        print(f"uv unavailable can't install {command}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(command, stream=sys.stderr)} uv unavailable; cannot install"
+        )
         return False
 
     package = parse(command_cfg, "package", f"commands.{command}", "string")
+    log_command(command, f"Installing uv tool: {package}")
     run(["uv", "tool", "install", package])
 
     install_hook = parse(
@@ -561,27 +645,37 @@ def install_uv_tool(command: str, command_cfg: dict[str, Any]) -> bool:
         and (run(["git", "rev-parse"], check=False).returncode == 0)
         and command_exists("pre-commit")
     ):
+        log_command(command, "Installing pre-commit hook")
         run(["pre-commit", "install"], check=False)
+    log_success(f"{format_command_label(command, stream=sys.stdout)} Install completed")
     return True
 
 
 def install_go_package(command: str, command_cfg: dict[str, Any]) -> bool:
     if not command_exists("go"):
-        print(f"Go unavailable can't install {command}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(command, stream=sys.stderr)} go unavailable; cannot install"
+        )
         return False
 
     package = parse(command_cfg, "package", f"commands.{command}", "string")
+    log_command(command, f"Installing Go package: {package}")
     run(["go", "install", package])
+    log_success(f"{format_command_label(command, stream=sys.stdout)} Install completed")
     return True
 
 
 def install_rustup_component(command: str, command_cfg: dict[str, Any]) -> bool:
     if not command_exists("rustup"):
-        print(f"ERROR: rustup unavailable can't install {command}", file=sys.stderr)
+        log_error(
+            f"{format_command_label(command, stream=sys.stderr)} rustup unavailable; cannot install"
+        )
         return False
 
     component = parse(command_cfg, "component", f"commands.{command}", "string")
+    log_command(command, f"Installing rustup component: {component}")
     run(["rustup", "component", "add", component])
+    log_success(f"{format_command_label(command, stream=sys.stdout)} Install completed")
     return True
 
 
@@ -722,26 +816,42 @@ def main() -> int:
     args = parse_args()
 
     try:
+        log_info(f"Loading config from {args.config}")
         commands_cfg = load_config(args.config)
     except ConfigError as exc:
-        print(f"Config error: {exc}", file=sys.stderr)
+        log_error(f"Config error: {exc}")
         return 1
 
     ensure_dirs()
     had_errors = False
+    installed_count = 0
+    arch_label = format_arch(args.arch, stream=sys.stdout)
+    log_info(f"Installing {len(args.commands)} command(s) for arch {arch_label}")
     for cmd in args.commands:
         cfg = commands_cfg.get(cmd)
         if cfg is None:
             had_errors = True
-            print(f'Command not recognized: "{cmd}"', file=sys.stderr)
+            log_error(f"{format_command_label(cmd, stream=sys.stderr)} Command not recognized")
             continue
 
         try:
-            if not install_command(cmd, cfg, args.arch):
+            command_type = parse(cfg, "type", f"commands.{cmd}", "string")
+            log_command(cmd, f"Starting install ({command_type})")
+            if install_command(cmd, cfg, args.arch):
+                installed_count += 1
+            else:
                 had_errors = True
         except (subprocess.CalledProcessError, OSError, tarfile.TarError, ValueError) as exc:
             had_errors = True
-            print(f"Failed to install {cmd}: {exc}", file=sys.stderr)
+            log_error(f"{format_command_label(cmd, stream=sys.stderr)} Install failed: {exc}")
+
+    if had_errors:
+        log_error(
+            "Finished with errors: installed "
+            f"{installed_count} of {len(args.commands)} requested command(s)"
+        )
+    else:
+        log_success(f"Finished successfully: installed {installed_count} command(s)")
 
     return 1 if had_errors else 0
 
