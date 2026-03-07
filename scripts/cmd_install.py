@@ -15,6 +15,7 @@ import hashlib
 import os
 import platform
 import shutil
+import stat
 import subprocess
 import sys
 import tarfile
@@ -23,6 +24,7 @@ import tomllib
 import urllib.error
 import urllib.parse
 import urllib.request
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
@@ -212,23 +214,26 @@ def download_with_sha256(url: str, expected_sha256: str) -> Path:
     return tmp_path
 
 
-def extract_tar(archive: Path, destination: Path) -> None:
-    suffixes = tuple(archive.suffixes)
+def extract_archive(archive: Path, destination: Path) -> None:
+    *_, final_suffix = tuple(archive.suffixes)
+    if final_suffix != ".zip":
+        shutil.unpack_archive(archive, destination, filter="data")
+        return
 
-    match suffixes:
-        case (*_, ".tar", ".gz") | (*_, ".tgz"):
-            mode = "r:gz"
-        case (*_, ".tar", ".bz2") | (*_, ".tbz2"):
-            mode = "r:bz2"
-        case (*_, ".tar", ".xz") | (*_, ".txz"):
-            mode = "r:xz"
-        case (*_, ".tar"):
-            mode = "r:"
-        case _:
-            raise ValueError(f"Unsupported tar archive extension for {archive.name}")
+    with zipfile.ZipFile(archive) as zip_file:
+        zip_file.extractall(destination)
+        for member in zip_file.infolist():
+            if member.is_dir():
+                continue
 
-    with tarfile.open(archive, mode=mode) as tar:
-        tar.extractall(destination, filter="data")
+            stored_mode = member.external_attr >> 16
+            user_executable_bit = stored_mode & stat.S_IXUSR
+            if user_executable_bit == 0:
+                continue
+
+            extracted_path = destination / member.filename
+            current_mode = extracted_path.stat().st_mode
+            extracted_path.chmod(current_mode | user_executable_bit)
 
 
 def copy_file(source: Path, destination: Path) -> None:
@@ -511,7 +516,7 @@ def install_archive_binary(command: str, command_cfg: dict[str, Any], arch: str)
         with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
             log_command(command, "Extracting archive")
-            extract_tar(tmp_file, extract_root)
+            extract_archive(tmp_file, extract_root)
             log_command(command, "Copying installed files into place")
             apply_file_copies(extract_root, file_copies)
     except (
@@ -579,7 +584,7 @@ def install_archive_extract(command: str, command_cfg: dict[str, Any], arch: str
         with tempfile.TemporaryDirectory() as extract_dir:
             extract_root = Path(extract_dir)
             log_command(command, "Extracting archive")
-            extract_tar(tmp_file, extract_root)
+            extract_archive(tmp_file, extract_root)
 
             destination_path = HOME / destination
             log_command(command, f"Replacing contents of {destination_path}")

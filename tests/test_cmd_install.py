@@ -3,6 +3,7 @@ import sys
 import tarfile
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from unittest import mock
 
@@ -168,34 +169,42 @@ class InstallArchiveExtractTests(unittest.TestCase):
         )
 
 
-class ExtractTarTests(unittest.TestCase):
-    def test_extract_tar_uses_mode_for_archive_extension(self) -> None:
-        cases = [
-            ("demo.tar", "r:"),
-            ("demo.tar.gz", "r:gz"),
-            ("demo.tgz", "r:gz"),
-            ("demo.tar.bz2", "r:bz2"),
-            ("demo.tbz2", "r:bz2"),
-            ("demo.tar.xz", "r:xz"),
-            ("demo.txz", "r:xz"),
-        ]
+class ExtractArchiveZipTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        self.root = Path(self.temp_dir.name)
 
-        for archive_name, expected_mode in cases:
-            with self.subTest(archive_name=archive_name):
-                archive = Path(archive_name)
-                destination = Path("/tmp/extract")
-                tar_handle = mock.MagicMock()
-                tar_context = mock.MagicMock()
-                tar_context.__enter__.return_value = tar_handle
-                tar_context.__exit__.return_value = False
+    def make_zip_archive(self, members: dict[str, tuple[str, int]]) -> Path:
+        archive_path = self.root / "tool.zip"
+        with zipfile.ZipFile(archive_path, mode="w") as archive:
+            for relative_path, (contents, mode) in members.items():
+                info = zipfile.ZipInfo(relative_path)
+                info.external_attr = mode << 16
+                archive.writestr(info, contents)
+        return archive_path
 
-                with mock.patch.object(
-                    cmd_install.tarfile, "open", return_value=tar_context
-                ) as open_mock:
-                    cmd_install.extract_tar(archive, destination)
+    def test_extract_archive_restores_only_user_executable_bit_for_zip_files(self) -> None:
+        archive_path = self.make_zip_archive({"bin/demo": ("demo\n", 0o755)})
+        destination = self.root / "extract-user-exec"
 
-                open_mock.assert_called_once_with(archive, mode=expected_mode)
-                tar_handle.extractall.assert_called_once_with(destination, filter="data")
+        cmd_install.extract_archive(archive_path, destination)
+
+        extracted = destination / "bin" / "demo"
+        self.assertEqual(extracted.read_text(encoding="utf-8"), "demo\n")
+        self.assertEqual(extracted.stat().st_mode & 0o111, 0o100)
+
+    def test_extract_archive_does_not_restore_group_or_other_execute_bits_for_zip_files(
+        self,
+    ) -> None:
+        archive_path = self.make_zip_archive({"bin/demo": ("demo\n", 0o011)})
+        destination = self.root / "extract-non-user-exec"
+
+        cmd_install.extract_archive(archive_path, destination)
+
+        extracted = destination / "bin" / "demo"
+        self.assertEqual(extracted.read_text(encoding="utf-8"), "demo\n")
+        self.assertEqual(extracted.stat().st_mode & 0o111, 0)
 
 
 if __name__ == "__main__":

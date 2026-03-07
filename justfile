@@ -5,10 +5,12 @@ test:
 	python -m unittest discover -s tests
 
 lint:
-	uv run ruff check --fix scripts tests
+	ruff check --fix scripts tests
 
 format:
-	uv run ruff format scripts tests
+	ruff format scripts tests
+	stylua .
+	find . -name '*.fish' -exec fish_indent --write {} +
 
 typecheck:
 	ty check scripts tests
