@@ -6,7 +6,7 @@ steps:
       python3 scripts/cmd_install.py uv stylua ty ruff fish just
       ln -s ~/.local/bin/fish ~/.local/bin/fish_indent
       just check
-      git diff --exit-code && printf "\033[32m:white_check_mark: No diff \033[0m\n"
+      git diff --exit-code && printf "\033[32m✅ No diff \033[0m\n"
     plugins:
       - docker#v5.13.0:
           image: "python:3.14-trixie"
