@@ -2,7 +2,11 @@ steps:
   - label: ":fish: :white_check_mark: Run linters"
     key: "lint"
     command: |
-      sudo apt-get update && sudo apt-get install -y fish
-      pip3 install pre-commit ty
-      pre-commit run --all-files --show-diff-on-failure
-      ty check
+      export PATH="$HOME/.local/bin:$PATH"
+      python3 scripts/cmd_install.py uv stylua ty ruff fish just
+      ln -s ~/.local/bin/fish ~/.local/bin/fish_indent
+      just check
+      git diff --exit-code && printf "\033[32m✅ No diff \033[0m\n"
+    plugins:
+      - docker#v5.13.0:
+          image: "python:3.14-trixie"

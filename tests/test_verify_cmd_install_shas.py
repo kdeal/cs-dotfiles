@@ -35,6 +35,7 @@ class VerifyConfiguredArchiveShasTests(unittest.TestCase):
                 )
 
                 with self.subTest(command=name, file=url):
+                    print(f"Testing download and SHA256 verification for {url}")
                     self.assertIsNotNone(arch)
                     try:
                         downloaded = cmd_install.download_with_sha256(url, sha256)
