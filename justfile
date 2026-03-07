@@ -5,7 +5,7 @@ test:
 	python -m unittest discover -s tests
 
 lint:
-	ruff check --exit-non-zero-on-fix --fix scripts tests
+	ruff check --fix scripts tests
 
 format:
 	ruff format scripts tests
