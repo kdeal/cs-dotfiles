@@ -1,0 +1,8 @@
+steps:
+  - label: ":fish: :white_check_mark: Run linters"
+    key: "lint"
+    command: |
+      sudo apt-get update && sudo apt-get install -y fish
+      pip3 install pre-commit ty
+      pre-commit run --all-files --show-diff-on-failure
+      ty check
