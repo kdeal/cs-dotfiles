@@ -1,3 +1,4 @@
+import gzip
 import importlib.util
 import sys
 import tarfile
@@ -183,6 +184,22 @@ class ExtractArchiveZipTests(unittest.TestCase):
                 info.external_attr = mode << 16
                 archive.writestr(info, contents)
         return archive_path
+
+    def make_gzip_file(self, name: str, contents: bytes) -> Path:
+        archive_path = self.root / name
+        with gzip.open(archive_path, mode="wb") as archive:
+            archive.write(contents)
+        return archive_path
+
+    def test_extract_archive_handles_non_tar_gz_files(self) -> None:
+        archive_path = self.make_gzip_file("tree-sitter-linux-amd64.gz", b"demo\n")
+        destination = self.root / "extract-plain-gzip"
+
+        cmd_install.extract_archive(archive_path, destination)
+
+        extracted = destination / "tree-sitter-linux-amd64"
+        self.assertEqual(extracted.read_bytes(), b"demo\n")
+        self.assertEqual(extracted.stat().st_mode & 0o111, 0o100)
 
     def test_extract_archive_restores_only_user_executable_bit_for_zip_files(self) -> None:
         archive_path = self.make_zip_archive({"bin/demo": ("demo\n", 0o755)})

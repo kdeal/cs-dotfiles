@@ -2,12 +2,10 @@ return {
     -- Tree sitter based syntax highlighting
     {
         "nvim-treesitter/nvim-treesitter",
-        branch = "master",
-        build = function()
-            require("nvim-treesitter.install").update({ with_sync = true })
-        end,
-        opts = {
-            ensure_installed = {
+        lazy = false,
+        build = ":TSUpdate",
+        config = function(_, opts)
+            local ensureInstalled = {
                 "bash",
                 "comment",
                 "css",
@@ -20,6 +18,7 @@ return {
                 "html",
                 "ini",
                 "javascript",
+                "just",
                 "json",
                 "lua",
                 "make",
@@ -35,16 +34,28 @@ return {
                 "typescript",
                 "vimdoc",
                 "yaml",
-            },
-            highlight = {
-                enable = true,
-            },
-            indent = {
-                enable = true,
-            },
-        },
-        config = function(_, opts)
-            require("nvim-treesitter.configs").setup(opts)
+            }
+            local alreadyInstalled = require("nvim-treesitter.config").get_installed()
+            local parsersToInstall = vim.iter(ensureInstalled)
+                :filter(function(parser)
+                    return not vim.tbl_contains(alreadyInstalled, parser)
+                end)
+                :totable()
+            require("nvim-treesitter").install(parsersToInstall)
+
+            vim.api.nvim_create_autocmd("FileType", {
+                desc = "User: enable treesitter highlighting",
+                callback = function(ctx)
+                    -- highlights
+                    local hasStarted = pcall(vim.treesitter.start) -- errors for filetypes with no parser
+
+                    -- indent
+                    local noIndent = {}
+                    if hasStarted and not vim.list_contains(noIndent, ctx.match) then
+                        vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                    end
+                end,
+            })
         end,
     },
 }

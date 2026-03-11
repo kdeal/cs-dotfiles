@@ -11,6 +11,7 @@ Python port of `xdg_config/fish/functions/cmd_install.fish`.
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import os
 import platform
@@ -186,10 +187,9 @@ def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[st
 
 def download_with_sha256(url: str, expected_sha256: str) -> Path:
     archive_name = Path(urllib.parse.urlparse(url).path).name
-    suffix = "".join(Path(archive_name).suffixes)
 
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
-        tmp_path = Path(handle.name)
+    with tempfile.TemporaryDirectory(delete=False) as tmp_dir:
+        tmp_path = Path(tmp_dir) / archive_name
 
     try:
         with (
@@ -215,7 +215,21 @@ def download_with_sha256(url: str, expected_sha256: str) -> Path:
 
 
 def extract_archive(archive: Path, destination: Path) -> None:
-    *_, final_suffix = tuple(archive.suffixes)
+    destination.mkdir(parents=True, exist_ok=True)
+
+    suffixes = archive.suffixes
+    if not suffixes:
+        shutil.unpack_archive(archive, destination, filter="data")
+        return
+
+    final_suffix = suffixes[-1]
+    if final_suffix == ".gz" and suffixes[-2:] != [".tar", ".gz"]:
+        extracted_path = destination / archive.name.removesuffix(".gz")
+        with gzip.open(archive, "rb") as compressed, extracted_path.open("wb") as out:
+            shutil.copyfileobj(compressed, out)
+        extracted_path.chmod(extracted_path.stat().st_mode | stat.S_IXUSR)
+        return
+
     if final_suffix != ".zip":
         shutil.unpack_archive(archive, destination, filter="data")
         return
