@@ -235,6 +235,22 @@ arch = "aarch64"
 variant = "unknown-linux-musl"
 sha256 = "b2693264a9428c3179c0952a9452028015819ebb5da50ca58276bbe4507b46a0"
 
+[commands.tree-sitter]
+type = "archive_binary"
+version = "0.26.6"
+url = "https://github.com/tree-sitter/tree-sitter/releases/download/v{version}/tree-sitter-{variant}-{arch}.gz"
+file_copies = [{ source = "tree-sitter-{variant}-{arch}", destination = ".local/bin/tree-sitter" }]
+
+[[commands.tree-sitter.arch]]
+arch = "x64"
+variant = "linux"
+sha256 = "2b9595064a7d9dbe208c6f09f521d73061f8039e4ffcc2fd08979d249aeabb54"
+
+[[commands.tree-sitter.arch]]
+arch = "arm64"
+variant = "linux"
+sha256 = "7beef62e5d2683085b87188be83b1a73c59229110a125c5f12d922ae57789a7a"
+
 [commands.typescript-language-server]
 type = "npm_global"
 packages = ["typescript", "typescript-language-server"]
