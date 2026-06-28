@@ -1,3 +1,4 @@
+import importlib.machinery
 import importlib.util
 import sys
 import unittest
@@ -5,19 +6,18 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-SPEC = importlib.util.spec_from_file_location(
-    "cmd_install", REPO_ROOT / "scripts" / "cmd_install.py"
-)
+LOADER = importlib.machinery.SourceFileLoader("cmd_install", str(REPO_ROOT / "bin" / "cmd-install"))
+SPEC = importlib.util.spec_from_loader(LOADER.name, LOADER)
 assert SPEC is not None
 assert SPEC.loader is not None
 cmd_install = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = cmd_install
-SPEC.loader.exec_module(cmd_install)
+LOADER.exec_module(cmd_install)
 
 
 class VerifyConfiguredArchiveShasTests(unittest.TestCase):
     def test_downloads_and_verifies_all_configured_archive_shas(self) -> None:
-        commands = cmd_install.load_config(REPO_ROOT / "cmd_install.toml")
+        commands = cmd_install.load_config(REPO_ROOT / "xdg_config" / "cmd_install" / "config.toml")
 
         for name, cfg in commands.items():
             command_type = cmd_install.parse(cfg, "type", f"commands.{name}", "string")

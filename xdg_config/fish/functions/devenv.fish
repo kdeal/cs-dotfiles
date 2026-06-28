@@ -32,5 +32,5 @@ function devenv
     end
 
     printf "Installing packages for the %s$env%s environment (%s$packages%s)\n" (set_color green) (set_color normal) (set_color yellow) (set_color normal)
-    cmd_install $packages
+    cmd-install $packages
 end

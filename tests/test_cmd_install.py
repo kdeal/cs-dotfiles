@@ -1,4 +1,5 @@
 import gzip
+import importlib.machinery
 import importlib.util
 import sys
 import tarfile
@@ -8,13 +9,14 @@ import zipfile
 from pathlib import Path
 from unittest import mock
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts" / "cmd_install.py"
-SPEC = importlib.util.spec_from_file_location("cmd_install", MODULE_PATH)
+MODULE_PATH = Path(__file__).resolve().parents[1] / "bin" / "cmd-install"
+LOADER = importlib.machinery.SourceFileLoader("cmd_install", str(MODULE_PATH))
+SPEC = importlib.util.spec_from_loader(LOADER.name, LOADER)
 assert SPEC is not None
 assert SPEC.loader is not None
 cmd_install = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = cmd_install
-SPEC.loader.exec_module(cmd_install)
+LOADER.exec_module(cmd_install)
 
 
 class LoadConfigTests(unittest.TestCase):

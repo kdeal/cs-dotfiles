@@ -1,12 +1,5 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.13"
-# dependencies = []
-# ///
-"""Install extra commands that I might want.
-
-Python port of `xdg_config/fish/functions/cmd_install.fish`.
-"""
+#!/usr/bin/env python3
+"""Install extra commands that I might want."""
 
 from __future__ import annotations
 
@@ -32,7 +25,7 @@ from typing import Any, Literal
 
 HOME = Path.home()
 BIN_DIR = HOME / ".local" / "bin"
-DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "cmd_install.toml"
+DEFAULT_CONFIG_PATH = Path.home() / ".config" / "cmd_install" / "config.toml"
 
 
 @dataclass(frozen=True)
@@ -131,13 +124,18 @@ def format_arch(arch: str, *, stream: Any) -> str:
 
 
 def log_info(message: str) -> None:
-    prefix = colorize("==>", ANSI_BOLD, ANSI_BLUE, stream=sys.stdout)
-    print(f"{prefix} {message}", flush=True)
+    prefix = colorize("==>", ANSI_BOLD, ANSI_BLUE, stream=sys.stderr)
+    print(f"{prefix} {message}", file=sys.stderr, flush=True)
 
 
 def log_success(message: str) -> None:
-    prefix = colorize("OK:", ANSI_BOLD, ANSI_GREEN, stream=sys.stdout)
-    print(f"{prefix} {message}", flush=True)
+    prefix = colorize("OK:", ANSI_BOLD, ANSI_GREEN, stream=sys.stderr)
+    print(f"{prefix} {message}", file=sys.stderr, flush=True)
+
+
+def log_warning(message: str) -> None:
+    prefix = colorize("WARN: ", ANSI_BOLD, ANSI_YELLOW, stream=sys.stderr)
+    print(f"{prefix} {message}", file=sys.stderr, flush=True)
 
 
 def log_error(message: str) -> None:
@@ -146,7 +144,7 @@ def log_error(message: str) -> None:
 
 
 def log_command(command: str, message: str) -> None:
-    log_info(f"{format_command_label(command, stream=sys.stdout)} {message}")
+    log_info(f"{format_command_label(command, stream=sys.stderr)} {message}")
 
 
 def normalize_arch(arch: str) -> str | None:
@@ -815,7 +813,7 @@ def install_command(command: str, command_cfg: dict[str, Any], arch: str) -> boo
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("commands", nargs="+", help="Command names to install")
+    parser.add_argument("commands", nargs="*", help="Command names to install")
     parser.add_argument(
         "--arch",
         type=parse_arch,
@@ -828,6 +826,7 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_CONFIG_PATH,
         help=f"TOML config path (default: {DEFAULT_CONFIG_PATH})",
     )
+    parser.add_argument("--list", help="List available commands and exit", action="store_true")
     return parser.parse_args()
 
 
@@ -840,6 +839,15 @@ def main() -> int:
     except ConfigError as exc:
         log_error(f"Config error: {exc}")
         return 1
+
+    if args.list:
+        for command in commands_cfg.keys():
+            print(command)
+        return 0
+
+    if not args.commands:
+        log_warning("no commands specified, doing nothing...")
+        return 0
 
     ensure_dirs()
     had_errors = False
