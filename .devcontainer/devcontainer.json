@@ -1,6 +1,6 @@
 {
     "name": "Default",
-    "image": "mcr.microsoft.com/devcontainers/universal:noble",
+    "image": "ghcr.io/kdeal/devenv-cs:latest",
     "features": {
         "sshd": "latest"
     }
