@@ -10,4 +10,6 @@ __pycache__/
 .mypy_cache/
 .vscode/
 
+.jj/
+
 /kd_tmp/

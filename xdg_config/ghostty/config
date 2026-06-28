@@ -2,8 +2,11 @@ font-family = Iosevka Term
 theme = light:everforest_light,dark:everforest_dark
 macos-titlebar-style = tabs
 
+scrollback-limit = 5000000
+
 shell-integration-features = no-cursor
 window-inherit-working-directory = false
+tab-inherit-working-directory = false
 
 keybind = super+-=unbind
 keybind = super+shift+d=text:\n~.\n
