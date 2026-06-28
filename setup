@@ -13,6 +13,9 @@ done
 mkdir -p $HOME/.config
 ls xdg_config | xargs -I+ ln -s "$HERE/xdg_config/+" $HOME/.config/
 
+mkdir -p $HOME/.local/bin
+ls bin | xargs -I+ ln -s "$HERE/bin/+" $HOME/.local/bin/
+
 # Need to use the full path because conda packages special infocmp and tic
 # versions that use the wrong terminfo databases
 if ! /bin/infocmp xterm-ghostty >/dev/null 2>&1; then
@@ -20,7 +23,7 @@ if ! /bin/infocmp xterm-ghostty >/dev/null 2>&1; then
 fi
 
 if [ ! -f "$HOME/.local/bin/fish" ]; then
-    python3 $HERE/scripts/cmd_install.py fish
+    ./bin/cmd-install fish
     # Installs the asset files
     $HOME/.local/bin/fish --install -c true
 fi

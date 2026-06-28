@@ -5,15 +5,15 @@ test:
 	python -m unittest discover -s tests
 
 lint:
-	ruff check --fix scripts tests
+	ruff check --fix bin/cmd-install tests
 
 format:
-	ruff format scripts tests
+	ruff format bin/cmd-install tests
 	stylua .
 	find . -name '*.fish' -exec fish_indent --write {} +
 	oxfmt
 
 typecheck:
-	ty check scripts tests
+	ty check bin/cmd-install tests
 
 check: test lint format typecheck
