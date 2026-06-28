@@ -72,7 +72,7 @@ return {
             require("mini.extra").setup()
 
             require("mini.misc").setup()
-            MiniMisc.setup_auto_root({ "Cargo.toml", "package.json", ".git" })
+            MiniMisc.setup_auto_root({ ".jj", "Cargo.toml", "package.json", ".git" })
             MiniMisc.setup_restore_cursor()
 
             -- Try out doing auto-pairs

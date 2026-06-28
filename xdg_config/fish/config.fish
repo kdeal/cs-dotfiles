@@ -1,3 +1,7 @@
+if test -d ~/.local/bin/
+    fish_add_path -p ~/.local/bin/
+end
+
 if status is-interactive
     # Use line when in insert mode
     set fish_cursor_insert line

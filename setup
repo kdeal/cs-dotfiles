@@ -20,7 +20,7 @@ if ! /bin/infocmp xterm-ghostty >/dev/null 2>&1; then
 fi
 
 if [ ! -f "$HOME/.local/bin/fish" ]; then
-    python $HERE/scripts/cmd_install.py fish
+    python3 $HERE/scripts/cmd_install.py fish
     # Installs the asset files
     $HOME/.local/bin/fish --install -c true
 fi

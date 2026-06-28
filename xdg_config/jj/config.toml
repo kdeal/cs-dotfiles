@@ -1,0 +1,36 @@
+[user]
+name = "Kyle Deal"
+email = "kdeal@kyledeal.com"
+
+[templates]
+# Template that adds the diff to the commit
+draft_commit_description = '''
+concat(
+  description,
+  surround(
+    "\nJJ: This commit contains the following files:\n", "",
+    indent("JJ:    ", diff.summary()),
+  ),
+  surround(
+    "\nJJ: With this many changes:\n", "",
+    indent("JJ:    ", diff.stat(72)),
+  ),
+  "\n",
+  "JJ: ignore-rest\n",
+  diff.git(),
+)
+'''
+
+[[--scope]]
+--when.commands = ["diff", "show"]
+[--scope.ui]
+pager = "delta"
+diff-formatter = ":git"
+
+[ui]
+diff-editor = ":builtin"
+default-command = "status"
+
+[aliases]
+push = ["git", "push"]
+fetch = ["git", "fetch"]
