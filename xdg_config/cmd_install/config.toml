@@ -271,10 +271,6 @@ packages = ["vscode-langservers-extracted"]
 type = "npm_global"
 packages = ["opencode-ai@latest"]
 
-[commands.copilot-language-server]
-type = "npm_global"
-packages = ["@github/copilot-language-server"]
-
 [commands.gopls]
 type = "go_install"
 package = "golang.org/x/tools/gopls@latest"
