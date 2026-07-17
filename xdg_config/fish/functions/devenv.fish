@@ -12,7 +12,7 @@ function devenv
         end
     end
 
-    set -l packages bat delta eza fd nvim rg copilot-language-server
+    set -l packages bat delta eza fd nvim rg
     switch $env
         case go
             set -a packages gopls

@@ -21,7 +21,6 @@ return {
             -- Use a loop to conveniently both setup defined servers
             -- and map buffer local keybindings when the language server attaches
             local servers = {
-                copilot = {},
                 cssls = {},
                 gopls = {
                     gopls = {
