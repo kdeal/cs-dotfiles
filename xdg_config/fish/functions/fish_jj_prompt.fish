@@ -49,15 +49,6 @@ function fish_jj_prompt
             set ahead_count (count $ahead_entries)
         end
     end
-
-    # Check for conflicts on the working copy commit
-    set -l conflict_flag (jj log --no-graph --ignore-working-copy --color=never --revisions @ \
-        --template 'if(conflict, "1", "")' 2>/dev/null)
-    set -l has_conflicts 0
-    if test -n (string trim -- $conflict_flag)
-        set has_conflicts 1
-    end
-
     printf '('
 
     set_color brwhite
@@ -97,12 +88,6 @@ function fish_jj_prompt
     if test $ahead_count -gt 0
         set_color yellow
         printf ' ↑%s' $ahead_count
-        set_color normal
-    end
-
-    if test $has_conflicts -eq 1
-        set_color red
-        printf ' ×'
         set_color normal
     end
 
