@@ -18,6 +18,10 @@ function update_abbrs
         abbr -ga cat 'bat -p'
     end
 
+    if command -qs opencode
+        abbr -ga oc opencode
+    end
+
     if command -qs nvim
         abbr -ga edit nvim
     else
