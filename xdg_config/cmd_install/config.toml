@@ -205,35 +205,35 @@ sha256 = "3a5fef8220f3d482fd9f4c1d2655827c90e42197a11a28da6c7b42e7ddde8be6"
 
 [commands.oxfmt]
 type = "archive_binary"
-version = "1.51.0"
+version = "1.75.0"
 url = "https://github.com/oxc-project/oxc/releases/download/apps_v{version}/oxfmt-{arch}-{variant}.tar.gz"
 file_copies = [{ source = "oxfmt-{arch}-{variant}", destination = ".local/bin/oxfmt" }]
 
 [[commands.oxfmt.arch]]
 arch = "x86_64"
 variant = "unknown-linux-musl"
-sha256 = "1ec7b38d64e13872591106fb9e38b1d153d3a51e9a2020d924b477ff9122bc54"
+sha256 = "75d78826fa2de38ed681dd380d088c7ac28f5eacb587e9fc0c0d48177044af3a"
 
 [[commands.oxfmt.arch]]
 arch = "aarch64"
 variant = "unknown-linux-musl"
-sha256 = "fa3f6fc5dabf7bb02fd808a3cfffc6bf81388bcf8226fb4a3afca7c428a77f75"
+sha256 = "4861f24cf8c1d5dd6dfba7ecec6f27f1459c68faffaa099761e4f3b70ae1fcab"
 
 [commands.oxlint]
 type = "archive_binary"
-version = "1.51.0"
+version = "1.75.0"
 url = "https://github.com/oxc-project/oxc/releases/download/apps_v{version}/oxlint-{arch}-{variant}.tar.gz"
 file_copies = [{ source = "oxlint-{arch}-{variant}", destination = ".local/bin/oxlint" }]
 
 [[commands.oxlint.arch]]
 arch = "x86_64"
 variant = "unknown-linux-musl"
-sha256 = "77a39edb86f068832be60d73d400c848dc837e561977a458c27ca39d5b01ed43"
+sha256 = "0a4e9683c6f1b8a50a9d6a261ed706cc5c908e4fd3d927b7185db5a2be1659cf"
 
 [[commands.oxlint.arch]]
 arch = "aarch64"
 variant = "unknown-linux-musl"
-sha256 = "b2693264a9428c3179c0952a9452028015819ebb5da50ca58276bbe4507b46a0"
+sha256 = "03e85d824edfdd1d1a8bd0576e32613f021023722471272920a07af2b9f3cb40"
 
 [commands.tree-sitter]
 type = "archive_binary"

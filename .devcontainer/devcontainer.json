@@ -1,8 +1,7 @@
 {
-    "name": "Default",
-    "image": "ghcr.io/kdeal/devenv-cs:latest",
-    "features": {
-        "sshd": "latest"
-    }
+  "name": "Default",
+  "image": "ghcr.io/kdeal/devenv-cs:latest",
+  "features": {
+    "sshd": "latest"
+  }
 }
-

@@ -5,7 +5,10 @@
   "fidget.nvim": { "branch": "main", "commit": "7fa433a83118a70fe24c1ce88d5f0bd3453c0970" },
   "fzf": { "branch": "master", "commit": "f3ca0b136540c2e042462b31ed91e2f89b906658" },
   "guess-indent.nvim": { "branch": "main", "commit": "84a4987ff36798c2fc1169cbaff67960aed9776f" },
-  "indent-blankline.nvim": { "branch": "master", "commit": "d28a3f70721c79e3c5f6693057ae929f3d9c0a03" },
+  "indent-blankline.nvim": {
+    "branch": "master",
+    "commit": "d28a3f70721c79e3c5f6693057ae929f3d9c0a03"
+  },
   "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
   "lazydev.nvim": { "branch": "main", "commit": "5231c62aa83c2f8dc8e7ba957aa77098cda1257d" },
   "mini.nvim": { "branch": "main", "commit": "cad365c212fb1e332cb93fa8f72697125799d00a" },
@@ -21,9 +24,15 @@
   "snacks.nvim": { "branch": "main", "commit": "9912042fc8bca2209105526ac7534e9a0c2071b2" },
   "undotree": { "branch": "master", "commit": "6fa6b57cda8459e1e4b2ca34df702f55242f4e4d" },
   "vim-dadbod": { "branch": "master", "commit": "6d1d41da4873a445c5605f2005ad2c68c99d8770" },
-  "vim-dadbod-completion": { "branch": "master", "commit": "a8dac0b3cf6132c80dc9b18bef36d4cf7a9e1fe6" },
+  "vim-dadbod-completion": {
+    "branch": "master",
+    "commit": "a8dac0b3cf6132c80dc9b18bef36d4cf7a9e1fe6"
+  },
   "vim-dadbod-ui": { "branch": "master", "commit": "07e92e22114cc5b1ba4938d99897d85b58e20475" },
   "vim-eunuch": { "branch": "master", "commit": "e86bb794a1c10a2edac130feb0ea590a00d03f1e" },
   "vim-repeat": { "branch": "master", "commit": "65846025c15494983dafe5e3b46c8f88ab2e9635" },
-  "vim-visual-star-search": { "branch": "master", "commit": "7c32edb9e3c85d473d9be4dec721a4c9d5d4d69c" }
+  "vim-visual-star-search": {
+    "branch": "master",
+    "commit": "7c32edb9e3c85d473d9be4dec721a4c9d5d4d69c"
+  }
 }
