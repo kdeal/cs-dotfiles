@@ -132,3 +132,40 @@ From the repository root:
 ```sh
 npx --yes tsx --test pi/extensions/tests/questionnaire-rpc.test.ts
 ```
+
+## Subagent streaming
+
+`subagent/index.ts` forwards each child's `message_start`, `message_update`, and
+`message_end` events through the parent tool's `tool_execution_update` records:
+
+```ts
+if (record.type === "tool_execution_update" && record.toolName === "subagent") {
+  const stream = record.partialResult.details?.stream;
+  if (stream) {
+    // Route to an independent instance of the main agent's message renderer.
+    const childKey = `${record.toolCallId}:${stream.index}`;
+    handleMessageEvent(childKey, stream.event);
+  }
+}
+```
+
+`stream.index` is zero-based: `0` for single mode, the task-array index for parallel
+mode, and the chain-array index for chain mode. It distinguishes repeated uses of
+the same agent. `stream.event` is the original child JSON event, including text,
+thinking, and tool-call deltas. Treat `message_end` as authoritative, just as for
+the main Pi stream. Tool-result message lifecycles are forwarded too.
+
+These updates retain the existing `details.results` snapshots of completed
+messages; they do not add partial messages to those arrays. Replace snapshot
+state rather than appending it on every update. The `stream` field is transient
+and is not included in the final tool result. Clients should discard unfinished
+streaming state when the parent tool finishes or fails.
+
+Streaming currently sends the result snapshots with each delta, so clients
+should read stdout continuously and batch display redraws as needed.
+
+### Tests
+
+```sh
+npx --yes tsx --test pi/extensions/tests/subagent-stream.test.ts
+```

@@ -23,6 +23,7 @@ import { StringEnum } from "@earendil-works/pi-ai";
 import {
 	CONFIG_DIR_NAME,
 	type ExtensionAPI,
+	type JsonAgentSessionEvent,
 	formatReadLineRange,
 	getAgentDir,
 	getMarkdownTheme,
@@ -164,6 +165,11 @@ interface SubagentDetails {
 	agentScope: AgentScope;
 	projectAgentsDir: string | null;
 	results: SingleResult[];
+	/** Transient child message event; index is zero-based within this tool invocation. */
+	stream?: {
+		index: number;
+		event: Extract<JsonAgentSessionEvent, { type: "message_start" | "message_update" | "message_end" }>;
+	};
 }
 
 function getFinalOutput(messages: Message[]): string {
@@ -320,11 +326,14 @@ async function runSingleAgent(
 		step,
 	};
 
-	const emitUpdate = () => {
+	const emitUpdate = (event?: NonNullable<SubagentDetails["stream"]>["event"]) => {
 		if (onUpdate) {
 			onUpdate({
 				content: [{ type: "text", text: getFinalOutput(currentResult.messages) || "(running...)" }],
-				details: makeDetails([currentResult]),
+				details: {
+					...makeDetails([currentResult]),
+					...(event ? { stream: { index: 0, event } } : {}),
+				},
 			});
 		}
 	};
@@ -347,6 +356,7 @@ async function runSingleAgent(
 				shell: false,
 				stdio: ["ignore", "pipe", "pipe"],
 			});
+			proc.stdout.setEncoding("utf8");
 			let buffer = "";
 
 			const processLine = (line: string) => {
@@ -377,7 +387,10 @@ async function runSingleAgent(
 						if (msg.stopReason) currentResult.stopReason = msg.stopReason;
 						if (msg.errorMessage) currentResult.errorMessage = msg.errorMessage;
 					}
-					emitUpdate();
+				}
+
+				if (event.type === "message_start" || event.type === "message_update" || event.type === "message_end") {
+					emitUpdate(event);
 				}
 
 				if (event.type === "tool_result_end" && event.message) {
@@ -386,8 +399,8 @@ async function runSingleAgent(
 				}
 			};
 
-			proc.stdout.on("data", (data) => {
-				buffer += data.toString();
+			proc.stdout.on("data", (data: string) => {
+				buffer += data;
 				const lines = buffer.split("\n");
 				buffer = lines.pop() || "";
 				for (const line of lines) processLine(line);
@@ -563,7 +576,12 @@ export default function (pi: ExtensionAPI) {
 									const allResults = [...results, currentResult];
 									onUpdate({
 										content: partial.content,
-										details: makeDetails("chain")(allResults),
+										details: {
+											...makeDetails("chain")(allResults),
+											...(partial.details?.stream
+												? { stream: { ...partial.details.stream, index: i } }
+												: {}),
+										},
 									});
 								}
 							}
@@ -628,7 +646,7 @@ export default function (pi: ExtensionAPI) {
 					};
 				}
 
-				const emitParallelUpdate = () => {
+				const emitParallelUpdate = (stream?: SubagentDetails["stream"]) => {
 					if (onUpdate) {
 						const running = allResults.filter((r) => r.exitCode === -1).length;
 						const done = allResults.filter((r) => r.exitCode !== -1).length;
@@ -636,7 +654,10 @@ export default function (pi: ExtensionAPI) {
 							content: [
 								{ type: "text", text: `Parallel: ${done}/${allResults.length} done, ${running} running...` },
 							],
-							details: makeDetails("parallel")([...allResults]),
+							details: {
+								...makeDetails("parallel")([...allResults]),
+								...(stream ? { stream } : {}),
+							},
 						});
 					}
 				};
@@ -655,7 +676,9 @@ export default function (pi: ExtensionAPI) {
 						(partial) => {
 							if (partial.details?.results[0]) {
 								allResults[index] = partial.details.results[0];
-								emitParallelUpdate();
+								emitParallelUpdate(
+									partial.details.stream ? { ...partial.details.stream, index } : undefined,
+								);
 							}
 						},
 						makeDetails("parallel"),
